@@ -5,7 +5,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/mzz2017/juicity/cmd/internal"
 	"github.com/mzz2017/juicity/config"
 	"github.com/mzz2017/juicity/pkg/log"
 	"github.com/mzz2017/juicity/server"
@@ -31,9 +30,6 @@ var (
 					Fatal().
 					Msg("Argument \"--config\" or \"-c\" is required but not provided.")
 			}
-
-			// Require "sudo" if necessary.
-			internal.AutoSu()
 
 			// Read config from --config cfgFile.
 			conf, err := config.ReadConfig(cfgFile)

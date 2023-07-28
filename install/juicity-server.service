@@ -1,0 +1,17 @@
+[Unit]
+Description=juicity-server Service
+Documentation=https://github.com/juicity/juicity
+After=network.target nss-lookup.target
+
+[Service]
+User=nobody
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+ExecStart=/usr/bin/juicity-server run -c /etc/juicity/server.json
+Restart=on-failure
+RestartSec=10
+LimitNPROC=512
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
