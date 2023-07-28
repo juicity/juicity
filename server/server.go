@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mzz2017/juicity/pkg/log"
+	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"

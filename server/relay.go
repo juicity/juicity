@@ -6,8 +6,8 @@ import (
 	"net/netip"
 	"time"
 
+	"github.com/juicity/juicity/pkg/log"
 	"github.com/miekg/dns"
-	"github.com/mzz2017/juicity/pkg/log"
 	"github.com/mzz2017/softwind/netproxy"
 	io2 "github.com/mzz2017/softwind/pkg/zeroalloc/io"
 	"github.com/mzz2017/softwind/pool"

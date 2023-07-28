@@ -6,16 +6,15 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/mzz2017/juicity/config"
-	"github.com/mzz2017/juicity/pkg/log"
-	"github.com/mzz2017/juicity/server"
+	"github.com/juicity/juicity/config"
+	"github.com/juicity/juicity/pkg/log"
+	"github.com/juicity/juicity/server"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
-	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "Disable timestamp.")
 }
 
 var (

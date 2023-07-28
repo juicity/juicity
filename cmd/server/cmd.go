@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mzz2017/juicity/config"
+	"github.com/juicity/juicity/config"
 	"github.com/spf13/cobra"
 )
 
