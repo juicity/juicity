@@ -11,7 +11,7 @@ In most cases, compared to tuic v5, juicity has following advantages:
 
 ## [juicity-server](cmd/server)
 
-## Link format
+## Link Format
 
 Full parameters:
 ```

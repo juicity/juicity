@@ -73,9 +73,10 @@ var (
 
 func Serve(conf *config.Config) error {
 	s, err := server.New(&server.Options{
-		Users:       conf.Users,
-		Certificate: conf.Certificate,
-		PrivateKey:  conf.PrivateKey,
+		Users:             conf.Users,
+		Certificate:       conf.Certificate,
+		PrivateKey:        conf.PrivateKey,
+		CongestionControl: conf.CongestionControl,
 	})
 	if err != nil {
 		return err

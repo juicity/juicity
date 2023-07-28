@@ -34,9 +34,10 @@ var (
 )
 
 type Options struct {
-	Users       map[string]string
-	Certificate string
-	PrivateKey  string
+	Users             map[string]string
+	Certificate       string
+	PrivateKey        string
+	CongestionControl string
 }
 
 type Server struct {
@@ -67,7 +68,7 @@ func New(opts *Options) (*Server, error) {
 			Certificates: []tls.Certificate{cert},
 		},
 		maxOpenIncomingStreams: 100,
-		congestionControl:      "bbr",
+		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
 	}, nil
