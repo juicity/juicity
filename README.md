@@ -20,7 +20,7 @@ juicity://uuid:password@example.com:port?congestion_control=cubic&sni=example.co
 
 Mini parameters:
 ```
-tuic://uuid:password@example.com:port?udp_relay_mode=native&congestion_control=cubic
+juicity://uuid:password@example.com:port?udp_relay_mode=native&congestion_control=cubic
 ```
 
 ## Clients
