@@ -17,7 +17,7 @@ go run -c config.json
 ```json
 {
     "listen": ":23182",
-    "users: {
+    "users": {
         "00000000-0000-0000-0000-000000000000": "my_password",
     },
     "certificate": "/path/to/fullchain.cer",
