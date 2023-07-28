@@ -81,6 +81,8 @@ func Serve(conf *config.Config) error {
 	if conf.Listen == "" {
 		return fmt.Errorf(`"Listen" is required`)
 	}
+	log.Logger().Info().
+		Msg("Listen at " + conf.Listen)
 	if err = s.Serve(conf.Listen); err != nil {
 		return err
 	}
