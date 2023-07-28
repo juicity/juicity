@@ -1,4 +1,4 @@
-juice-server:
+juicity-server:
 	go build -o $@ -trimpath -ldflags "-s -w" ./cmd/server
 
-.PHONY: juice-server
+.PHONY: juicity-server

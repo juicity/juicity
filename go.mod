@@ -1,10 +1,10 @@
-module github.com/mzz2017/juice
+module github.com/mzz2017/juicity
 
 go 1.20
 
 require (
 	github.com/mzz2017/quic-go v0.0.0-20230706143320-cc858d4932b7
-	github.com/mzz2017/softwind v0.0.0-20230728154514-56fe6391a4bf
+	github.com/mzz2017/softwind v0.0.0-20230728155247-76e5378c4d7b
 	github.com/rs/zerolog v1.29.1
 )
 

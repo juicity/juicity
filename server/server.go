@@ -12,12 +12,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mzz2017/juice/pkg/log"
+	"github.com/mzz2017/juicity/pkg/log"
 
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
 	"github.com/mzz2017/softwind/protocol/direct"
-	"github.com/mzz2017/softwind/protocol/juice"
+	"github.com/mzz2017/softwind/protocol/juicity"
 	"github.com/mzz2017/softwind/protocol/tuic"
 	"github.com/mzz2017/softwind/protocol/tuic/common"
 )
@@ -139,7 +139,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 
 func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stream quic.Stream) error {
 	defer stream.Close()
-	lConn := juice.NewConn(stream, nil, nil)
+	lConn := juicity.NewConn(stream, nil, nil)
 	// Read the header and initiate the metadata
 	_, err := lConn.Read(nil)
 	if err != nil {
@@ -158,7 +158,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
 		log.Logger().Debug().
 			Str("target", target).
-			Msg("juice received a tcp request")
+			Msg("juicity received a tcp request")
 		rConn, err := dialer.Dial("tcp", target)
 		if err != nil {
 			var netErr net.Error
@@ -180,9 +180,9 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		}
 	case "udp":
 		log.Logger().Debug().
-			Msg("juice received a udp connection")
+			Msg("juicity received a udp connection")
 		// can dial any target
-		if err = relayUoT(dialer, &juice.PacketConn{
+		if err = relayUoT(dialer, &juicity.PacketConn{
 			Conn: lConn,
 		}); err != nil {
 			var netErr net.Error
@@ -210,7 +210,7 @@ func (s *Server) handleAuth(ctx context.Context, conn quic.Connection) (uuid *uu
 		return nil, err
 	}
 	switch v[0] {
-	case juice.Version0:
+	case juicity.Version0:
 		commandHead, err := tuic.ReadCommandHead(r)
 		if err != nil {
 			return nil, fmt.Errorf("ReadCommandHead: %w", err)

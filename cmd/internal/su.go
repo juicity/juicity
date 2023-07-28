@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/mzz2017/juice/pkg/log"
+	"github.com/mzz2017/juicity/pkg/log"
 )
 
 func AutoSu() {

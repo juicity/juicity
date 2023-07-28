@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/mzz2017/juice/pkg/log"
+	"github.com/mzz2017/juicity/pkg/log"
 	"github.com/mzz2017/softwind/netproxy"
 	io2 "github.com/mzz2017/softwind/pkg/zeroalloc/io"
 	"github.com/mzz2017/softwind/pool"
-	"github.com/mzz2017/softwind/protocol/juice"
+	"github.com/mzz2017/softwind/protocol/juicity"
 )
 
 const (
@@ -47,7 +47,7 @@ func RelayTCP(lConn, rConn netproxy.Conn) (err error) {
 	return <-eCh
 }
 
-func relayConnToUDP(dst netproxy.PacketConn, src *juice.PacketConn, timeout time.Duration) (err error) {
+func relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout time.Duration) (err error) {
 	var n int
 	var addr netip.AddrPort
 	buf := pool.GetFullCap(EthernetMtu)
@@ -72,7 +72,7 @@ func relayConnToUDP(dst netproxy.PacketConn, src *juice.PacketConn, timeout time
 	}
 }
 
-func relayUoT(rDialer netproxy.Dialer, lConn *juice.PacketConn) (err error) {
+func relayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
 	buf := pool.GetFullCap(EthernetMtu)
 	defer pool.Put(buf)
 	lConn.SetReadDeadline(time.Now().Add(DefaultNatTimeout))

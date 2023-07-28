@@ -5,16 +5,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/mzz2017/juice/cmd/internal"
-	"github.com/mzz2017/juice/config"
-	"github.com/mzz2017/juice/pkg/log"
-	"github.com/mzz2017/juice/server"
+	"github.com/mzz2017/juicity/cmd/internal"
+	"github.com/mzz2017/juicity/config"
+	"github.com/mzz2017/juicity/pkg/log"
+	"github.com/mzz2017/juicity/server"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juice-server.")
+	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "Disable timestamp.")
 }
 
@@ -24,7 +24,7 @@ var (
 
 	runCmd = &cobra.Command{
 		Use:   "run",
-		Short: "To run juice-server in the foreground.",
+		Short: "To run juicity-server in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
 			if cfgFile == "" {
 				log.Logger().
