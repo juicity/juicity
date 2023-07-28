@@ -1,0 +1,4 @@
+* @juicity/governance
+docs/** @juicity/docs
+CHANGELOGS.md @juicity/docs @juicity/release
+/.github/** @juicity/infra
