@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/mzz2017/quic-go v0.0.0-20230706143320-cc858d4932b7
-	github.com/mzz2017/softwind v0.0.0-20230723121615-456e7588fb15
+	github.com/mzz2017/softwind v0.0.0-20230728154514-56fe6391a4bf
 	github.com/rs/zerolog v1.29.1
 )
 
@@ -34,4 +34,4 @@ require (
 	golang.org/x/tools v0.11.0 // indirect
 )
 
-replace github.com/mzz2017/softwind => ../softwind
+// replace github.com/mzz2017/softwind => ../softwind
