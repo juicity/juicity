@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -76,6 +77,9 @@ func Serve(conf *config.Config) error {
 	})
 	if err != nil {
 		return err
+	}
+	if conf.Listen == "" {
+		return fmt.Errorf(`"Listen" is required`)
 	}
 	if err = s.Serve(conf.Listen); err != nil {
 		return err
