@@ -23,8 +23,10 @@ make CGO_ENABLED=0 juicity-server
     "certificate": "/path/to/fullchain.cer",
     "private_key": "/path/to/private.key",
     "congestion_control": "bbr",
+    "fwmark": 0x1000,
     "log_level": "info"
 }
 ```
 
 - Optional values of `congestion_control`: cubic, bbr, new_reno.
+- `fwmark` is useful for iptables/nft.

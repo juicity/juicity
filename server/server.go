@@ -16,6 +16,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
+	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/protocol/direct"
 	"github.com/mzz2017/softwind/protocol/juicity"
 	"github.com/mzz2017/softwind/protocol/tuic"
@@ -38,6 +39,7 @@ type Options struct {
 	Certificate       string
 	PrivateKey        string
 	CongestionControl string
+	Fwmark            int
 }
 
 type Server struct {
@@ -46,6 +48,7 @@ type Server struct {
 	congestionControl      string
 	cwnd                   int
 	users                  map[uuid.UUID]string
+	fwmark                 int
 }
 
 func New(opts *Options) (*Server, error) {
@@ -71,6 +74,7 @@ func New(opts *Options) (*Server, error) {
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
+		fwmark:                 opts.Fwmark,
 	}, nil
 }
 
@@ -160,7 +164,11 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		log.Logger().Debug().
 			Str("target", target).
 			Msg("juicity received a tcp request")
-		rConn, err := dialer.Dial("tcp", target)
+		magicNetwork := netproxy.MagicNetwork{
+			Network: "tcp",
+			Mark:    uint32(s.fwmark),
+		}
+		rConn, err := dialer.Dial(magicNetwork.Encode(), target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -183,9 +191,11 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		log.Logger().Debug().
 			Msg("juicity received a udp connection")
 		// can dial any target
-		if err = RelayUoT(dialer, &juicity.PacketConn{
-			Conn: lConn,
-		}); err != nil {
+		if err = RelayUoT(
+			dialer,
+			&juicity.PacketConn{Conn: lConn},
+			s.fwmark,
+		); err != nil {
 			var netErr net.Error
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) {
 				return nil // ignore i/o timeout
