@@ -25,6 +25,5 @@ juicity://uuid:password@example.com:port?congestion_control=cubic
 
 ## Clients
 
-### Linux
-
-- [daeuniverse/dae](https://github.com/daeuniverse/dae/pull/248).
+- [juicity/juicity-client](cmd/client) (Official)
+- [daeuniverse/dae](https://github.com/daeuniverse/dae/pull/248) (Official, Linux Only)

@@ -8,7 +8,12 @@ else
 	VERSION ?= unstable-$(date).r$(count).$(commit)
 endif
 
-juicity-server:
-	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/cmd.Version=$(VERSION)" ./cmd/server
+all: juicity-server juicity-client
 
-.PHONY: juicity-server
+juicity-server:
+	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" ./cmd/server
+
+juicity-client:
+	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" ./cmd/client
+
+.PHONY: juicity-server juicity-client all

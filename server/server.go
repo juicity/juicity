@@ -183,7 +183,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		log.Logger().Debug().
 			Msg("juicity received a udp connection")
 		// can dial any target
-		if err = relayUoT(dialer, &juicity.PacketConn{
+		if err = RelayUoT(dialer, &juicity.PacketConn{
 			Conn: lConn,
 		}); err != nil {
 			var netErr net.Error

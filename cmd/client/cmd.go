@@ -7,9 +7,9 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:     "juicity-server [flags] [command [argument ...]]",
-		Short:   "juicity-server is a quic-based proxy server.",
-		Long:    "juicity-server is a quic-based proxy server.",
+		Use:     "juicity-client [flags] [command [argument ...]]",
+		Short:   "juicity-client is a quic-based proxy client.",
+		Long:    "juicity-client is a quic-based proxy client.",
 		Version: config.Version,
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
