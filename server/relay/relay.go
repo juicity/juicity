@@ -1,4 +1,4 @@
-package server
+package relay
 
 import (
 	"errors"
@@ -6,12 +6,13 @@ import (
 	"net/netip"
 	"time"
 
-	"github.com/juicity/juicity/pkg/log"
 	"github.com/miekg/dns"
 	"github.com/mzz2017/softwind/netproxy"
 	io2 "github.com/mzz2017/softwind/pkg/zeroalloc/io"
 	"github.com/mzz2017/softwind/pool"
 	"github.com/mzz2017/softwind/protocol/juicity"
+
+	"github.com/juicity/juicity/pkg/log"
 )
 
 const (
@@ -25,7 +26,23 @@ type WriteCloser interface {
 	CloseWrite() error
 }
 
-func RelayTCP(lConn, rConn netproxy.Conn) (err error) {
+type relay struct {
+	logger log.Logger
+}
+
+type Relay interface {
+	RelayTCP(lConn, rConn netproxy.Conn) (err error)
+	RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error)
+	SelectTimeout(packet []byte) time.Duration
+	RelayUDP(dst *net.UDPConn, laddr net.Addr, src net.PacketConn, timeout time.Duration) (err error)
+	RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration, bufSize int) (err error)
+}
+
+func NewRelay(logger log.Logger) Relay {
+	return &relay{logger: logger}
+}
+
+func (r *relay) RelayTCP(lConn, rConn netproxy.Conn) (err error) {
 	eCh := make(chan error, 1)
 	go func() {
 		_, e := io2.Copy(rConn, lConn)
@@ -47,7 +64,7 @@ func RelayTCP(lConn, rConn netproxy.Conn) (err error) {
 	return <-eCh
 }
 
-func relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout time.Duration) (err error) {
+func (r *relay) relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout time.Duration) (err error) {
 	var n int
 	var addr netip.AddrPort
 	buf := pool.GetFullCap(EthernetMtu)
@@ -62,9 +79,7 @@ func relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout ti
 		_, err = dst.WriteTo(buf[:n], addr.String())
 		// WARNING: if the dst is an pre-connected conn, Write should be invoked here.
 		if errors.Is(err, net.ErrWriteToConnected) {
-			log.Logger().Error().
-				Err(err).
-				Msg("relayConnToUDP")
+			r.logger.Error().Err(err).Msg("relayConnToUDP")
 		}
 		if err != nil {
 			return
@@ -72,7 +87,7 @@ func relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout ti
 	}
 }
 
-func RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
+func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
 	buf := pool.GetFullCap(EthernetMtu)
 	defer pool.Put(buf)
 	lConn.SetReadDeadline(time.Now().Add(DefaultNatTimeout))
@@ -92,9 +107,7 @@ func RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
 	_ = rConn.SetWriteDeadline(time.Now().Add(DefaultNatTimeout)) // should keep consistent
 	_, err = rConn.WriteTo(buf[:n], addr.String())
 	if errors.Is(err, net.ErrWriteToConnected) {
-		log.Logger().Error().
-			Err(err).
-			Msg("relayConnToUDP")
+		r.logger.Error().Err(err).Msg("relayConnToUDP")
 	}
 	if err != nil {
 		return
@@ -102,11 +115,11 @@ func RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
 
 	eCh := make(chan error, 1)
 	go func() {
-		e := relayConnToUDP(rConn, lConn, DefaultNatTimeout)
+		e := r.relayConnToUDP(rConn, lConn, DefaultNatTimeout)
 		rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		eCh <- e
 	}()
-	e := RelayUDPToConn(lConn, rConn, DefaultNatTimeout, len(buf))
+	e := r.RelayUDPToConn(lConn, rConn, DefaultNatTimeout, len(buf))
 	lConn.CloseWrite()
 	lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	if e != nil {
@@ -121,7 +134,7 @@ func RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
 }
 
 // SelectTimeout selects an appropriate timeout for UDP packet.
-func SelectTimeout(packet []byte) time.Duration {
+func (r *relay) SelectTimeout(packet []byte) time.Duration {
 	var dMessage dns.Msg
 	if err := dMessage.Unpack(packet); err != nil {
 		return DefaultNatTimeout
@@ -129,7 +142,7 @@ func SelectTimeout(packet []byte) time.Duration {
 	return DnsQueryTimeout
 }
 
-func RelayUDP(dst *net.UDPConn, laddr net.Addr, src net.PacketConn, timeout time.Duration) (err error) {
+func (r *relay) RelayUDP(dst *net.UDPConn, laddr net.Addr, src net.PacketConn, timeout time.Duration) (err error) {
 	var n int
 	buf := pool.GetFullCap(EthernetMtu)
 	defer pool.Put(buf)
@@ -147,7 +160,7 @@ func RelayUDP(dst *net.UDPConn, laddr net.Addr, src net.PacketConn, timeout time
 	}
 }
 
-func RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration, bufSize int) (err error) {
+func (r *relay) RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration, bufSize int) (err error) {
 	var n int
 	var addr netip.AddrPort
 	buf := pool.GetFullCap(bufSize)
