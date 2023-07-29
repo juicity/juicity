@@ -61,6 +61,16 @@ jobs:
           - goos: darwin
             goarch: arm64
           # END Darwin ARM64 AMD64
+          # BEGIN Windows ARM64 AMD64
+          - goos: windows
+            goarch: amd64
+          - goos: windows
+            goarch: arm64
+          # END Windows ARM64 AMD64
+          # BEGIN Android ARM64
+          - goos: android
+            goarch: arm64
+          # END Android ARM64
       fail-fast: false
 
     runs-on: ubuntu-latest
@@ -106,12 +116,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.19'
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y clang-15 llvm-15
+          go-version: '^1.20'
 
       - name: Get project dependencies
         run: |
@@ -126,13 +131,20 @@ jobs:
           export CGO_ENABLED=0
           export GOFLAGS="-trimpath -modcacherw"
           export VERSION=${{ steps.get_version.outputs.VERSION }}
-          make
+          make all
           cp ./juicity-server ./build/
           cp ./juicity-client ./build/
+
+      - name: Rename windows name
+        if: matrix.goos == 'windows'
+        run: |
+          mv ./build/juicity-server ./build/juicity-server.exe
+          mv ./build/juicity-client ./build/juicity-client.exe
 
       - name: Copy systemd service
         if: matrix.goos == 'linux'
         run: |
+          cp ./install/juicity-client.service ./build/
           cp ./install/juicity-server.service ./build/
 
       - name: Smoke test
