@@ -26,8 +26,7 @@ func init() {
 }
 
 var (
-	cfgFile          string
-	disableTimestamp bool
+	cfgFile string
 
 	runCmd = &cobra.Command{
 		Use:   "run",
