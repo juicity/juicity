@@ -61,13 +61,16 @@ var (
 	}
 )
 
-func Serve(conf *config.Config) error {
-	fwmark, err := strconv.ParseUint(conf.Fwmark, 0, 32)
-	if err != nil {
-		return fmt.Errorf("parse fwmark: %w", err)
-	}
-	if uint64(fwmark) > math.MaxInt || uint64(fwmark) > math.MaxUint32 {
-		return fmt.Errorf("fwmark is too large")
+func Serve(conf *config.Config) (err error) {
+	var fwmark uint64
+	if conf.Fwmark != "" {
+		fwmark, err = strconv.ParseUint(conf.Fwmark, 0, 32)
+		if err != nil {
+			return fmt.Errorf("parse fwmark: %w", err)
+		}
+		if fwmark > math.MaxInt || fwmark > math.MaxUint32 {
+			return fmt.Errorf("fwmark is too large")
+		}
 	}
 	s, err := server.New(&server.Options{
 		Users:             conf.Users,
