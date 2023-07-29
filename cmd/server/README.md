@@ -22,7 +22,8 @@ go run -c config.json
     },
     "certificate": "/path/to/fullchain.cer",
     "private_key": "/path/to/private.key",
-    "congestion_control": "bbr"
+    "congestion_control": "bbr",
+    "log_level": "info"
 }
 ```
 
