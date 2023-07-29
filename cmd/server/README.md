@@ -40,10 +40,12 @@ Full configuration:
     "certificate": "/path/to/fullchain.cer",
     "private_key": "/path/to/private.key",
     "congestion_control": "bbr",
+    "fwmark": 0x1000,
     "send_through": "113.25.132.3",
     "log_level": "info"
 }
 ```
 
 - Optional values of `congestion_control`: cubic, bbr, new_reno.
+- `fwmark` is useful for iptables/nft.
 - `send_through` is the interface IP to specify to use.

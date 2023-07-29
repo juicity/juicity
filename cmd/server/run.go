@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"os/signal"
 	"syscall"
@@ -60,11 +61,15 @@ var (
 )
 
 func Serve(conf *config.Config) error {
+	if uint64(conf.Fwmark) > math.MaxInt || uint64(conf.Fwmark) > math.MaxUint32 {
+		return fmt.Errorf("fwmark is too large")
+	}
 	s, err := server.New(&server.Options{
 		Users:             conf.Users,
 		Certificate:       conf.Certificate,
 		PrivateKey:        conf.PrivateKey,
 		CongestionControl: conf.CongestionControl,
+		Fwmark:            conf.Fwmark,
 		SendThrough:       conf.SendThrough,
 	})
 	if err != nil {

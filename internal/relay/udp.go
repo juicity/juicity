@@ -68,7 +68,7 @@ func (r *relay) SelectTimeout(packet []byte) time.Duration {
 }
 
 // RelayUoT relays UDP traffict over TCP
-func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
+func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwmark int) (err error) {
 	buf := pool.GetFullCap(EthernetMtu)
 	defer pool.Put(buf)
 	lConn.SetReadDeadline(time.Now().Add(DefaultNatTimeout))
@@ -76,10 +76,15 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (er
 	if err != nil {
 		return
 	}
+
+	magicNetwork := netproxy.MagicNetwork{
+		Network: "udp",
+		Mark:    uint32(fwmark),
+	}
+	conn, err := rDialer.Dial(magicNetwork.Encode(), addr.String())
 	r.logger.Debug().
 		Str("target", addr.String()).
 		Msg("juicity received a udp request")
-	conn, err := rDialer.Dial("udp", addr.String())
 	if err != nil {
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {

@@ -41,6 +41,7 @@ type Options struct {
 	Certificate       string
 	PrivateKey        string
 	CongestionControl string
+	Fwmark            int
 	SendThrough       string
 }
 
@@ -53,6 +54,7 @@ type Server struct {
 	congestionControl      string
 	cwnd                   int
 	users                  map[uuid.UUID]string
+	fwmark                 int
 }
 
 func New(opts *Options) (*Server, error) {
@@ -89,6 +91,7 @@ func New(opts *Options) (*Server, error) {
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
+		fwmark:                 opts.Fwmark,
 	}, nil
 }
 
@@ -177,7 +180,11 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		s.logger.Debug().
 			Str("target", target).
 			Msg("juicity received a tcp request")
-		rConn, err := s.dialer.Dial("tcp", target)
+		magicNetwork := netproxy.MagicNetwork{
+			Network: "tcp",
+			Mark:    uint32(s.fwmark),
+		}
+		rConn, err := s.dialer.Dial(magicNetwork.Encode(), target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -198,9 +205,11 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		}
 	case "udp":
 		// can dial any target
-		if err = s.relay.RelayUoT(s.dialer, &juicity.PacketConn{
-			Conn: lConn,
-		}); err != nil {
+		if err = s.relay.RelayUoT(
+			s.dialer,
+			&juicity.PacketConn{Conn: lConn},
+			s.fwmark,
+		); err != nil {
 			var netErr net.Error
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) {
 				return nil // ignore i/o timeout
