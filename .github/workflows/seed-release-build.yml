@@ -10,7 +10,7 @@
 # This is a open-source software, liscensed under the AGPL-3.0 License.
 # See /License for more information.
 
-name: Seed Build
+name: Seed Release Build
 
 on:
   workflow_call:
@@ -19,12 +19,6 @@ on:
         type: string
         required: true
         default: ${{ github.ref }}
-      pr-number:
-        type: number
-        required: false
-      build-type:
-        type: string
-        description: "[pr-build,main-build,daily-build]"
 
 jobs:
   build:
@@ -91,19 +85,11 @@ jobs:
       - name: Get the version
         id: get_version
         env:
-          REF: ${{ inputs.ref }}
+          REF: ${{ inputs.tag }}
         run: |
-          date=$(git log -1 --format="%cd" --date=short | sed s/-//g)
-          commit=$(echo ${REF} | cut -c1-6)
-          if [[ "${{ inputs.build-type }}" == "pr-build" ]]; then
-            count=$(git rev-list --count origin/main..HEAD)
-            version="unstable-${date}.pr-${{ inputs.pr-number }}.r${count}.${commit}"
-          else
-            count=$(git rev-list --count HEAD)
-            version="unstable-${date}.r${count}.${commit}"
-          fi
-          echo "VERSION=${version}" >> $GITHUB_OUTPUT
-          echo "VERSION=${version}" >> $GITHUB_ENV
+          version=${REF}
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+          echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: Show workflow information
         id: get_filename
@@ -125,13 +111,24 @@ jobs:
           find ./go-mod/ -maxdepth 1 ! -name "cache" ! -name "go-mod" -exec rm -rf {} \;
           sed -i 's/#export GOMODCACHE=$(PWD)\/go-mod/export GOMODCACHE=$(PWD)\/go-mod/' Makefile
 
+      - name: Create full source ZIP archive and Signature
+        if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
+        run: |
+          zip -9vr juicity-full-src.zip . -x .git/\*
+          FILE=./juicity-full-src.zip
+          echo "$(md5sum $FILE)""  md5" >> $FILE.dgst
+          echo "$(shasum -a 1 $FILE)""  sha1" >> $FILE.dgst
+          echo "$(shasum -a 256 $FILE)""  sha256" >> $FILE.dgst
+          echo "$(shasum -a 512 $FILE)""  sha512" >> $FILE.dgst
+
       - name: Build juicity
         run: |
           mkdir -p ./build/
           export CGO_ENABLED=0
           export GOFLAGS="-trimpath -modcacherw"
           export VERSION=${{ steps.get_version.outputs.VERSION }}
-          make all
+          make
+          cp ./install/juicity-server.service ./build/
           cp ./juicity-server ./build/
           cp ./juicity-client ./build/
 
@@ -159,17 +156,16 @@ jobs:
           zip -9vr ../juicity-$ASSET_NAME.zip .
           popd || exit 1
           FILE=./juicity-$ASSET_NAME.zip
-          DGST=$FILE.dgst
-          md5sum        $FILE >>$DGST
-          shasum -a 1   $FILE >>$DGST
-          shasum -a 256 $FILE >>$DGST
-          shasum -a 512 $FILE >>$DGST
+          echo "$(md5sum $FILE)""  md5" >> $FILE.dgst
+          echo "$(shasum -a 1 $FILE)""  sha1" >> $FILE.dgst
+          echo "$(shasum -a 256 $FILE)""  sha256" >> $FILE.dgst
+          echo "$(shasum -a 512 $FILE)""  sha512" >> $FILE.dgst
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: juicity-${{ steps.get_filename.outputs.ASSET_NAME }}.zip
-          path: build/*
+          path: ./*.zip*
 
       # - name: Report result
       #   uses: daeuniverse/ci-seed-jobs/common/report-check-run@master
