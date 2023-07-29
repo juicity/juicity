@@ -13,22 +13,24 @@ juicity is a quic-based proxy protocol, inspired by tuic.
 
 In most cases, compared to tuic v5, juicity has following advantages:
 
-1. More stable.
-1. More actively maintained.
-1. Better UDP implementation.
-1. Better compatibility and consistency with clients in golang.
+- [x] More stable.
+- [x] More actively maintained.
+- [x] Better UDP implementation.
+- [x] Better compatibility and consistency with clients in golang.
 
 ## [juicity-server](cmd/server)
 
 ## Link Format
 
 Full parameters:
-```
+
+```shell
 juicity://uuid:password@122.12.31.66:port?congestion_control=cubic&sni=www.example.com&allow_insecure=0
 ```
 
 Mini parameters:
-```
+
+```shell
 juicity://uuid:password@example.com:port?congestion_control=cubic
 ```
 
@@ -36,3 +38,11 @@ juicity://uuid:password@example.com:port?congestion_control=cubic
 
 - [juicity/juicity-client](cmd/client) (Official)
 - [daeuniverse/dae](https://github.com/daeuniverse/dae/pull/248) (Official, Linux Only)
+
+## License
+
+[AGPL-3.0 (C) juicity](https://github.com/juicity/juicity/blob/main/LICENSE)
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/juicity/juicity.svg)](https://starchart.cc/juicity/juicity)
