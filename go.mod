@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
 	github.com/mzz2017/quic-go v0.0.0-20230706143320-cc858d4932b7
-	github.com/mzz2017/softwind v0.0.0-20230728155247-76e5378c4d7b
+	github.com/mzz2017/softwind v0.0.0-20230729064821-66059a3329e6
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.29.1
 	github.com/spf13/cobra v1.7.0
