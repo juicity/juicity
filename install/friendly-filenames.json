@@ -12,6 +12,6 @@
   "linux-mipsle": { "friendlyName": "linux-mips32le" },
   "linux-mips": { "friendlyName": "linux-mips32" },
   "linux-riscv64": { "friendlyName": "linux-riscv64" },
-  "darwin-amd64": { "friendlyName": "darwin-amd64" },
-  "darwin-arm64": { "friendlyName": "darwin-arm64" }
+  "darwin-amd64": { "friendlyName": "macos-64" },
+  "darwin-arm64": { "friendlyName": "macos-arm64-v8a" }
 }
