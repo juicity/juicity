@@ -68,7 +68,7 @@ var (
 )
 
 func Serve(conf *config.Config) error {
-	if conf.Fwmark > math.MaxInt || conf.Fwmark > math.MaxUint32 {
+	if uint64(conf.Fwmark) > math.MaxInt || uint64(conf.Fwmark) > math.MaxUint32 {
 		return fmt.Errorf("fwmark is too large")
 	}
 	s, err := server.New(&server.Options{
