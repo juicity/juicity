@@ -140,6 +140,11 @@ jobs:
           cp ./juicity-server ./build/
           cp ./juicity-client ./build/
 
+      - name: Rename windows name
+        run: |
+          mv ./build/juicity-server ./build/juicity-server.exe
+          mv ./build/juicity-client ./build/juicity-client.exe
+
       - name: Copy systemd service
         if: matrix.goos == 'linux'
         run: |
