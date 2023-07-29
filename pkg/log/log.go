@@ -15,7 +15,7 @@ var (
 
 type Logger = *zerolog.Logger
 
-func NewLogger() *zerolog.Logger {
+func AccessLogger() *zerolog.Logger {
 	once.Do(func() {
 		w := zerolog.NewConsoleWriter()
 		l := zerolog.New(w)

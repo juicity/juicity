@@ -97,7 +97,7 @@ func Serve(conf *config.Config) error {
 
 func init() {
 	// logger
-	logger = log.NewLogger()
+	logger = log.AccessLogger()
 
 	// cmds
 	rootCmd.AddCommand(runCmd)

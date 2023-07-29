@@ -64,7 +64,7 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger := log.NewLogger()
+	logger := log.AccessLogger()
 	return &Server{
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.

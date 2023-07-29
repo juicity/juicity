@@ -5,7 +5,7 @@ import (
 )
 
 func TestLogger(t *testing.T) {
-	logger := NewLogger()
+	logger := AccessLogger()
 
 	const msg = "hello!"
 
