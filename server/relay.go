@@ -72,7 +72,7 @@ func relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout ti
 	}
 }
 
-func relayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
+func RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn) (err error) {
 	buf := pool.GetFullCap(EthernetMtu)
 	defer pool.Put(buf)
 	lConn.SetReadDeadline(time.Now().Add(DefaultNatTimeout))

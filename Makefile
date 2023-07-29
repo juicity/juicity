@@ -9,6 +9,9 @@ else
 endif
 
 juicity-server:
-	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/cmd.Version=$(VERSION)" ./cmd/server
+	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" ./cmd/server
 
-.PHONY: juicity-server
+juicity-client:
+	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" ./cmd/client
+
+.PHONY: juicity-server juicity-client

@@ -32,6 +32,8 @@ github.com/mzz2017/quic-go v0.0.0-20230706143320-cc858d4932b7 h1:9zmZilN02x3byMB
 github.com/mzz2017/quic-go v0.0.0-20230706143320-cc858d4932b7/go.mod h1:3H6d55CEofIWWr3gQThiB27+hA3WG5tATtPovzEYPAA=
 github.com/mzz2017/softwind v0.0.0-20230728155247-76e5378c4d7b h1:f2ZXl16SUvB5Nup9cWpPnUnqsjazcDZI2QWAHyW8pbk=
 github.com/mzz2017/softwind v0.0.0-20230728155247-76e5378c4d7b/go.mod h1:Fz8fgR7/dbnfR6RLpeOMkUDyebq4xShdmjj+cE5jnJ4=
+github.com/nadoo/glider v0.16.3 h1:vfwrjNUiLlYkPxhONKMtfDIrX6lbIf6Rl4A82n9aWJQ=
+github.com/nadoo/glider v0.16.3/go.mod h1:2j+kOy7DLG4wSMBcz13GPfUz+wfC7gOy2Bf4xCbo8qk=
 github.com/onsi/ginkgo/v2 v2.11.0 h1:WgqUCUt/lT6yXoQ8Wef0fsNn5cAuMK7+KT9UFRz2tcU=
 github.com/onsi/ginkgo/v2 v2.11.0/go.mod h1:ZhrRA5XmEE3x3rhlzamx/JJvujdZoJ2uvgI7kR0iZvM=
 github.com/onsi/gomega v1.27.8 h1:gegWiwZjBsf2DgiSbf5hpokZ98JVDMcWkUiigk6/KXc=
