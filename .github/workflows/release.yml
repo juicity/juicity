@@ -43,3 +43,9 @@ jobs:
   #     check-run-id: "juicity-bot[bot]/main-build-passed"
   #     check-run-conclusion: ${{ needs.build.result }}
   #   secrets: inherit
+
+  upload-release:
+    needs: [build]
+    uses: juicity/juicity-1/.github/workflows/seed-release-build.yml@main
+    with:
+      prerelease: false
