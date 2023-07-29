@@ -30,8 +30,8 @@ jobs:
 
       - name: Prepare files for upload
         run: |
-          cp release/*.zip ./
-          cp release/*.zip.dgst ./
+          cp release/*/*.zip ./
+          cp release/*/*.zip.dgst ./
           echo "Show files are going to upload..."
           ls -lh | grep ".zip"
 

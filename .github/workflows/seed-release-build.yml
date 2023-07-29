@@ -139,17 +139,16 @@ jobs:
           zip -9vr ../juicity-$ASSET_NAME.zip .
           popd || exit 1
           FILE=./juicity-$ASSET_NAME.zip
-          DGST=$FILE.dgst
-          md5sum        $FILE >>$DGST
-          shasum -a 1   $FILE >>$DGST
-          shasum -a 256 $FILE >>$DGST
-          shasum -a 512 $FILE >>$DGST
+          echo "$(md5sum $FILE)""  md5" >> $FILE.dgst
+          echo "$(shasum -a 1 $FILE)""  sha1" >> $FILE.dgst
+          echo "$(shasum -a 256 $FILE)""  sha256" >> $FILE.dgst
+          echo "$(shasum -a 512 $FILE)""  sha512" >> $FILE.dgst
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: juicity-${{ steps.get_filename.outputs.ASSET_NAME }}.zip
-          path: build/*
+          path: ./*.zip*
 
       # - name: Report result
       #   uses: daeuniverse/ci-seed-jobs/common/report-check-run@master
