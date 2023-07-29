@@ -65,6 +65,7 @@ func Serve(conf *config.Config) error {
 		Certificate:       conf.Certificate,
 		PrivateKey:        conf.PrivateKey,
 		CongestionControl: conf.CongestionControl,
+		SendThrough:       conf.SendThrough,
 	})
 	if err != nil {
 		return err

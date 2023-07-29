@@ -9,18 +9,20 @@ import (
 	"io"
 	"math"
 	"net"
+	"net/netip"
 	"strconv"
 	"time"
 
+	"github.com/juicity/juicity/internal/relay"
+	"github.com/juicity/juicity/pkg/log"
+
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
+	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/protocol/direct"
 	"github.com/mzz2017/softwind/protocol/juicity"
 	"github.com/mzz2017/softwind/protocol/tuic"
 	"github.com/mzz2017/softwind/protocol/tuic/common"
-
-	"github.com/juicity/juicity/internal/relay"
-	"github.com/juicity/juicity/pkg/log"
 )
 
 const (
@@ -39,11 +41,13 @@ type Options struct {
 	Certificate       string
 	PrivateKey        string
 	CongestionControl string
+	SendThrough       string
 }
 
 type Server struct {
 	logger                 log.Logger
 	relay                  relay.Relay
+	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
@@ -64,6 +68,14 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	dialer := direct.FullconeDirect
+	if opts.SendThrough != "" {
+		lAddr, err := netip.ParseAddr(opts.SendThrough)
+		if err != nil {
+			return nil, fmt.Errorf("parse send_through: %w", err)
+		}
+		dialer = direct.NewDirectDialerLaddr(true, lAddr)
+	}
 	return &Server{
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
@@ -74,8 +86,7 @@ func New(opts *Options) (*Server, error) {
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
-		logger:                 log.AccessLogger(),
-		relay:                  relay.NewRelay(),
+		dialer:                 dialer,
 	}, nil
 }
 
@@ -109,7 +120,9 @@ func (s *Server) Serve(addr string) (err error) {
 				if errors.As(err, &netError) && netError.Timeout() {
 					return // ignore i/o timeout
 				}
-				s.logger.Warn().Err(err).Send()
+				s.logger.Warn().
+					Err(err).
+					Send()
 			}
 		}(conn)
 	}
@@ -123,7 +136,9 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	defer authDone()
 	go func() {
 		if _, err := s.handleAuth(ctx, conn); err != nil {
-			s.logger.Warn().Err(err).Msg("handleAuth")
+			s.logger.Warn().
+				Err(err).
+				Msg("handleAuth")
 			cancel()
 			conn.CloseWithError(tuic.AuthenticationFailed, "")
 			return
@@ -154,16 +169,19 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	default:
 	}
 	mdata := lConn.Metadata
-	dialer := direct.FullconeDirect
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
-		s.logger.Debug().Str("target", target).Msg("juicity received a tcp request")
-		rConn, err := dialer.Dial("tcp", target)
+		s.logger.Debug().
+			Str("target", target).
+			Msg("juicity received a tcp request")
+		rConn, err := s.dialer.Dial("tcp", target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
-				s.logger.Debug().Err(err).Send()
+				s.logger.Debug().
+					Err(err).
+					Send()
 				return nil // ignore i/o timeout
 			}
 			return err
@@ -177,9 +195,8 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			return fmt.Errorf("relay error: %w", err)
 		}
 	case "udp":
-		s.logger.Debug().Msg("juicity received a udp connection")
 		// can dial any target
-		if err = s.relay.RelayUoT(dialer, &juicity.PacketConn{
+		if err = s.relay.RelayUoT(s.dialer, &juicity.PacketConn{
 			Conn: lConn,
 		}); err != nil {
 			var netErr net.Error
