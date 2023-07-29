@@ -9,6 +9,7 @@ import (
 	"io"
 	"math"
 	"net"
+	"net/netip"
 	"strconv"
 	"time"
 
@@ -40,9 +41,11 @@ type Options struct {
 	PrivateKey        string
 	CongestionControl string
 	Fwmark            int
+	SendThrough       string
 }
 
 type Server struct {
+	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
@@ -64,6 +67,14 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	dialer := direct.FullconeDirect
+	if opts.SendThrough != "" {
+		lAddr, err := netip.ParseAddr(opts.SendThrough)
+		if err != nil {
+			return nil, fmt.Errorf("parse send_through: %w", err)
+		}
+		dialer = direct.NewDirectDialerLaddr(true, lAddr)
+	}
 	return &Server{
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
@@ -75,6 +86,7 @@ func New(opts *Options) (*Server, error) {
 		cwnd:                   10,
 		users:                  users,
 		fwmark:                 opts.Fwmark,
+		dialer:                 dialer,
 	}, nil
 }
 
@@ -157,7 +169,6 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	default:
 	}
 	mdata := lConn.Metadata
-	dialer := direct.FullconeDirect
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
@@ -188,8 +199,6 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			return fmt.Errorf("relay error: %w", err)
 		}
 	case "udp":
-		log.Logger().Debug().
-			Msg("juicity received a udp connection")
 		// can dial any target
 		if err = RelayUoT(
 			dialer,

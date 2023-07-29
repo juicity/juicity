@@ -77,6 +77,7 @@ func Serve(conf *config.Config) error {
 		PrivateKey:        conf.PrivateKey,
 		CongestionControl: conf.CongestionControl,
 		Fwmark:            conf.Fwmark,
+		SendThrough:       conf.SendThrough,
 	})
 	if err != nil {
 		return err

@@ -58,6 +58,9 @@ func relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout ti
 		if err != nil {
 			return
 		}
+		log.Logger().Debug().
+			Str("target", addr.String()).
+			Msg("juicity received a udp request")
 		_ = dst.SetWriteDeadline(time.Now().Add(DefaultNatTimeout)) // should keep consistent
 		_, err = dst.WriteTo(buf[:n], addr.String())
 		// WARNING: if the dst is an pre-connected conn, Write should be invoked here.
@@ -85,6 +88,9 @@ func RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwmark int) (e
 		Mark:    uint32(fwmark),
 	}
 	conn, err := rDialer.Dial(magicNetwork.Encode(), addr.String())
+	log.Logger().Debug().
+		Str("target", addr.String()).
+		Msg("juicity received a udp request")
 	if err != nil {
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
