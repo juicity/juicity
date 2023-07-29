@@ -40,7 +40,7 @@ Full configuration:
     "certificate": "/path/to/fullchain.cer",
     "private_key": "/path/to/private.key",
     "congestion_control": "bbr",
-    "fwmark": 0x1000,
+    "fwmark": "0x1000",
     "send_through": "113.25.132.3",
     "log_level": "info"
 }

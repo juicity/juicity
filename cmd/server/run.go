@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/juicity/juicity/config"
@@ -61,7 +62,11 @@ var (
 )
 
 func Serve(conf *config.Config) error {
-	if uint64(conf.Fwmark) > math.MaxInt || uint64(conf.Fwmark) > math.MaxUint32 {
+	fwmark, err := strconv.ParseUint(conf.Fwmark, 0, 32)
+	if err != nil {
+		return fmt.Errorf("parse fwmark: %w", err)
+	}
+	if uint64(fwmark) > math.MaxInt || uint64(fwmark) > math.MaxUint32 {
 		return fmt.Errorf("fwmark is too large")
 	}
 	s, err := server.New(&server.Options{
@@ -69,7 +74,7 @@ func Serve(conf *config.Config) error {
 		Certificate:       conf.Certificate,
 		PrivateKey:        conf.PrivateKey,
 		CongestionControl: conf.CongestionControl,
-		Fwmark:            conf.Fwmark,
+		Fwmark:            int(fwmark),
 		SendThrough:       conf.SendThrough,
 	})
 	if err != nil {

@@ -21,7 +21,7 @@ type Config struct {
 	Users       map[string]string `json:"users"`
 	Certificate string            `json:"certificate"`
 	PrivateKey  string            `json:"private_key"`
-	Fwmark      int               `json:"fwmark"`
+	Fwmark      string            `json:"fwmark"`
 	SendThrough string            `json:"send_through"`
 
 	// Common
