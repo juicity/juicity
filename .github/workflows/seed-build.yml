@@ -122,6 +122,8 @@ jobs:
           export VERSION=${{ steps.get_version.outputs.VERSION }}
           make
           cp ./install/juicity-server.service ./build/
+          cp ./juicity-server ./build/
+          cp ./juicity-client ./build/
 
       - name: Smoke test
         if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
