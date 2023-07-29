@@ -2,7 +2,7 @@
 
 <p align="left">
     <img src="https://github.com/juicity/juicity/actions/workflows/build.yml/badge.svg" alt="Build"/>
-    <img src="https://custom-icon-badges.herokuapp.com/github/license/juicity/juicity?logo=law&color=white" alt="License"/>
+    <img src="https://custom-icon-badges.herokuapp.com/github/license/juicity/juicity?logo=law&color=blue" alt="License"/>
     <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fjuicity%2Fjuicity&count_bg=%23493DC8&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false"/>
     <img src="https://custom-icon-badges.herokuapp.com/github/v/release/juicity/juicity?logo=rocket" alt="version">
     <img src="https://custom-icon-badges.herokuapp.com/github/issues-pr-closed/juicity/juicity?color=purple&logo=git-pull-request&logoColor=white"/>
