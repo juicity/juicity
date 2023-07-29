@@ -14,7 +14,7 @@
   "linux-riscv64": { "friendlyName": "linux-riscv64" },
   "darwin-amd64": { "friendlyName": "macos-x86_64" },
   "darwin-arm64": { "friendlyName": "macos-arm64" },
-  "windows-amd64": { "friendlyName": "windows-x86_64" },
-  "windows-arm64": { "friendlyName": "windows-arm64" },
+  "windows-amd64": { "friendlyName": "windows-x86_64.exe" },
+  "windows-arm64": { "friendlyName": "windows-arm64.exe" },
   "android-arm64": { "friendlyName": "android-arm64" }
 }
