@@ -37,7 +37,6 @@ jobs:
   #   secrets: inherit
 
   build:
-    # needs: [pre-actions]
     if: ${{ github.event.pull_request.draft == false }}
     uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
