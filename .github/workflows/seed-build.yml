@@ -136,6 +136,7 @@ jobs:
           cp ./juicity-client ./build/
 
       - name: Rename windows name
+        if: matrix.goos == 'windows'
         run: |
           mv ./build/juicity-server ./build/juicity-server.exe
           mv ./build/juicity-client ./build/juicity-client.exe
