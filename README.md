@@ -1,4 +1,4 @@
-# juicity
+# Juicity
 
 <p align="left">
     <img src="https://github.com/juicity/juicity/actions/workflows/build.yml/badge.svg" alt="Build"/>
@@ -9,7 +9,7 @@
     <img src="https://custom-icon-badges.herokuapp.com/github/last-commit/juicity/juicity?logo=history&logoColor=white" alt="lastcommit"/>
 </p>
 
-juicity is a quic-based proxy protocol, inspired by tuic.
+Juicity is a quic-based proxy protocol, inspired by tuic.
 
 In most cases, compared to tuic v5, juicity has following advantages:
 
@@ -20,10 +20,11 @@ In most cases, compared to tuic v5, juicity has following advantages:
 
 ## [juicity-server](cmd/server/README.md)
 
-## Clients
+## Client
 
 - [juicity/juicity-client](cmd/client/README.md) (Official)
-- [daeuniverse/dae](https://github.com/daeuniverse/dae/pull/248) (Official, Linux Only)
+- [daeuniverse/dae](https://github.com/daeuniverse/dae) (Official, Linux Only)
+- [daeuniverse/daed](https://github.com/daeuniverse/daed) (Official, Linux Only)
 
 ## Link Format
 
