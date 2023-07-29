@@ -49,6 +49,12 @@ jobs:
             goarch: amd64
             goamd64: v3
           # END Linux AMD64 v1 v2 v3
+          # BEGIN Darwin ARM64 AMD64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          # END Darwin ARM64 AMD64
       fail-fast: false
 
     runs-on: ubuntu-latest
