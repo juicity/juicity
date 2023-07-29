@@ -1,0 +1,46 @@
+#    _       _      _ _
+#   (_)_   _(_) ___(_) |_ _   _
+#   | | | | | |/ __| | __| | | |
+#   | | |_| | | (__| | |_| |_| |
+#  _/ |\__,_|_|\___|_|\__|\__, |
+# |__/                    |___/
+#
+# Copyright (C) 2023 @juicity <https://github.com/juicity>
+#
+# This is a open-source software, liscensed under the AGPL-3.0 License.
+# See /License for more information.
+
+name: Publish Release
+run-name: Publish prerelease ${{ inputs.tag }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+jobs:
+  # pre-actions:
+  #   uses: daeuniverse/ci-seed-jobs/.github/workflows/pre-actions.yml@master
+  #   with:
+  #     repository: ${{ github.repository }}
+  #     ref: ${{ inputs.tag }}
+  #     fetch-depth: 0
+  #     check-runs: '["build", "main-build-passed"]'
+  #   secrets: inherit
+
+  build:
+    uses: juicity/juicity-1/.github/workflows/seed-release-build.yml@main
+    with:
+      ref: ${{ inputs.tag }}
+      build-type: main-build
+    secrets: inherit
+
+  # post-actions:
+  #   if: always()
+  #   needs: [build]
+  #   uses: daeuniverse/ci-seed-jobs/.github/workflows/juicity-post-actions.yml@master
+  #   with:
+  #     check-run-id: "juicity-bot[bot]/main-build-passed"
+  #     check-run-conclusion: ${{ needs.build.result }}
+  #   secrets: inherit
