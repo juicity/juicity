@@ -19,8 +19,8 @@ import (
 	"github.com/mzz2017/softwind/protocol/tuic"
 	"github.com/mzz2017/softwind/protocol/tuic/common"
 
+	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
-	"github.com/juicity/juicity/server/relay"
 )
 
 const (
@@ -64,7 +64,6 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger := log.AccessLogger()
 	return &Server{
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
@@ -75,8 +74,8 @@ func New(opts *Options) (*Server, error) {
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
-		logger:                 logger,
-		relay:                  relay.NewRelay(logger),
+		logger:                 log.AccessLogger(),
+		relay:                  relay.NewRelay(),
 	}, nil
 }
 

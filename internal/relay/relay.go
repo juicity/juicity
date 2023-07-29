@@ -22,10 +22,6 @@ const (
 	DnsQueryTimeout   = 17 * time.Second // RFC 5452
 )
 
-type WriteCloser interface {
-	CloseWrite() error
-}
-
 type relay struct {
 	logger log.Logger
 }
@@ -38,8 +34,12 @@ type Relay interface {
 	RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration, bufSize int) (err error)
 }
 
-func NewRelay(logger log.Logger) Relay {
-	return &relay{logger: logger}
+type WriteCloser interface {
+	CloseWrite() error
+}
+
+func NewRelay() Relay {
+	return &relay{logger: log.AccessLogger()}
 }
 
 func (r *relay) RelayTCP(lConn, rConn netproxy.Conn) (err error) {
