@@ -32,6 +32,6 @@ type WriteCloser interface {
 	CloseWrite() error
 }
 
-func NewRelay(logger log.Logger) Relay {
-	return &relay{logger: logger}
+func NewRelay() Relay {
+	return &relay{logger: log.AccessLogger()}
 }

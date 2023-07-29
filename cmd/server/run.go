@@ -22,13 +22,16 @@ var (
 		Short: "To run juicity-server in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
 			if cfgFile == "" {
-				logger.Fatal().Msg("Argument \"--config\" or \"-c\" is required but not provided.")
+				logger.Fatal().
+					Msg("Argument \"--config\" or \"-c\" is required but not provided.")
 			}
 
 			// Read config from --config cfgFile.
 			conf, err := config.ReadConfig(cfgFile)
 			if err != nil {
-				logger.Fatal().Err(err).Msg("Failed to read config")
+				logger.Fatal().
+					Err(err).
+					Msg("Failed to read config")
 			}
 			lvl, err := zerolog.ParseLevel(conf.LogLevel)
 			if err != nil {
