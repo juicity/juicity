@@ -179,7 +179,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			Network: "tcp",
 			Mark:    uint32(s.fwmark),
 		}
-		rConn, err := dialer.Dial(magicNetwork.Encode(), target)
+		rConn, err := s.dialer.Dial(magicNetwork.Encode(), target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -201,7 +201,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	case "udp":
 		// can dial any target
 		if err = RelayUoT(
-			dialer,
+			s.dialer,
 			&juicity.PacketConn{Conn: lConn},
 			s.fwmark,
 		); err != nil {
