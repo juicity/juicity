@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/google/uuid"
@@ -44,6 +45,8 @@ type Options struct {
 }
 
 type Server struct {
+	logger                 log.Logger
+	relay                  relay.Relay
 	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
@@ -117,7 +120,7 @@ func (s *Server) Serve(addr string) (err error) {
 				if errors.As(err, &netError) && netError.Timeout() {
 					return // ignore i/o timeout
 				}
-				log.Logger().Warn().
+				s.logger.Warn().
 					Err(err).
 					Send()
 			}
@@ -133,7 +136,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	defer authDone()
 	go func() {
 		if _, err := s.handleAuth(ctx, conn); err != nil {
-			log.Logger().Warn().
+			s.logger.Warn().
 				Err(err).
 				Msg("handleAuth")
 			cancel()
@@ -169,14 +172,14 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
-		log.Logger().Debug().
+		s.logger.Debug().
 			Str("target", target).
 			Msg("juicity received a tcp request")
 		rConn, err := s.dialer.Dial("tcp", target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
-				log.Logger().Debug().
+				s.logger.Debug().
 					Err(err).
 					Send()
 				return nil // ignore i/o timeout
@@ -184,7 +187,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			return err
 		}
 		defer rConn.Close()
-		if err = RelayTCP(lConn, rConn); err != nil {
+		if err = s.relay.RelayTCP(lConn, rConn); err != nil {
 			var netErr net.Error
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) {
 				return nil // ignore i/o timeout
@@ -193,7 +196,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		}
 	case "udp":
 		// can dial any target
-		if err = RelayUoT(s.dialer, &juicity.PacketConn{
+		if err = s.relay.RelayUoT(s.dialer, &juicity.PacketConn{
 			Conn: lConn,
 		}); err != nil {
 			var netErr net.Error
