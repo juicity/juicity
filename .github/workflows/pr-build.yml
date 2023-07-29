@@ -38,7 +38,7 @@ jobs:
 
   build:
     if: ${{ github.event.pull_request.draft == false }}
-    uses: juicity/juicity/.github/workflows/seed-build.yml@main
+    uses: juicity/juicity/.github/workflows/seed-build.yml@ci/darwin_build
     with:
       ref: ${{ github.event.pull_request.head.sha }}
       pr-number: ${{ github.event.pull_request.number }}
