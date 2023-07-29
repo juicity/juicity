@@ -77,6 +77,9 @@ func New(opts *Options) (*Server, error) {
 		dialer = direct.NewDirectDialerLaddr(true, lAddr)
 	}
 	return &Server{
+		logger: log.AccessLogger(),
+		relay:  relay.NewRelay(),
+		dialer: dialer,
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
 			MinVersion:   tls.VersionTLS13,
@@ -86,7 +89,6 @@ func New(opts *Options) (*Server, error) {
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
-		dialer:                 dialer,
 	}, nil
 }
 
