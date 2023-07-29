@@ -10,7 +10,7 @@
 # This is a open-source software, liscensed under the AGPL-3.0 License.
 # See /License for more information.
 
-name: Seed Build
+name: Seed Release Build
 
 on:
   workflow_call:
@@ -19,12 +19,6 @@ on:
         type: string
         required: true
         default: ${{ github.ref }}
-      pr-number:
-        type: number
-        required: false
-      build-type:
-        type: string
-        description: "[pr-build,main-build,daily-build]"
 
 jobs:
   build:
@@ -75,19 +69,11 @@ jobs:
       - name: Get the version
         id: get_version
         env:
-          REF: ${{ inputs.ref }}
+          REF: ${{ inputs.tag }}
         run: |
-          date=$(git log -1 --format="%cd" --date=short | sed s/-//g)
-          commit=$(echo ${REF} | cut -c1-6)
-          if [[ "${{ inputs.build-type }}" == "pr-build" ]]; then
-            count=$(git rev-list --count origin/main..HEAD)
-            version="unstable-${date}.pr-${{ inputs.pr-number }}.r${count}.${commit}"
-          else
-            count=$(git rev-list --count HEAD)
-            version="unstable-${date}.r${count}.${commit}"
-          fi
-          echo "VERSION=${version}" >> $GITHUB_OUTPUT
-          echo "VERSION=${version}" >> $GITHUB_ENV
+          version=${REF}
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+          echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: Show workflow information
         id: get_filename
@@ -106,6 +92,16 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y clang-15 llvm-15
+
+      - name: Create full source ZIP archive and Signature
+        if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
+        run: |
+          zip -9vr juicity-full-src.zip . -x .git/\*
+          FILE=./juicity-full-src.zip
+          echo "$(md5sum $FILE)""  md5" >> $FILE.dgst
+          echo "$(shasum -a 1 $FILE)""  sha1" >> $FILE.dgst
+          echo "$(shasum -a 256 $FILE)""  sha256" >> $FILE.dgst
+          echo "$(shasum -a 512 $FILE)""  sha512" >> $FILE.dgst
 
       - name: Get project dependencies
         run: |
