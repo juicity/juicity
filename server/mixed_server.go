@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/mzz2017/softwind/netproxy"
+	gliderLog "github.com/nadoo/glider/pkg/log"
 	"github.com/nadoo/glider/proxy"
 	"github.com/nadoo/glider/proxy/http"
 	"github.com/nadoo/glider/proxy/socks5"
@@ -108,18 +109,22 @@ func NewMixed(s string, d netproxy.Dialer) (*Mixed, error) {
 }
 
 // ListenAndServe listens on server's addr and serves connections.
-func (m *Mixed) ListenAndServe() (err error) {
+func (m *Mixed) ListenAndServe() {
 	go m.socks5Server.ListenAndServeUDP()
 
 	l, err := net.Listen("tcp", m.addr)
 	if err != nil {
-		return fmt.Errorf("failed to listen on %s: %v", m.addr, err)
+		gliderLog.Fatalf("[mixed] failed to listen on %s: %v", m.addr, err)
+		return
 	}
+
+	gliderLog.F("[mixed] http & socks5 server listening TCP on %s", m.addr)
 
 	for {
 		c, err := l.Accept()
 		if err != nil {
-			return err
+			gliderLog.F("[mixed] failed to accept: %v", err)
+			continue
 		}
 
 		go m.Serve(c)
@@ -131,7 +136,7 @@ func (m *Mixed) Serve(c net.Conn) {
 	conn := proxy.NewConn(c)
 	if head, err := conn.Peek(1); err == nil {
 		if head[0] == socks5.Version {
-			m.socks5Server.Serve(c)
+			m.socks5Server.Serve(conn)
 			return
 		}
 	}

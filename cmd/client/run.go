@@ -108,9 +108,7 @@ func Serve(conf *config.Config) error {
 	}
 	log.Logger().Info().
 		Msg("Listen http and socks5 at " + conf.Listen)
-	if err = s.ListenAndServe(); err != nil {
-		return err
-	}
+	s.ListenAndServe()
 	return nil
 }
 
