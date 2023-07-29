@@ -18,7 +18,12 @@ In most cases, compared to tuic v5, juicity has following advantages:
 - [x] Better UDP implementation.
 - [x] Better compatibility and consistency with clients in golang.
 
-## [juicity-server](cmd/server)
+## [juicity-server](cmd/server/README.md)
+
+## Clients
+
+- [juicity/juicity-client](cmd/client/README.md) (Official)
+- [daeuniverse/dae](https://github.com/daeuniverse/dae/pull/248) (Official, Linux Only)
 
 ## Link Format
 
@@ -33,11 +38,6 @@ Mini parameters:
 ```shell
 juicity://uuid:password@example.com:port?congestion_control=cubic
 ```
-
-## Clients
-
-- [juicity/juicity-client](cmd/client) (Official)
-- [daeuniverse/dae](https://github.com/daeuniverse/dae/pull/248) (Official, Linux Only)
 
 ## License
 
