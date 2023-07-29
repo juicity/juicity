@@ -99,6 +99,13 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y clang-15 llvm-15
 
+      - name: Get project dependencies
+        run: |
+          git submodule update --init --recursive
+          GOMODCACHE="${PWD}"/go-mod go mod download -modcacherw
+          find ./go-mod/ -maxdepth 1 ! -name "cache" ! -name "go-mod" -exec rm -rf {} \;
+          sed -i 's/#export GOMODCACHE=$(PWD)\/go-mod/export GOMODCACHE=$(PWD)\/go-mod/' Makefile
+
       - name: Create full source ZIP archive and Signature
         if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
         run: |
@@ -108,13 +115,6 @@ jobs:
           echo "$(shasum -a 1 $FILE)""  sha1" >> $FILE.dgst
           echo "$(shasum -a 256 $FILE)""  sha256" >> $FILE.dgst
           echo "$(shasum -a 512 $FILE)""  sha512" >> $FILE.dgst
-
-      - name: Get project dependencies
-        run: |
-          git submodule update --init --recursive
-          GOMODCACHE="${PWD}"/go-mod go mod download -modcacherw
-          find ./go-mod/ -maxdepth 1 ! -name "cache" ! -name "go-mod" -exec rm -rf {} \;
-          sed -i 's/#export GOMODCACHE=$(PWD)\/go-mod/export GOMODCACHE=$(PWD)\/go-mod/' Makefile
 
       - name: Build juicity
         run: |
