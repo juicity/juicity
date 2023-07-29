@@ -9,6 +9,7 @@ import (
 	"io"
 	"math"
 	"net"
+	"net/netip"
 	"strconv"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
+	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/protocol/direct"
 	"github.com/mzz2017/softwind/protocol/juicity"
 	"github.com/mzz2017/softwind/protocol/tuic"
@@ -38,9 +40,11 @@ type Options struct {
 	Certificate       string
 	PrivateKey        string
 	CongestionControl string
+	SendThrough       string
 }
 
 type Server struct {
+	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
@@ -61,6 +65,14 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	dialer := direct.FullconeDirect
+	if opts.SendThrough != "" {
+		lAddr, err := netip.ParseAddr(opts.SendThrough)
+		if err != nil {
+			return nil, fmt.Errorf("parse send_through: %w", err)
+		}
+		dialer = direct.NewDirectDialerLaddr(true, lAddr)
+	}
 	return &Server{
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
@@ -71,6 +83,7 @@ func New(opts *Options) (*Server, error) {
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
+		dialer:                 dialer,
 	}, nil
 }
 
@@ -153,14 +166,13 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	default:
 	}
 	mdata := lConn.Metadata
-	dialer := direct.FullconeDirect
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
 		log.Logger().Debug().
 			Str("target", target).
 			Msg("juicity received a tcp request")
-		rConn, err := dialer.Dial("tcp", target)
+		rConn, err := s.dialer.Dial("tcp", target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -180,10 +192,8 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			return fmt.Errorf("relay error: %w", err)
 		}
 	case "udp":
-		log.Logger().Debug().
-			Msg("juicity received a udp connection")
 		// can dial any target
-		if err = RelayUoT(dialer, &juicity.PacketConn{
+		if err = RelayUoT(s.dialer, &juicity.PacketConn{
 			Conn: lConn,
 		}); err != nil {
 			var netErr net.Error
