@@ -61,6 +61,16 @@ jobs:
           - goos: darwin
             goarch: arm64
           # END Darwin ARM64 AMD64
+          # BEGIN Windows ARM64 AMD64
+          - goos: windows
+            goarch: amd64
+          - goos: windows
+            goarch: arm64
+          # END Windows ARM64 AMD64
+          # BEGIN Android ARM64
+          - goos: android
+            goarch: arm64
+          # END Android ARM64
       fail-fast: false
 
     runs-on: ubuntu-latest
@@ -126,13 +136,14 @@ jobs:
           export CGO_ENABLED=0
           export GOFLAGS="-trimpath -modcacherw"
           export VERSION=${{ steps.get_version.outputs.VERSION }}
-          make
+          make all
           cp ./juicity-server ./build/
           cp ./juicity-client ./build/
 
       - name: Copy systemd service
         if: matrix.goos == 'linux'
         run: |
+          cp ./install/juicity-client.service ./build/
           cp ./install/juicity-server.service ./build/
 
       - name: Smoke test
