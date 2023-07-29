@@ -42,13 +42,13 @@ type Options struct {
 }
 
 type Server struct {
+	logger                 log.Logger
 	relay                  relay.Relay
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
 	cwnd                   int
 	users                  map[uuid.UUID]string
-	logger                 log.Logger
 }
 
 func New(opts *Options) (*Server, error) {
@@ -77,10 +77,6 @@ func New(opts *Options) (*Server, error) {
 		logger:                 log.AccessLogger(),
 		relay:                  relay.NewRelay(),
 	}, nil
-}
-
-func (s *Server) InheritLogger() log.Logger {
-	return s.logger
 }
 
 func (s *Server) Serve(addr string) (err error) {

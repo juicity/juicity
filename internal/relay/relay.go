@@ -39,7 +39,9 @@ type WriteCloser interface {
 }
 
 func NewRelay() Relay {
-	return &relay{logger: log.AccessLogger()}
+	return &relay{
+		logger: log.AccessLogger(),
+	}
 }
 
 func (r *relay) RelayTCP(lConn, rConn netproxy.Conn) (err error) {
