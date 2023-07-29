@@ -33,7 +33,6 @@ jobs:
     uses: juicity/juicity-1/.github/workflows/seed-release-build.yml@main
     with:
       ref: ${{ inputs.tag }}
-      build-type: main-build
     secrets: inherit
 
   # post-actions:
