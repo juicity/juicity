@@ -21,11 +21,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
-}
-
 var (
+	logger  log.Logger
 	cfgFile string
 
 	runCmd = &cobra.Command{
@@ -33,44 +30,32 @@ var (
 		Short: "To run juicity-client in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
 			if cfgFile == "" {
-				log.Logger().
-					Fatal().
-					Msg("Argument \"--config\" or \"-c\" is required but not provided.")
+				logger.Fatal().Msg("Argument \"--config\" or \"-c\" is required but not provided.")
 			}
 
 			// Read config from --config cfgFile.
 			conf, err := config.ReadConfig(cfgFile)
 			if err != nil {
-				log.Logger().
-					Fatal().
-					Err(err).
-					Msg("Failed to read config")
+				logger.Fatal().Err(err).Msg("Failed to read config")
 			}
 			lvl, err := zerolog.ParseLevel(conf.LogLevel)
 			if err != nil {
-				log.Logger().
-					Fatal().
-					Err(err).
-					Send()
+				logger.Fatal().Err(err).Send()
 			}
 			if lvl <= zerolog.InfoLevel {
 				gliderLog.Set(true, stdlog.Ltime)
 			}
-			*log.Logger() = log.Logger().Level(lvl)
+			*logger = logger.Level(lvl)
 
 			go func() {
 				if err := Serve(conf); err != nil {
-					log.Logger().Fatal().
-						Err(err).
-						Send()
+					logger.Fatal().Err(err).Send()
 				}
 			}()
 			sigs := make(chan os.Signal, 1)
 			signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGKILL, syscall.SIGILL)
 			for sig := range sigs {
-				log.Logger().Warn().
-					Str("signal", sig.String()).
-					Msg("Exiting")
+				logger.Warn().Str("signal", sig.String()).Msg("Exiting")
 				return
 			}
 		},
@@ -105,12 +90,18 @@ func Serve(conf *config.Config) error {
 	if conf.Listen == "" {
 		return fmt.Errorf(`"Listen" is required`)
 	}
-	log.Logger().Info().
-		Msg("Listen http and socks5 at " + conf.Listen)
+	logger.Info().Msg("Listen http and socks5 at " + conf.Listen)
 	s.ListenAndServe()
 	return nil
 }
 
 func init() {
+	// logger
+	logger = log.NewLogger()
+
+	// cmds
 	rootCmd.AddCommand(runCmd)
+
+	// flags
+	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
 }
