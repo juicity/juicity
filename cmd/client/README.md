@@ -9,7 +9,7 @@ make CGO_ENABLED=0 juicity-client
 ## Run
 
 ```shell
-go run -c config.json
+./juicity-client run -c config.json
 ```
 
 ## Configuration

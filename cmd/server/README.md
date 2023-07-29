@@ -3,13 +3,13 @@
 ## Build
 
 ```shell
-make CGO_ENABLED=0
+make CGO_ENABLED=0 juicity-server
 ```
 
 ## Run
 
 ```shell
-go run -c config.json
+./juicity-server run -c config.json
 ```
 
 ## Configuration
