@@ -126,10 +126,8 @@ jobs:
           export STRIP=llvm-strip-15
           make
           cp ./install/juicity-server.service ./build/
-          curl -L -o ./build/geoip.dat https://github.com/v2fly/geoip/releases/latest/download/geoip.dat
-          curl -L -o ./build/geosite.dat https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat
 
-      - name: Smoking test
+      - name: Smoke test
         if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
         run: ./build/juicity-$ASSET_NAME --version
 
