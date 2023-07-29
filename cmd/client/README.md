@@ -3,7 +3,7 @@
 ## Build
 
 ```shell
-make CGO_ENABLED=0 juicity-client
+make juicity-client
 ```
 
 ## Run
