@@ -46,6 +46,6 @@ jobs:
 
   upload-release:
     needs: [build]
-    uses: juicity/juicity-1/.github/workflows/seed-release-build.yml@main
+    uses: juicity/juicity-1/.github/workflows/seed-upload-release.yml@main
     with:
       prerelease: false
