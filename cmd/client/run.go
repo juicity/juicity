@@ -26,6 +26,7 @@ var (
 	logger           *log.Logger
 	cfgFile          string
 	disableTimestamp bool
+	logFile          string
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -60,7 +61,10 @@ var (
 			if disableTimestamp {
 				timeFormat = ""
 			}
-			logger = log.NewLogger(timeFormat)
+			logger = log.NewLogger(&log.Options{
+				TimeFormat: timeFormat,
+				LogFile:    logFile,
+			})
 			*logger = logger.Level(lvl)
 
 			go func() {
@@ -118,4 +122,5 @@ func init() {
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
+	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "f", "", "write logs to file")
 }

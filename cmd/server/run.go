@@ -20,12 +20,17 @@ var (
 	logger           *log.Logger
 	cfgFile          string
 	disableTimestamp bool
+	logFile          string
 
 	runCmd = &cobra.Command{
 		Use:   "run",
 		Short: "To run juicity-server in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
-			logger = log.NewLogger(time.DateTime)
+			logger = log.NewLogger(&log.Options{
+				TimeFormat: time.DateTime,
+				LogFile:    logFile,
+			})
+
 			if cfgFile == "" {
 				logger.Fatal().
 					Msg("Argument \"--config\" or \"-c\" is required but not provided.")
@@ -39,7 +44,7 @@ var (
 					Msg("Failed to read config")
 			}
 
-			// Logger.
+			// Logger
 			lvl, err := zerolog.ParseLevel(conf.LogLevel)
 			if err != nil {
 				logger.Fatal().Err(err).Send()
@@ -48,7 +53,10 @@ var (
 			if disableTimestamp {
 				timeFormat = ""
 			}
-			logger = log.NewLogger(timeFormat)
+			logger = log.NewLogger(&log.Options{
+				TimeFormat: timeFormat,
+				LogFile:    logFile,
+			})
 			*logger = logger.Level(lvl)
 
 			go func() {
@@ -110,4 +118,5 @@ func init() {
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
+	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "f", "", "write logs to file")
 }

@@ -6,7 +6,10 @@ import (
 )
 
 func TestLogger(t *testing.T) {
-	logger := NewLogger(time.DateTime)
+	logger := NewLogger(&Options{
+		TimeFormat: time.DateTime,
+		LogFile:    "../../app.log",
+	})
 
 	const msg = "hello!"
 

@@ -1,6 +1,7 @@
 package log
 
 import (
+	"io"
 	"path/filepath"
 	"strconv"
 
@@ -10,29 +11,45 @@ import (
 
 type Logger = zerolog.Logger
 
-func NewLogger(timeFormat string) *Logger {
+type Options struct {
+	TimeFormat string
+	LogFile    string
+}
+
+type Radius interface {
+	int64 | int8 | float64
+}
+
+func NewLogger(opt *Options) *Logger {
+	var writer io.Writer
+
 	// parse log level from config
 	c := zerolog.NewConsoleWriter()
-	c.TimeFormat = timeFormat
+	c.TimeFormat = opt.TimeFormat
 
 	// https://github.com/natefinch/lumberjack
-	f := &lumberjack.Logger{
-		Filename:   "app.log",
-		MaxSize:    10,   // megabytes
-		MaxBackups: 1,    // copies
-		MaxAge:     1,    // days
-		Compress:   true, // disabled by default
+	if opt.LogFile != "" {
+		f := &lumberjack.Logger{
+			Filename:   opt.LogFile,
+			MaxSize:    10,   // megabytes
+			MaxBackups: 1,    // copies
+			MaxAge:     1,    // days
+			Compress:   true, // disabled by default
+		}
+		// set multiple write streams (default: [stdout, file])
+		multi := zerolog.MultiLevelWriter(c, f)
+		writer = multi
+	} else {
+		writer = &c
 	}
 
-	// set multiple write streams (default: [stdout, file])
-	multi := zerolog.MultiLevelWriter(c, f)
-	l := zerolog.New(multi)
+	l := zerolog.New(writer)
 
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
 		return filepath.Base(file) + ":" + strconv.Itoa(line)
 	}
 	l = l.With().Caller().Logger()
-	if timeFormat != "" {
+	if opt.TimeFormat != "" {
 		l = l.With().Timestamp().Logger()
 	}
 	l.Level(zerolog.DebugLevel)
