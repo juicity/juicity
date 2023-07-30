@@ -18,7 +18,7 @@ const (
 )
 
 type relay struct {
-	logger log.Logger
+	logger *log.Logger
 }
 
 type Relay interface {
@@ -32,6 +32,6 @@ type WriteCloser interface {
 	CloseWrite() error
 }
 
-func NewRelay() Relay {
-	return &relay{logger: log.AccessLogger()}
+func NewRelay(logger *log.Logger) Relay {
+	return &relay{logger: logger}
 }

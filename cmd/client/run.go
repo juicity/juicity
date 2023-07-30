@@ -3,27 +3,29 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	stdlog "log"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
-	stdlog "log"
-
-	"github.com/juicity/juicity/config"
-	"github.com/juicity/juicity/pkg/log"
-	"github.com/juicity/juicity/server"
 	"github.com/mzz2017/softwind/protocol"
 	"github.com/mzz2017/softwind/protocol/direct"
 	"github.com/mzz2017/softwind/protocol/juicity"
 	gliderLog "github.com/nadoo/glider/pkg/log"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
+
+	"github.com/juicity/juicity/config"
+	"github.com/juicity/juicity/pkg/log"
+	"github.com/juicity/juicity/server"
 )
 
 var (
-	logger  log.Logger
-	cfgFile string
+	logger           *log.Logger
+	cfgFile          string
+	disableTimestamp bool
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -41,13 +43,24 @@ var (
 					Err(err).
 					Msg("Failed to read config")
 			}
+
+			// Logger.
 			lvl, err := zerolog.ParseLevel(conf.LogLevel)
 			if err != nil {
 				logger.Fatal().Err(err).Send()
 			}
 			if lvl <= zerolog.InfoLevel {
-				gliderLog.Set(true, stdlog.Ltime)
+				flag := 0
+				if !disableTimestamp {
+					flag = stdlog.Ltime | stdlog.Ldate
+				}
+				gliderLog.Set(true, flag)
 			}
+			timeFormat := time.DateTime
+			if disableTimestamp {
+				timeFormat = ""
+			}
+			logger = log.NewLogger(timeFormat)
 			*logger = logger.Level(lvl)
 
 			go func() {
@@ -99,12 +112,10 @@ func Serve(conf *config.Config) error {
 }
 
 func init() {
-	// logger
-	logger = log.AccessLogger()
-
 	// cmds
 	rootCmd.AddCommand(runCmd)
 
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
+	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
 }

@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/juicity/juicity/config"
 	"github.com/juicity/juicity/pkg/log"
@@ -16,13 +17,15 @@ import (
 )
 
 var (
-	logger  log.Logger
-	cfgFile string
+	logger           *log.Logger
+	cfgFile          string
+	disableTimestamp bool
 
 	runCmd = &cobra.Command{
 		Use:   "run",
 		Short: "To run juicity-server in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
+			logger = log.NewLogger(time.DateTime)
 			if cfgFile == "" {
 				logger.Fatal().
 					Msg("Argument \"--config\" or \"-c\" is required but not provided.")
@@ -35,11 +38,17 @@ var (
 					Err(err).
 					Msg("Failed to read config")
 			}
+
+			// Logger.
 			lvl, err := zerolog.ParseLevel(conf.LogLevel)
 			if err != nil {
 				logger.Fatal().Err(err).Send()
 			}
-
+			timeFormat := time.DateTime
+			if disableTimestamp {
+				timeFormat = ""
+			}
+			logger = log.NewLogger(timeFormat)
 			*logger = logger.Level(lvl)
 
 			go func() {
@@ -73,6 +82,7 @@ func Serve(conf *config.Config) (err error) {
 		}
 	}
 	s, err := server.New(&server.Options{
+		Logger:            logger,
 		Users:             conf.Users,
 		Certificate:       conf.Certificate,
 		PrivateKey:        conf.PrivateKey,
@@ -94,12 +104,10 @@ func Serve(conf *config.Config) (err error) {
 }
 
 func init() {
-	// logger
-	logger = log.AccessLogger()
-
 	// cmds
 	rootCmd.AddCommand(runCmd)
 
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
+	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
 }
