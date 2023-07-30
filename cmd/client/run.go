@@ -50,7 +50,11 @@ var (
 				logger.Fatal().Err(err).Send()
 			}
 			if lvl <= zerolog.InfoLevel {
-				gliderLog.Set(true, stdlog.Ltime)
+				flag := 0
+				if !disableTimestamp {
+					flag = stdlog.Ltime | stdlog.Ldate
+				}
+				gliderLog.Set(true, flag)
 			}
 			timeFormat := time.DateTime
 			if disableTimestamp {
