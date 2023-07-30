@@ -43,6 +43,8 @@ var (
 					Err(err).
 					Msg("Failed to read config")
 			}
+
+			// Logger.
 			lvl, err := zerolog.ParseLevel(conf.LogLevel)
 			if err != nil {
 				logger.Fatal().Err(err).Send()
@@ -50,6 +52,11 @@ var (
 			if lvl <= zerolog.InfoLevel {
 				gliderLog.Set(true, stdlog.Ltime)
 			}
+			timeFormat := time.DateTime
+			if disableTimestamp {
+				timeFormat = ""
+			}
+			logger = log.NewLogger(timeFormat)
 			*logger = logger.Level(lvl)
 
 			go func() {
@@ -107,11 +114,4 @@ func init() {
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
-
-	// logger
-	timeFormat := time.DateTime
-	if disableTimestamp {
-		timeFormat = ""
-	}
-	logger = log.NewLogger(timeFormat)
 }
