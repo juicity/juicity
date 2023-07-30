@@ -16,10 +16,6 @@ type Options struct {
 	LogFile    string
 }
 
-type Radius interface {
-	int64 | int8 | float64
-}
-
 func NewLogger(opt *Options) *Logger {
 	var writer io.Writer
 
