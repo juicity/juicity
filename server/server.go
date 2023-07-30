@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/juicity/juicity/internal/relay"
-	"github.com/juicity/juicity/pkg/log"
+	"github.com/rs/zerolog"
 
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
@@ -37,6 +37,7 @@ var (
 )
 
 type Options struct {
+	Logger            *zerolog.Logger
 	Users             map[string]string
 	Certificate       string
 	PrivateKey        string
@@ -46,7 +47,7 @@ type Options struct {
 }
 
 type Server struct {
-	logger                 log.Logger
+	logger                 *zerolog.Logger
 	relay                  relay.Relay
 	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
@@ -79,8 +80,8 @@ func New(opts *Options) (*Server, error) {
 		dialer = direct.NewDirectDialerLaddr(true, lAddr)
 	}
 	return &Server{
-		logger: log.AccessLogger(),
-		relay:  relay.NewRelay(),
+		logger: opts.Logger,
+		relay:  relay.NewRelay(opts.Logger),
 		dialer: dialer,
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.

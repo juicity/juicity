@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	stdlog "log"
 
@@ -22,8 +23,9 @@ import (
 )
 
 var (
-	logger  log.Logger
-	cfgFile string
+	logger           *zerolog.Logger
+	cfgFile          string
+	disableTimestamp bool
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -99,12 +101,17 @@ func Serve(conf *config.Config) error {
 }
 
 func init() {
-	// logger
-	logger = log.AccessLogger()
-
 	// cmds
 	rootCmd.AddCommand(runCmd)
 
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
+	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
+
+	// logger
+	timeFormat := time.DateTime
+	if disableTimestamp {
+		timeFormat = ""
+	}
+	logger = log.NewLogger(timeFormat)
 }

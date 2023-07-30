@@ -2,10 +2,11 @@ package log
 
 import (
 	"testing"
+	"time"
 )
 
 func TestLogger(t *testing.T) {
-	logger := AccessLogger()
+	logger := NewLogger(time.DateTime)
 
 	const msg = "hello!"
 

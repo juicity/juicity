@@ -6,8 +6,7 @@ import (
 
 	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/protocol/juicity"
-
-	"github.com/juicity/juicity/pkg/log"
+	"github.com/rs/zerolog"
 )
 
 const (
@@ -18,7 +17,7 @@ const (
 )
 
 type relay struct {
-	logger log.Logger
+	logger *zerolog.Logger
 }
 
 type Relay interface {
@@ -32,6 +31,6 @@ type WriteCloser interface {
 	CloseWrite() error
 }
 
-func NewRelay() Relay {
-	return &relay{logger: log.AccessLogger()}
+func NewRelay(logger *zerolog.Logger) Relay {
+	return &relay{logger: logger}
 }
