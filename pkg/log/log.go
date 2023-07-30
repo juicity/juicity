@@ -12,8 +12,8 @@ type Logger = zerolog.Logger
 
 func NewLogger(timeFormat string) *Logger {
 	// parse log level from config
-	w := zerolog.NewConsoleWriter()
-	w.TimeFormat = timeFormat
+	c := zerolog.NewConsoleWriter()
+	c.TimeFormat = timeFormat
 
 	// https://github.com/natefinch/lumberjack
 	f := &lumberjack.Logger{
@@ -25,7 +25,7 @@ func NewLogger(timeFormat string) *Logger {
 	}
 
 	// set multiple write streams (default: [stdout, file])
-	multi := zerolog.MultiLevelWriter(w, f)
+	multi := zerolog.MultiLevelWriter(c, f)
 	l := zerolog.New(multi)
 
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
