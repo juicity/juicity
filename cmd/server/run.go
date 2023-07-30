@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/juicity/juicity/config"
+	"github.com/juicity/juicity/internal/config"
 	"github.com/juicity/juicity/pkg/log"
 	"github.com/juicity/juicity/server"
 	"github.com/rs/zerolog"
