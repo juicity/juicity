@@ -37,5 +37,6 @@ make juicity-client
 }
 ```
 
+- `listen` is the address that the socks5 and http server listen at.
 - Optional values of `congestion_control`: cubic, bbr, new_reno.
 - `sni` can be omitted if domain is given in `server`. However, if you use `domain` in `server`, client will resolve the domain into IP address every requests. This is slower in general, but also depends on different client implementations.
