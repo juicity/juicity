@@ -38,6 +38,8 @@ jobs:
     secrets:
       app_id: ${{ secrets.GH_APP_ID }}
       private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+      telegram_to: ${{ secrets.TELEGRAM_TO }}
+      telegram_token: ${{ secrets.TELEGRAM_TOKEN }}
 
   build:
     needs: [pre-actions]
