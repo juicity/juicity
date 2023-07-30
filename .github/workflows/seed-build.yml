@@ -26,6 +26,12 @@ on:
         type: string
         description: "[pr-build,main-build,daily-build]"
 
+    secrets:
+      app_id:
+        required: true
+      private_key:
+        required: true
+
 jobs:
   build:
     strategy:
@@ -171,11 +177,11 @@ jobs:
           name: juicity-${{ steps.get_filename.outputs.ASSET_NAME }}.zip
           path: build/*
 
-      # - name: Report result
-      #   uses: daeuniverse/ci-seed-jobs/common/report-check-run@master
-      #   if: always() && inputs.build-type == 'pr-build' && startsWith(github.event.pull_request.head.repo.full_name, github.repository_owner)
-      #   with:
-      #     app_id: ${{ secrets.GH_APP_ID }}
-      #     private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-      #     id: "juicity-bot[bot]/build"
+      - name: Report result
+        uses: daeuniverse/ci-seed-jobs/common/report-check-run@master
+        if: always() && inputs.build-type == 'pr-build' && startsWith(github.event.pull_request.head.repo.full_name, github.repository_owner)
+        with:
+          app_id: ${{ secrets.app_id }}
+          private_key: ${{ secrets.private_key }}
+          id: "juicity-bot[bot]/build"
 
