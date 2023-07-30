@@ -41,7 +41,7 @@ jobs:
     uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
       ref: ${{ github.sha }}
-      build-type: main-build
+      build_type: main-build
     secrets: inherit
 
   post-actions:

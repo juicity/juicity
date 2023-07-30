@@ -19,10 +19,10 @@ on:
         type: string
         required: true
         default: ${{ github.ref }}
-      pr-number:
+      pr_number:
         type: number
         required: false
-      build-type:
+      build_type:
         type: string
         description: "[pr-build,main-build,daily-build]"
 
@@ -101,9 +101,9 @@ jobs:
         run: |
           date=$(git log -1 --format="%cd" --date=short | sed s/-//g)
           commit=$(echo ${REF} | cut -c1-6)
-          if [[ "${{ inputs.build-type }}" == "pr-build" ]]; then
+          if [[ "${{ inputs.build_type }}" == "pr-build" ]]; then
             count=$(git rev-list --count origin/main..HEAD)
-            version="unstable-${date}.pr-${{ inputs.pr-number }}.r${count}.${commit}"
+            version="unstable-${date}.pr-${{ inputs.pr_number }}.r${count}.${commit}"
           else
             count=$(git rev-list --count HEAD)
             version="unstable-${date}.r${count}.${commit}"
@@ -179,7 +179,7 @@ jobs:
 
       - name: Report result
         uses: daeuniverse/ci-seed-jobs/common/report-check-run@master
-        if: always() && inputs.build-type == 'pr-build' && startsWith(github.event.pull_request.head.repo.full_name, github.repository_owner)
+        if: always() && inputs.build_type == 'pr-build' && startsWith(github.event.pull_request.head.repo.full_name, github.repository_owner)
         with:
           app_id: ${{ secrets.app_id }}
           private_key: ${{ secrets.private_key }}

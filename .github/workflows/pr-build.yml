@@ -47,8 +47,8 @@ jobs:
     uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
       ref: ${{ github.event.pull_request.head.sha }}
-      pr-number: ${{ github.event.pull_request.number }}
-      build-type: pr-build
+      pr_number: ${{ github.event.pull_request.number }}
+      build_type: pr-build
     secrets:
       app_id: ${{ secrets.GH_APP_ID }}
       private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
