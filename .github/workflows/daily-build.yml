@@ -40,14 +40,3 @@ jobs:
     secrets:
       app_id: ${{ secrets.GH_APP_ID }}
       private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-
-  post-actions:
-    if: always()
-    needs: [build]
-    uses: daeuniverse/ci-seed-jobs/.github/workflows/juicity-post-actions.yml@master
-    with:
-      check_run-id: "juicity-bot[bot]/daily-build-passed"
-      check_run-conclusion: ${{ needs.build.result }}
-    secrets:
-      app_id: ${{ secrets.GH_APP_ID }}
-      private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
