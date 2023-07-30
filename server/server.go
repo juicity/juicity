@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/netip"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/juicity/juicity/internal/relay"
@@ -156,7 +157,13 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 		if err != nil {
 			return err
 		}
-		go s.handleStream(ctx, authCtx, stream)
+		go func() {
+			if err = s.handleStream(ctx, authCtx, stream); err != nil {
+				s.logger.Warn().
+					Err(err).
+					Send()
+			}
+		}()
 	}
 }
 
@@ -199,7 +206,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 		defer rConn.Close()
 		if err = s.relay.RelayTCP(lConn, rConn); err != nil {
 			var netErr net.Error
-			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) {
+			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
 				return nil // ignore i/o timeout
 			}
 			return fmt.Errorf("relay error: %w", err)
@@ -212,7 +219,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			s.fwmark,
 		); err != nil {
 			var netErr net.Error
-			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) {
+			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
 				return nil // ignore i/o timeout
 			}
 			return fmt.Errorf("relay error: %w", err)
