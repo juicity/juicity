@@ -35,14 +35,20 @@ jobs:
       fetch_depth: 0
       check_runs: '["build", "main-build-passed"]'
       bot_name: "juicity-bot"
-    secrets: inherit
+    secrets:
+      app_id: ${{ secrets.GH_APP_ID }}
+      private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+      telegram_to: ${{ secrets.TELEGRAM_TO }}
+      telegram_token: ${{ secrets.TELEGRAM_TOKEN }}
 
   build:
     uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
       ref: ${{ github.sha }}
       build_type: main-build
-    secrets: inherit
+    secrets:
+      app_id: ${{ secrets.GH_APP_ID }}
+      private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
   post-actions:
     needs: [build]
