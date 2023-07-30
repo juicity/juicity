@@ -37,6 +37,9 @@ jobs:
     with:
       ref: ${{ github.sha }}
       build_type: daily-build
+    secrets:
+      app_id: ${{ secrets.GH_APP_ID }}
+      private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
   post-actions:
     if: always()
