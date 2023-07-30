@@ -7,7 +7,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type Logger = zerolog.Logger
+
 func NewLogger(timeFormat string) *zerolog.Logger {
+	// parse log level from config
 	w := zerolog.NewConsoleWriter()
 	w.TimeFormat = timeFormat
 	l := zerolog.New(w)

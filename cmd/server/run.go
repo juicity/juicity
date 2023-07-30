@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	logger           *zerolog.Logger
+	logger           *log.Logger
 	cfgFile          string
 	disableTimestamp bool
 

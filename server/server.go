@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/juicity/juicity/internal/relay"
-	"github.com/rs/zerolog"
+	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
@@ -37,7 +37,7 @@ var (
 )
 
 type Options struct {
-	Logger            *zerolog.Logger
+	Logger            *log.Logger
 	Users             map[string]string
 	Certificate       string
 	PrivateKey        string
@@ -47,7 +47,7 @@ type Options struct {
 }
 
 type Server struct {
-	logger                 *zerolog.Logger
+	logger                 *log.Logger
 	relay                  relay.Relay
 	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
