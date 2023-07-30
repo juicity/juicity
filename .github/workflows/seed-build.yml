@@ -144,8 +144,8 @@ jobs:
       - name: Copy systemd service
         if: matrix.goos == 'linux'
         run: |
-          cp ./install/juicity-client.service ./build/
-          cp ./install/juicity-server.service ./build/
+          cp ./install/example-{client,server}.json ./build/
+          cp ./install/juicity-{client,server}.service ./build/
 
       - name: Smoke test
         if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
