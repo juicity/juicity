@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/juicity/juicity/config"
 	"github.com/juicity/juicity/pkg/log"
 	"github.com/juicity/juicity/server"
