@@ -37,6 +37,7 @@ jobs:
   #   secrets: inherit
 
   build:
+  #   needs: [pre-actions]
     uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
       ref: ${{ github.sha }}
@@ -44,8 +45,8 @@ jobs:
     secrets: inherit
 
   # post-actions:
-  #   if: always()
   #   needs: [build]
+  #   if: always()
   #   uses: daeuniverse/ci-seed-jobs/.github/workflows/juicity-post-actions.yml@master
   #   with:
   #     check-run-id: "juicity-bot[bot]/main-build-passed"

@@ -49,7 +49,7 @@ jobs:
   post-actions:
     needs: [build]
     if: always()
-    uses: daeuniverse/ci-seed-jobs/.github/workflows/juicity--post-actions.yml@master
+    uses: daeuniverse/ci-seed-jobs/.github/workflows/juicity-post-actions.yml@master
     with:
       check-run-id: "juicity-bot[bot]/pr-build-passed"
       check-run-conclusion: ${{ needs.build.result }}
