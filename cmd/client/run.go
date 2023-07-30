@@ -17,7 +17,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
-	"github.com/juicity/juicity/internal/config"
+	"github.com/juicity/juicity/config"
 	"github.com/juicity/juicity/pkg/log"
 	"github.com/juicity/juicity/server"
 )
