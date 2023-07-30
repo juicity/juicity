@@ -1,8 +1,18 @@
 # juicity-client
 
-## Build
+## Install
+
+**Download from releases**
+
+Multiple platforms and architectures are provited at <https://github.com/juicity/juicity/releases>.
+
+**Build from sratch**
+
+If you want to build from scratch:
 
 ```shell
+git clone https://github.com/juicity/juicity
+cd juicity
 make juicity-client
 ```
 
@@ -17,7 +27,7 @@ make juicity-client
 ```json
 {
     "listen": ":1080",
-    "server": "112.32.62.11:23182",
+    "server": "<ip or domain>:<port>",
     "uuid": "00000000-0000-0000-0000-000000000000",
     "password": "my_password",
     "sni": "www.example.com",
@@ -27,4 +37,6 @@ make juicity-client
 }
 ```
 
+- `listen` is the address that the socks5 and http server listen at.
 - Optional values of `congestion_control`: cubic, bbr, new_reno.
+- `sni` can be omitted if domain is given in `server`. However, if you use `domain` in `server`, client will resolve the domain into IP address every requests. This is slower in general, but also depends on different client implementations.

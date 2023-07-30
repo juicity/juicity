@@ -1,8 +1,18 @@
 # juicity-server
 
-## Build
+## Install
+
+**Download from releases**
+
+Multiple platforms and architectures are provited at <https://github.com/juicity/juicity/releases>.
+
+**Build from sratch**
+
+If you want to build from scratch:
 
 ```shell
+git clone https://github.com/juicity/juicity
+cd juicity
 make CGO_ENABLED=0 juicity-server
 ```
 

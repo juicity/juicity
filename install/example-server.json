@@ -1,0 +1,10 @@
+{
+    "listen": ":23182",
+    "users": {
+        "00000000-0000-0000-0000-000000000000": "my_password"
+    },
+    "certificate": "/path/to/fullchain.cer",
+    "private_key": "/path/to/private.key",
+    "congestion_control": "bbr",
+    "log_level": "info"
+}
