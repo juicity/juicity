@@ -19,25 +19,24 @@ on:
 
 jobs:
   pre-actions:
-    uses: daeuniverse/ci-seed-jobs/.github/workflows/pre-actions.yml@master
+    uses: daeuniverse/ci-seed-jobs/.github/workflows/pre-actions-public.yml@master
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.sha }}
-      fetch-depth: 0
-      check-runs: '["build", "daily-build-passed"]'
-    secrets: inherit
+      fetch_depth: 0
+      check_runs: '["build", "daily-build-passed"]'
+      bot_name: "juicity-bot"
+    secrets:
+      app_id: ${{ secrets.GH_APP_ID }}
+      private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+      telegram_to: ${{ secrets.TELEGRAM_TO }}
+      telegram_token: ${{ secrets.TELEGRAM_TOKEN }}
 
   build:
     uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
       ref: ${{ github.sha }}
-      build-type: daily-build
-
-  post-actions:
-    if: always()
-    needs: [build]
-    uses: daeuniverse/ci-seed-jobs/.github/workflows/juicity-post-actions.yml@master
-    with:
-      check-run-id: "juicity-bot[bot]/daily-build-passed"
-      check-run-conclusion: ${{ needs.build.result }}
-    secrets: inherit
+      build_type: daily-build
+    secrets:
+      app_id: ${{ secrets.GH_APP_ID }}
+      private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
