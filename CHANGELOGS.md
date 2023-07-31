@@ -88,7 +88,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 - @arm64v8a made their first contribution in #44
 
-### v0.1.0 (latest)
+### v0.1.0
 
 > Release date: 2023/07/30
 
