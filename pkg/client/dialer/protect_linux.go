@@ -34,7 +34,6 @@ func init() {
 			return fmt.Errorf("error invoking socket control function: %w", controlErr)
 		}
 		return sockOptErr
-
 	}
 }
 
