@@ -16,6 +16,7 @@ type Config struct {
 	Password      string `json:"password"`
 	Sni           string `json:"sni"`
 	AllowInsecure bool   `json:"allow_insecure"`
+	ProtectPath   string `json:"protect_path"`
 
 	// Server
 	Users       map[string]string `json:"users"`
