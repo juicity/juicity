@@ -30,7 +30,6 @@ require (
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	tailscale.com v1.46.1 // indirect
 )
 
 // replace github.com/mzz2017/softwind => ../softwind
