@@ -28,10 +28,10 @@ github.com/mattn/go-isatty v0.0.19 h1:JITubQf0MOLdlGRuRq+jtsDlekdYPia9ZFsB8h/APP
 github.com/mattn/go-isatty v0.0.19/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/miekg/dns v1.1.55 h1:GoQ4hpsj0nFLYe+bWiCToyrBEJXkQfOOIvFGFy0lEgo=
 github.com/miekg/dns v1.1.55/go.mod h1:uInx36IzPl7FYnDcMeVWxj9byh7DutNykX4G9Sj60FY=
-github.com/mzz2017/quic-go v0.0.0-20230731150147-39ba789c9620 h1:UtQBgqnzgXMU52uIiDyVqjIdU6+Qo0PE9nAhvB8rRTs=
-github.com/mzz2017/quic-go v0.0.0-20230731150147-39ba789c9620/go.mod h1:+8o4sdYYZCkNfMGiP3oKstpdHeSDFJy84A68evIzhw4=
-github.com/mzz2017/softwind v0.0.0-20230731153125-c95c9d656d55 h1:YZLqVMgKMuF0xtQvmyYuvb3nuTMtHALgevXaNOd5yfM=
-github.com/mzz2017/softwind v0.0.0-20230731153125-c95c9d656d55/go.mod h1:1DZsBje+roK7vVs28ZKWVZgNRey7ZUr1smvsAu6PWgQ=
+github.com/mzz2017/quic-go v0.0.0-20230731153658-2aabc7c97220 h1:StI6iNucfDVrm54yhrHL0Dr1vKC1nBqkok2Itkypvdk=
+github.com/mzz2017/quic-go v0.0.0-20230731153658-2aabc7c97220/go.mod h1:+8o4sdYYZCkNfMGiP3oKstpdHeSDFJy84A68evIzhw4=
+github.com/mzz2017/softwind v0.0.0-20230731153807-772d1b5bf824 h1:54AuQMVVMv3iOng3jLkoL5jzjXJcwLQBOSJh5ZBGHkI=
+github.com/mzz2017/softwind v0.0.0-20230731153807-772d1b5bf824/go.mod h1:TopiWHnL2ty4V4AkNM1nNVdbLlASWdQqploagf4tcKc=
 github.com/nadoo/glider v0.16.3 h1:vfwrjNUiLlYkPxhONKMtfDIrX6lbIf6Rl4A82n9aWJQ=
 github.com/nadoo/glider v0.16.3/go.mod h1:2j+kOy7DLG4wSMBcz13GPfUz+wfC7gOy2Bf4xCbo8qk=
 github.com/onsi/ginkgo/v2 v2.11.0 h1:WgqUCUt/lT6yXoQ8Wef0fsNn5cAuMK7+KT9UFRz2tcU=
