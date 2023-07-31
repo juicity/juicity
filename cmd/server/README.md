@@ -61,7 +61,7 @@ Full configuration:
 - `send_through` is the interface IP to specify to use.
 - Set environment variable `QUIC_GO_ENABLE_GSO=true` to enable GSO, which can greatly improve the performance of sending and receiving packets. Notice that this option needs the support of NIC features. See more: <https://github.com/juicity/juicity/discussions/42>
 
-## Run Options
+## Arguments
 
 | Name                  | Description                             | Default Value                | Required |
 | --------------------- | --------------------------------------- | ---------------------------- | -------- |
