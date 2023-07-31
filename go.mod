@@ -5,8 +5,8 @@ go 1.20
 require (
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
-	github.com/mzz2017/quic-go v0.0.0-20230731141244-f455a937ce44
-	github.com/mzz2017/softwind v0.0.0-20230731141343-9c6f2057a95e
+	github.com/mzz2017/quic-go v0.0.0-20230731150147-39ba789c9620
+	github.com/mzz2017/softwind v0.0.0-20230731151432-02904f6961a1
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.29.1
 	github.com/spf13/cobra v1.7.0
