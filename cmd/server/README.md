@@ -63,8 +63,10 @@ Full configuration:
 
 ## Run Options
 
-- `--config`: specify config file path
-- `--disable-timestamp`: disable timestamp
-- `--log-file`: write logs to file
-- `--no-log-color`: disable colorful log output
-- `--json-log-format`: use json log format
+| Name                  | Description                             | Default Value                | Required |
+| --------------------- | --------------------------------------- | ---------------------------- | -------- |
+| `--config, -c`        | specify config file path                | NA                           | yes      |
+| `--disable-timestamp` | disable timestamp                       | false                        | no       |
+| `--log-file`          | write logs to file                      | /var/log/juicity/juicity.log | no       |
+| `--log-disable-color` | disable colorful log output             | false                        | no       |
+| `--log-format`        | specify log format; options: [raw,json] | raw                          | no       |

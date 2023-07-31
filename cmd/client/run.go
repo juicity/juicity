@@ -29,7 +29,7 @@ var (
 	disableTimestamp bool
 	logFile          string
 	noLogColor       bool
-	jsonLogFormat    bool
+	logFormat        string
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -65,10 +65,10 @@ var (
 				timeFormat = ""
 			}
 			logger = log.NewLogger(&log.Options{
-				TimeFormat:    timeFormat,
-				LogFile:       logFile,
-				NoColor:       noLogColor,
-				JsonLogFormat: jsonLogFormat,
+				TimeFormat: timeFormat,
+				LogFile:    logFile,
+				NoColor:    noLogColor,
+				LogFormat:  logFormat,
 			})
 			*logger = logger.Level(lvl)
 
@@ -133,7 +133,7 @@ func init() {
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify config file path")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
-	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "f", "", "write logs to file")
-	runCmd.PersistentFlags().BoolVarP(&noLogColor, "no-log-color", "", false, "disable colorful log output")
-	runCmd.PersistentFlags().BoolVarP(&jsonLogFormat, "json-log-format", "", false, "use json log format")
+	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "", "", "write logs to file")
+	runCmd.PersistentFlags().StringVarP(&logFormat, "log-format", "", "raw", "specify log format; options: [raw,json]; default: raw")
+	runCmd.PersistentFlags().BoolVarP(&noLogColor, "log-disable-color", "", false, "disable colorful log output")
 }

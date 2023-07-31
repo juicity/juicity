@@ -13,10 +13,10 @@ import (
 type Logger = zerolog.Logger
 
 type Options struct {
-	TimeFormat    string
-	LogFile       string
-	NoColor       bool
-	JsonLogFormat bool
+	TimeFormat string
+	LogFile    string
+	LogFormat  string
+	NoColor    bool
 }
 
 func NewLogger(opt *Options) *Logger {
@@ -33,7 +33,7 @@ func NewLogger(opt *Options) *Logger {
 	}
 
 	// jsonWriter
-	if opt.JsonLogFormat {
+	if opt.LogFormat == "json" {
 		writer = zerolog.MultiLevelWriter(os.Stdout)
 	} else {
 		writer = zerolog.MultiLevelWriter(c)
@@ -60,7 +60,7 @@ func NewLogger(opt *Options) *Logger {
 	}
 
 	// fileWriter + jsonWriter
-	if opt.LogFile != "" && opt.JsonLogFormat {
+	if opt.LogFile != "" && opt.LogFormat == "json" {
 		f := &lumberjack.Logger{
 			Filename:   opt.LogFile,
 			MaxSize:    10,   // megabytes
