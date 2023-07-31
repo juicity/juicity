@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"github.com/mzz2017/softwind/protocol"
-	"github.com/mzz2017/softwind/protocol/direct"
 	"github.com/mzz2017/softwind/protocol/juicity"
 	gliderLog "github.com/nadoo/glider/pkg/log"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
 	"github.com/juicity/juicity/config"
+	"github.com/juicity/juicity/pkg/client/dialer"
 	"github.com/juicity/juicity/pkg/log"
 	"github.com/juicity/juicity/server"
 )
@@ -82,7 +82,7 @@ func Serve(conf *config.Config) error {
 	if conf.Sni == "" {
 		conf.Sni, _, _ = net.SplitHostPort(conf.Server)
 	}
-	d, err := juicity.NewDialer(direct.SymmetricDirect, protocol.Header{
+	d, err := juicity.NewDialer(dialer.NewClientDialer(conf), protocol.Header{
 		ProxyAddress: conf.Server,
 		Feature1:     conf.CongestionControl,
 		TlsConfig: &tls.Config{
