@@ -53,6 +53,12 @@ var (
 			logger = log.NewLogger(timeFormat)
 			*logger = logger.Level(lvl)
 
+			// QUIC_GO_ENABLE_GSO
+			gso, _ := strconv.ParseBool(os.Getenv("QUIC_GO_ENABLE_GSO"))
+			logger.Info().
+				Bool("Requested QUIC_GO_ENABLE_GSO", gso).
+				Send()
+
 			go func() {
 				if err := Serve(conf); err != nil {
 					logger.Fatal().
