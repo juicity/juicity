@@ -23,14 +23,18 @@ var (
 	cfgFile          string
 	disableTimestamp bool
 	logFile          string
+	noLogColor       bool
+	jsonLogFormat    bool
 
 	runCmd = &cobra.Command{
 		Use:   "run",
 		Short: "To run juicity-server in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger = log.NewLogger(&log.Options{
-				TimeFormat: time.DateTime,
-				LogFile:    logFile,
+				TimeFormat:    time.DateTime,
+				LogFile:       logFile,
+				NoColor:       noLogColor,
+				JsonLogFormat: jsonLogFormat,
 			})
 
 			if cfgFile == "" {
@@ -56,8 +60,10 @@ var (
 				timeFormat = ""
 			}
 			logger = log.NewLogger(&log.Options{
-				TimeFormat: timeFormat,
-				LogFile:    logFile,
+				TimeFormat:    timeFormat,
+				LogFile:       logFile,
+				NoColor:       noLogColor,
+				JsonLogFormat: jsonLogFormat,
 			})
 			*logger = logger.Level(lvl)
 
@@ -121,4 +127,6 @@ func init() {
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
 	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "f", "", "write logs to file")
+	runCmd.PersistentFlags().BoolVarP(&noLogColor, "no-log-color", "", false, "colorful log output")
+	runCmd.PersistentFlags().BoolVarP(&jsonLogFormat, "json-log-format", "", false, "use json log format")
 }
