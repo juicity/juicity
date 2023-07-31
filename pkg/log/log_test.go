@@ -41,6 +41,14 @@ func TestLogger(t *testing.T) {
 			}),
 		},
 		{
+			condition: "ConsoleWriter + FileWriter (in Stdout format; disable Color Output)",
+			logger: NewLogger(&Options{
+				TimeFormat: time.DateTime,
+				LogFile:    "../../app_file_writer_stdout.log",
+				NoColor:    true,
+			}),
+		},
+		{
 			condition: "JsonWrtier + FileWriter (in JSON format)",
 			logger: NewLogger(&Options{
 				TimeFormat:    time.DateTime,
