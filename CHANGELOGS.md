@@ -12,10 +12,83 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
-- [v0.1.0 (latest)](#v010-latest)
+- [v0.1.1 (Latest)](#v011-latest)
+- [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.1.0 (latest)
+### v0.1.1 (Latest)
+
+> Release date: 2023/07/31
+
+### Features
+
+- feat(client): add protect_path support for android vpn in [#44](https://github.com/juicity/juicity/pull/44) by (@arm64v8a)
+- optimize: upgrade quic-go to v0.37.0 to support GSO in [#40](https://github.com/juicity/juicity/pull/40) by (@mzz2017)
+- feat/refactor(pkg/log): add log writer stream in [#39](https://github.com/juicity/juicity/pull/39) by (@yqlbu)
+- optimize: little more faster in [#36](https://github.com/juicity/juicity/pull/36) by (@mzz2017)
+- feat(server): support fwmark in [#18](https://github.com/juicity/juicity/pull/18) by (mzz2017)
+- feat: support send_through in [#17](https://github.com/juicity/juicity/pull/17) by (mzz2017)
+
+### Bug Fixes
+
+- fix: should support hex fwmark in [#20](https://github.com/juicity/juicity/pull/20) by (mzz2017)
+- hotfix: fix server instantiation in [#19](https://github.com/juicity/juicity/pull/19) by (@yqlbu)
+
+### Others
+
+- feat/refactor: add constant pkg in [#31](https://github.com/juicity/juicity/pull/31) by (@yqlbu)
+- ci/hotfix(build): fix secret inputs missing issue in [#33](https://github.com/juicity/juicity/pull/33) by (@yqlbu)
+- docs: add authentication docs of http/socks5 listening in [#46](https://github.com/juicity/juicity/pull/46) by (@mzz2017)
+- chore/fix: upgrade softwind to support to set udp buffer size in [#45](https://github.com/juicity/juicity/pull/45) by (@mzz2017)
+- chore(pr_template): fix typos in [#43](https://github.com/juicity/juicity/pull/43) by (@yqlbu)
+- ci: add generate-changelogs workflow in [#37](https://github.com/juicity/juicity/pull/37) by (@yqlbu)
+- ci(build,daily-build): demise post-actions stage in [#35](https://github.com/juicity/juicity/pull/35) by (@yqlbu)
+- ci(build,pr-build,daily-build): enable check_run stages in [#32](https://github.com/juicity/juicity/pull/32) by (@yqlbu)
+- chore: add example-{client,server}.json in [#29](https://github.com/juicity/juicity/pull/29) by (@mzz2017)
+- chore/optimize(log): change log format to datetime in [#26](https://github.com/juicity/juicity/pull/26) by (@mzz2017)
+- docs: refine README in [#25](https://github.com/juicity/juicity/pull/25) by (@mzz2017)
+- docs(readme): add daed client as a new juicity client in [#21](https://github.com/juicity/juicity/pull/21) by (@mzz2017)
+- refactor/patch: rework logger instantiation in [#16](https://github.com/juicity/juicity/pull/16) by (@yqlbu)
+- ci/feature: add release builds in [#15](https://github.com/juicity/juicity/pull/15) by (@yqlbu)
+
+### 特性支持
+
+- 特性(client): 为安卓 vpn 添加 protect_path 支持 in [#44](https://github.com/juicity/juicity/pull/44) by (@arm64v8a)
+- 优化: 升级 quic-go 到 v0.37.0 以支持 GSO in [#40](https://github.com/juicity/juicity/pull/40) by (@mzz2017)
+- 特性/重构(pkg/log): 添加日志写入流 in [#39](https://github.com/juicity/juicity/pull/39) by (@yqlbu)
+- 优化: 小幅提升速度 in [#36](https://github.com/juicity/juicity/pull/36) by (@mzz2017)
+- 特性(server): 支持 fwmark in [#18](https://github.com/juicity/juicity/pull/18) by (mzz2017)
+- 特性: 支持 send_through in [#17](https://github.com/juicity/juicity/pull/17) by (mzz2017)
+
+### 问题修复
+
+- 修复: 应当支持十六进制 fwmark in [#20](https://github.com/juicity/juicity/pull/20) by (mzz2017)
+- 紧急修复: 修复服务器实例化问题 in [#19](https://github.com/juicity/juicity/pull/19) by (@yqlbu)
+
+### 其他变更
+
+- 特性/重构: 添加常量包 in [#31](https://github.com/juicity/juicity/pull/31) by (@yqlbu)
+- 自动化/修复(build): 修复 secret 输入丢失问题 in [#33](https://github.com/juicity/juicity/pull/33) by (@yqlbu)
+- 文档: 添加 http/socks5 监听的身份验证文档 in [#46](https://github.com/juicity/juicity/pull/46) by (@mzz2017)
+- 杂项/修复: 升级 softwind 以支持设置 UDP 缓冲区大小 in [#45](https://github.com/juicity/juicity/pull/45) by (@mzz2017)
+- 杂项(pr_template): 修复拼写错误 in [#43](https://github.com/juicity/juicity/pull/43) by (@yqlbu)
+- 自动化: 添加 generate-changelogs 工作流程 in [#37](https://github.com/juicity/juicity/pull/37) by (@yqlbu)
+- 自动化(build,daily-build): 移除 post-actions 阶段 in [#35](https://github.com/juicity/juicity/pull/35) by (@yqlbu)
+- 自动化(build,pr-build,daily-build): 启用 check_run 阶段 in [#32](https://github.com/juicity/juicity/pull/32) by (@yqlbu)
+- 杂项: 添加 example-{client,server}.json in [#29](https://github.com/juicity/juicity/pull/29) by (@mzz2017)
+- 杂项/优化(log): 更改日志格式为日期时间 in [#26](https://github.com/juicity/juicity/pull/26) by (@mzz2017)
+- 文档: 优化 README in [#25](https://github.com/juicity/juicity/pull/25) by (@mzz2017)
+- 文档(readme): 将 daed client 添加为新的 juicity client in [#21](https://github.com/juicity/juicity/pull/21) by (@mzz2017)
+- 重构/补丁: 重新设计日志记录实例化 in [#16](https://github.com/juicity/juicity/pull/16) by (@yqlbu)
+- 自动化/特性: 添加发布构建 in [#15](https://github.com/juicity/juicity/pull/15) by (@yqlbu)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.1.0...v0.1.1
+
+### New Contributors
+
+- @arm64v8a made their first contribution in #44
+
+### v0.1.0
 
 > Release date: 2023/07/30
 
