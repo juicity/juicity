@@ -7,7 +7,7 @@ import (
 	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/protocol/juicity"
 
-	"github.com/juicity/juicity/internal/constant"
+	"github.com/juicity/juicity/common/constant"
 	"github.com/juicity/juicity/pkg/log"
 )
 
