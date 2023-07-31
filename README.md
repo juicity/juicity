@@ -9,9 +9,9 @@
     <img src="https://custom-icon-badges.herokuapp.com/github/last-commit/juicity/juicity?logo=history&logoColor=white" alt="lastcommit"/>
 </p>
 
-Juicity is a quic-based proxy protocol, inspired by tuic.
+Juicity is a quic-based proxy protocol and implementation, inspired by tuic (with many thanks).
 
-In most cases, compared to tuic v5, juicity has following advantages:
+Juicity is implemented with the following goals:
 
 - [x] More stable.
 - [x] More actively maintained.
