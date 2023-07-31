@@ -27,6 +27,9 @@ var (
 	logger           *log.Logger
 	cfgFile          string
 	disableTimestamp bool
+	logFile          string
+	noLogColor       bool
+	logFormat        string
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -61,7 +64,12 @@ var (
 			if disableTimestamp {
 				timeFormat = ""
 			}
-			logger = log.NewLogger(timeFormat)
+			logger = log.NewLogger(&log.Options{
+				TimeFormat: timeFormat,
+				LogFile:    logFile,
+				NoColor:    noLogColor,
+				LogFormat:  logFormat,
+			})
 			*logger = logger.Level(lvl)
 
 			// QUIC_GO_ENABLE_GSO
@@ -123,6 +131,9 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 
 	// flags
-	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
+	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify config file path")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
+	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "", "", "write logs to file")
+	runCmd.PersistentFlags().StringVarP(&logFormat, "log-format", "", "raw", "specify log format; options: [raw,json]; default: raw")
+	runCmd.PersistentFlags().BoolVarP(&noLogColor, "log-disable-color", "", false, "disable colorful log output")
 }

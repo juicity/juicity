@@ -1,26 +1,88 @@
 package log
 
 import (
+	"io"
+	"os"
 	"path/filepath"
 	"strconv"
 
 	"github.com/rs/zerolog"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type Logger = zerolog.Logger
 
-func NewLogger(timeFormat string) *Logger {
-	// parse log level from config
-	w := zerolog.NewConsoleWriter()
-	w.TimeFormat = timeFormat
-	l := zerolog.New(w)
+type Options struct {
+	TimeFormat string
+	LogFile    string
+	LogFormat  string
+	NoColor    bool
+}
+
+func NewLogger(opt *Options) *Logger {
+	var writer io.Writer
+
+	// default writer: ConsoleWriter
+	// additional writer options: [jsonWriter, fileWriter]
+
+	// consoleWriter
+	c := &zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: opt.TimeFormat,
+		NoColor:    opt.NoColor,
+	}
+
+	// jsonWriter
+	if opt.LogFormat == "json" {
+		writer = zerolog.MultiLevelWriter(os.Stdout)
+	} else {
+		writer = zerolog.MultiLevelWriter(c)
+	}
+
+	// fileWriter (additional log stream)
+	// https://github.com/natefinch/lumberjack
+	if opt.LogFile != "" {
+		// this will write log to file in stdout format
+		f := zerolog.ConsoleWriter{
+			Out: &lumberjack.Logger{
+				Filename:   opt.LogFile,
+				MaxSize:    10,   // megabytes
+				MaxBackups: 1,    // copies
+				MaxAge:     1,    // days
+				Compress:   true, // disabled by default
+			},
+			TimeFormat: opt.TimeFormat,
+			NoColor:    opt.NoColor,
+		}
+
+		// set multiple write streams (default: [stdout, file])
+		writer = zerolog.MultiLevelWriter(c, f)
+	}
+
+	// fileWriter + jsonWriter
+	if opt.LogFile != "" && opt.LogFormat == "json" {
+		f := &lumberjack.Logger{
+			Filename:   opt.LogFile,
+			MaxSize:    10,   // megabytes
+			MaxBackups: 1,    // copies
+			MaxAge:     1,    // days
+			Compress:   true, // disabled by default
+		}
+
+		// set multiple write streams (default: [stdout, file])
+		writer = zerolog.MultiLevelWriter(os.Stdout, f)
+	}
+
+	logger := zerolog.New(writer)
+
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
 		return filepath.Base(file) + ":" + strconv.Itoa(line)
 	}
-	l = l.With().Caller().Logger()
-	if timeFormat != "" {
-		l = l.With().Timestamp().Logger()
+	logger = logger.With().Caller().Logger()
+	if opt.TimeFormat != "" {
+		logger = logger.With().Timestamp().Logger()
 	}
-	l.Level(zerolog.DebugLevel)
-	return &l
+	logger.Level(zerolog.DebugLevel)
+
+	return &logger
 }
