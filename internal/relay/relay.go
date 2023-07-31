@@ -7,15 +7,11 @@ import (
 	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/protocol/juicity"
 
-	"github.com/juicity/juicity/common/consts"
 	"github.com/juicity/juicity/pkg/log"
 )
 
 type relay struct {
-	logger          *log.Logger
-	mtu             int
-	natTimeout      time.Duration
-	dnsQueryTimeout time.Duration
+	logger *log.Logger
 }
 
 type Relay interface {
@@ -31,9 +27,6 @@ type WriteCloser interface {
 
 func NewRelay(logger *log.Logger) Relay {
 	return &relay{
-		logger:          logger,
-		mtu:             consts.EthernetMtu,
-		natTimeout:      consts.DefaultNatTimeout,
-		dnsQueryTimeout: consts.DnsQueryTimeout,
+		logger: logger,
 	}
 }
