@@ -10,13 +10,6 @@ import (
 	"github.com/juicity/juicity/pkg/log"
 )
 
-const (
-	EthernetMtu = 1500
-
-	DefaultNatTimeout = 3 * time.Minute
-	DnsQueryTimeout   = 17 * time.Second // RFC 5452
-)
-
 type relay struct {
 	logger *log.Logger
 }
@@ -33,5 +26,7 @@ type WriteCloser interface {
 }
 
 func NewRelay(logger *log.Logger) Relay {
-	return &relay{logger: logger}
+	return &relay{
+		logger: logger,
+	}
 }
