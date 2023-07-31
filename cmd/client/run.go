@@ -131,9 +131,9 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 
 	// flags
-	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of juicity-server.")
+	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify config file path")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
 	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "f", "", "write logs to file")
-	runCmd.PersistentFlags().BoolVarP(&noLogColor, "no-log-color", "", false, "colorful log output")
+	runCmd.PersistentFlags().BoolVarP(&noLogColor, "no-log-color", "", false, "disable colorful log output")
 	runCmd.PersistentFlags().BoolVarP(&jsonLogFormat, "json-log-format", "", false, "use json log format")
 }

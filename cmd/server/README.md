@@ -28,14 +28,14 @@ Min configuration:
 
 ```json
 {
-    "listen": ":23182",
-    "users": {
-        "00000000-0000-0000-0000-000000000000": "my_password"
-    },
-    "certificate": "/path/to/fullchain.cer",
-    "private_key": "/path/to/private.key",
-    "congestion_control": "bbr",
-    "log_level": "info"
+  "listen": ":23182",
+  "users": {
+    "00000000-0000-0000-0000-000000000000": "my_password"
+  },
+  "certificate": "/path/to/fullchain.cer",
+  "private_key": "/path/to/private.key",
+  "congestion_control": "bbr",
+  "log_level": "info"
 }
 ```
 
@@ -43,16 +43,16 @@ Full configuration:
 
 ```json
 {
-    "listen": ":23182",
-    "users": {
-        "00000000-0000-0000-0000-000000000000": "my_password"
-    },
-    "certificate": "/path/to/fullchain.cer",
-    "private_key": "/path/to/private.key",
-    "congestion_control": "bbr",
-    "fwmark": "0x1000",
-    "send_through": "113.25.132.3",
-    "log_level": "info"
+  "listen": ":23182",
+  "users": {
+    "00000000-0000-0000-0000-000000000000": "my_password"
+  },
+  "certificate": "/path/to/fullchain.cer",
+  "private_key": "/path/to/private.key",
+  "congestion_control": "bbr",
+  "fwmark": "0x1000",
+  "send_through": "113.25.132.3",
+  "log_level": "info"
 }
 ```
 
@@ -60,3 +60,11 @@ Full configuration:
 - `fwmark` is useful for iptables/nft.
 - `send_through` is the interface IP to specify to use.
 - Set environment variable `QUIC_GO_ENABLE_GSO=true` to enable GSO, which can greatly improve the performance of sending and receiving packets. Notice that this option needs the support of NIC features. See more: <https://github.com/juicity/juicity/discussions/42>
+
+## Run Options
+
+- `--config`: specify config file path
+- `--disable-timestamp`: disable timestamp
+- `--log-file`: write logs to file
+- `--no-log-color`: disable colorful log output
+- `--json-log-format`: use json log format
