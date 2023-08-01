@@ -12,16 +12,16 @@ func (r *relay) RelayTCP(lConn, rConn netproxy.Conn) (err error) {
 	go func() {
 		_, e := io2.Copy(rConn, lConn)
 		if rConn, ok := rConn.(WriteCloser); ok {
-			rConn.CloseWrite()
+			_ = rConn.CloseWrite()
 		}
-		rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+		_ = rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		eCh <- e
 	}()
 	_, e := io2.Copy(lConn, rConn)
 	if lConn, ok := lConn.(WriteCloser); ok {
-		lConn.CloseWrite()
+		_ = lConn.CloseWrite()
 	}
-	lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	_ = lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	if e != nil {
 		<-eCh
 		return e

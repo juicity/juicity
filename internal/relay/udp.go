@@ -73,7 +73,7 @@ func (r *relay) SelectTimeout(packet []byte) time.Duration {
 func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwmark int) (err error) {
 	buf := pool.GetFullCap(consts.EthernetMtu)
 	defer pool.Put(buf)
-	lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
+	_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
 	n, addr, err := lConn.ReadFrom(buf)
 	if err != nil {
 		return
@@ -108,12 +108,12 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 	eCh := make(chan error, 1)
 	go func() {
 		e := r.relayConnToUDP(rConn, lConn, consts.DefaultNatTimeout)
-		rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+		_ = rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		eCh <- e
 	}()
 	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, len(buf))
-	lConn.CloseWrite()
-	lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	_ = lConn.CloseWrite()
+	_ = lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	if e != nil {
 		var netErr net.Error
 		if errors.As(e, &netErr) && netErr.Timeout() {
