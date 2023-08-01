@@ -158,7 +158,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 			return err
 		}
 		go func() {
-			if err = s.handleStream(ctx, authCtx, stream); err != nil {
+			if err = s.handleStream(ctx, authCtx, conn, stream); err != nil {
 				s.logger.Warn().
 					Err(err).
 					Send()
@@ -167,7 +167,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	}
 }
 
-func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stream quic.Stream) error {
+func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) error {
 	defer stream.Close()
 	lConn := juicity.NewConn(stream, nil, nil)
 	// Read the header and initiate the metadata
@@ -185,8 +185,10 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
+		source := fmt.Sprintf("%s %s", conn.RemoteAddr().Network(), conn.RemoteAddr().String())
 		s.logger.Debug().
 			Str("target", target).
+			Str("src", source).
 			Msg("juicity received a tcp request")
 		magicNetwork := netproxy.MagicNetwork{
 			Network: "tcp",
