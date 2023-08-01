@@ -147,7 +147,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 				Err(err).
 				Msg("handleAuth")
 			cancel()
-			conn.CloseWithError(tuic.AuthenticationFailed, "")
+			_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
 			return
 		}
 		authDone()
