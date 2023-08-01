@@ -147,7 +147,12 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 				Err(err).
 				Msg("handleAuth")
 			cancel()
-			conn.CloseWithError(tuic.AuthenticationFailed, "")
+			err = conn.CloseWithError(tuic.AuthenticationFailed, "")
+			if err != nil {
+				s.logger.Warn().
+					Err(err).
+					Msg("handleClose")
+			}
 			return
 		}
 		authDone()
