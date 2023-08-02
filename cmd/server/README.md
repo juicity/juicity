@@ -63,10 +63,14 @@ Full configuration:
 
 ## Arguments
 
-| Name                  | Description                             | Default Value                | Required |
-| --------------------- | --------------------------------------- | ---------------------------- | -------- |
-| `--config, -c`        | specify config file path                | NA                           | yes      |
-| `--disable-timestamp` | disable timestamp                       | false                        | no       |
-| `--log-file`          | write logs to file                      | /var/log/juicity/juicity.log | no       |
-| `--log-disable-color` | disable colorful log output             | false                        | no       |
-| `--log-format`        | specify log format; options: [raw,json] | raw                          | no       |
+| Name                  | Description                                                                                                 | Default Value                | Required |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------- | -------- |
+| `--config, -c`        | specify config file path                                                                                    | NA                           | yes      |
+| `--disable-timestamp` | disable timestamp                                                                                           | false                        | no       |
+| `--log-file`          | write logs to file                                                                                          | /var/log/juicity/juicity.log | no       |
+| `--log-format`        | specify log format; options: [raw,json]                                                                     | raw                          | no       |
+| `--log-disable-color` | disable colorful log output                                                                                 | false                        | no       |
+| `--log-max-size`      | specify maximum size in megabytes of the log file before it gets rotated                                    | 10 megabytes                 | no       |
+| `--log-max-backups`   | specify the maximum number of old log files to retain                                                       | 1 copy                       | no       |
+| `--log-max-age`       | specify the maximum number of days to retain old log files based on the timestamp encoded in their filename | 1 day                        | no       |
+| `--log-compress`      | enable log compression                                                                                      | true                         | no       |
