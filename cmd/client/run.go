@@ -25,16 +25,17 @@ import (
 )
 
 var (
-	logger           *log.Logger
-	cfgFile          string
-	disableTimestamp bool
-	logFile          string
-	logDisableColor  bool
-	logFormat        string
-	logMaxSize       int
-	logMaxBackups    int
-	logMaxAge        int
-	logCompress      bool
+	logger              *log.Logger
+	cfgFile             string
+	disableTimestamp    bool
+	logEnableFileWriter bool
+	logDisableColor     bool
+	logFile             string
+	logFormat           string
+	logMaxSize          int
+	logMaxBackups       int
+	logMaxAge           int
+	logCompress         bool
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -70,14 +71,15 @@ var (
 				timeFormat = ""
 			}
 			logger = log.NewLogger(&log.Options{
-				TimeFormat: timeFormat,
-				File:       logFile,
-				NoColor:    logDisableColor,
-				Format:     logFormat,
-				MaxSize:    logMaxSize,
-				MaxBackups: logMaxBackups,
-				MaxAge:     logMaxAge,
-				Compress:   logCompress,
+				TimeFormat:       timeFormat,
+				EnableFileWriter: logEnableFileWriter,
+				NoColor:          logDisableColor,
+				File:             logFile,
+				Format:           logFormat,
+				MaxSize:          logMaxSize,
+				MaxBackups:       logMaxBackups,
+				MaxAge:           logMaxAge,
+				Compress:         logCompress,
 			})
 			*logger = logger.Level(lvl)
 
@@ -141,8 +143,9 @@ func init() {
 
 	// flags
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify config file path")
-	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp")
+	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp; default: false")
 	// log-related flags
+	runCmd.PersistentFlags().BoolVarP(&logEnableFileWriter, "log-enable-file-writer", "", consts.LogEnableFileWriter, "enable log file writer; default: false")
 	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "", consts.LogFile, "write logs to file; default: /var/log/juicity/juicity.log")
 	runCmd.PersistentFlags().StringVarP(&logFormat, "log-format", "", "raw", "specify log format; options: [raw,json]; default: raw")
 	runCmd.PersistentFlags().BoolVarP(&logDisableColor, "log-disable-color", "", false, "disable colorful log output")
