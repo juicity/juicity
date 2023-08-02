@@ -2,6 +2,7 @@ package relay
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"net/netip"
 	"time"
@@ -43,9 +44,10 @@ func (r *relay) relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn,
 		if err != nil {
 			return
 		}
-		r.logger.Debug().
-			Str("target", addr.String()).
-			Msg("juicity received a udp request")
+		// Remove the log due to flood.
+		// r.logger.Debug().
+		// 	Str("target", addr.String()).
+		// 	Msg("juicity received a udp request")
 		_ = dst.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 		_, err = dst.WriteTo(buf[:n], addr.String())
 		// WARNING: if the dst is an pre-connected conn, Write should be invoked here.
@@ -76,7 +78,7 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 	_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
 	n, addr, err := lConn.ReadFrom(buf)
 	if err != nil {
-		return
+		return fmt.Errorf("ReadFrom: %w", err)
 	}
 
 	magicNetwork := netproxy.MagicNetwork{
@@ -92,17 +94,18 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			return nil // ignore i/o timeout
 		}
-		return err
+		return fmt.Errorf("Dial: %w", err)
 	}
 	rConn := conn.(netproxy.PacketConn)
 	_ = rConn.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 	_, err = rConn.WriteTo(buf[:n], addr.String())
 	if errors.Is(err, net.ErrWriteToConnected) {
-		r.logger.Error().Err(err).
+		r.logger.Warn().
+			Err(err).
 			Msg("relayConnToUDP")
 	}
 	if err != nil {
-		return
+		return fmt.Errorf("WriteTo: %w", err)
 	}
 
 	eCh := make(chan error, 1)
@@ -112,17 +115,19 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 		eCh <- e
 	}()
 	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, len(buf))
-	_ = lConn.CloseWrite()
-	_ = lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
-	if e != nil {
-		var netErr net.Error
-		if errors.As(e, &netErr) && netErr.Timeout() {
-			return <-eCh
-		}
-		<-eCh
-		return e
+	var netErr net.Error
+	if errors.As(e, &netErr) && netErr.Timeout() {
+		e = nil
 	}
-	return <-eCh
+	e2 := <-eCh
+	if errors.As(e2, &netErr) && netErr.Timeout() {
+		e2 = nil
+	}
+	e = errors.Join(e, e2)
+	if e != nil {
+		return fmt.Errorf("RelayUDPToConn: %w", e)
+	}
+	return nil
 }
 
 func (r *relay) RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration, bufSize int) (err error) {

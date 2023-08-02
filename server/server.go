@@ -157,17 +157,17 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 		if err != nil {
 			return err
 		}
-		go func() {
-			if err = s.handleStream(ctx, authCtx, stream); err != nil {
+		go func(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) {
+			if err = s.handleStream(ctx, authCtx, conn, stream); err != nil {
 				s.logger.Warn().
 					Err(err).
 					Send()
 			}
-		}()
+		}(ctx, authCtx, conn, stream)
 	}
 }
 
-func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stream quic.Stream) error {
+func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) error {
 	defer stream.Close()
 	lConn := juicity.NewConn(stream, nil, nil)
 	// Read the header and initiate the metadata
@@ -185,8 +185,10 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
+		source := conn.RemoteAddr().String()
 		s.logger.Debug().
 			Str("target", target).
+			Str("source", source).
 			Msg("juicity received a tcp request")
 		magicNetwork := netproxy.MagicNetwork{
 			Network: "tcp",
@@ -209,7 +211,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
 				return nil // ignore i/o timeout
 			}
-			return fmt.Errorf("relay error: %w", err)
+			return fmt.Errorf("relay tcp error: %w", err)
 		}
 	case "udp":
 		// can dial any target
@@ -222,7 +224,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
 				return nil // ignore i/o timeout
 			}
-			return fmt.Errorf("relay error: %w", err)
+			return fmt.Errorf("relay udp error: %w", err)
 		}
 	default:
 		return fmt.Errorf("unexpected network: %v", mdata.Network)
