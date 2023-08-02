@@ -6,10 +6,11 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
 	github.com/mzz2017/quic-go v0.0.0-20230731153658-2aabc7c97220
-	github.com/mzz2017/softwind v0.0.0-20230731153807-772d1b5bf824
+	github.com/mzz2017/softwind v0.0.0-20230801175554-aea465387f93
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.29.1
 	github.com/spf13/cobra v1.7.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
@@ -29,7 +30,6 @@ require (
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
 // replace github.com/mzz2017/softwind => ../softwind

@@ -209,7 +209,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
 				return nil // ignore i/o timeout
 			}
-			return fmt.Errorf("relay error: %w", err)
+			return fmt.Errorf("relay tcp error: %w", err)
 		}
 	case "udp":
 		// can dial any target
@@ -222,7 +222,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, stre
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
 				return nil // ignore i/o timeout
 			}
-			return fmt.Errorf("relay error: %w", err)
+			return fmt.Errorf("relay udp error: %w", err)
 		}
 	default:
 		return fmt.Errorf("unexpected network: %v", mdata.Network)
