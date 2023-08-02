@@ -115,6 +115,8 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 		eCh <- e
 	}()
 	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, len(buf))
+	_ = lConn.CloseWrite()
+	_ = lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	var netErr net.Error
 	if errors.As(e, &netErr) && netErr.Timeout() {
 		e = nil
