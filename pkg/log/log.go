@@ -14,9 +14,13 @@ type Logger = zerolog.Logger
 
 type Options struct {
 	TimeFormat string
-	LogFile    string
-	LogFormat  string
+	Format     string
 	NoColor    bool
+	File       string
+	MaxSize    int
+	MaxBackups int
+	MaxAge     int
+	Compress   bool
 }
 
 func NewLogger(opt *Options) *Logger {
@@ -33,7 +37,7 @@ func NewLogger(opt *Options) *Logger {
 	}
 
 	// jsonWriter
-	if opt.LogFormat == "json" {
+	if opt.Format == "json" {
 		writer = zerolog.MultiLevelWriter(os.Stdout)
 	} else {
 		writer = zerolog.MultiLevelWriter(c)
@@ -41,15 +45,15 @@ func NewLogger(opt *Options) *Logger {
 
 	// fileWriter (additional log stream)
 	// https://github.com/natefinch/lumberjack
-	if opt.LogFile != "" {
+	if opt.File != "" {
 		// this will write log to file in stdout format
 		f := zerolog.ConsoleWriter{
 			Out: &lumberjack.Logger{
-				Filename:   opt.LogFile,
-				MaxSize:    10,   // megabytes
-				MaxBackups: 1,    // copies
-				MaxAge:     1,    // days
-				Compress:   true, // disabled by default
+				Filename:   opt.File,       // path
+				MaxSize:    opt.MaxSize,    // megabytes
+				MaxBackups: opt.MaxBackups, // copies
+				MaxAge:     opt.MaxAge,     // days
+				Compress:   opt.Compress,   // enable by default
 			},
 			TimeFormat: opt.TimeFormat,
 			NoColor:    opt.NoColor,
@@ -60,13 +64,13 @@ func NewLogger(opt *Options) *Logger {
 	}
 
 	// fileWriter + jsonWriter
-	if opt.LogFile != "" && opt.LogFormat == "json" {
+	if opt.File != "" && opt.Format == "json" {
 		f := &lumberjack.Logger{
-			Filename:   opt.LogFile,
-			MaxSize:    10,   // megabytes
-			MaxBackups: 1,    // copies
-			MaxAge:     1,    // days
-			Compress:   true, // disabled by default
+			Filename:   opt.File,       // path
+			MaxSize:    opt.MaxSize,    // megabytes
+			MaxBackups: opt.MaxBackups, // copies
+			MaxAge:     opt.MaxAge,     // days
+			Compress:   opt.Compress,   // enable by default
 		}
 
 		// set multiple write streams (default: [stdout, file])
