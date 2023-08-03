@@ -219,6 +219,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			s.dialer,
 			&juicity.PacketConn{Conn: lConn},
 			s.fwmark,
+			conn,
 		); err != nil {
 			var netErr net.Error
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {

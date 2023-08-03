@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
+	"github.com/mzz2017/quic-go"
 	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/pool"
 	"github.com/mzz2017/softwind/protocol/juicity"
@@ -72,7 +73,7 @@ func (r *relay) SelectTimeout(packet []byte) time.Duration {
 }
 
 // RelayUoT relays UDP traffict over TCP
-func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwmark int) (err error) {
+func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwmark int, srcConn quic.Connection) (err error) {
 	buf := pool.GetFullCap(consts.EthernetMtu)
 	defer pool.Put(buf)
 	_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
@@ -88,6 +89,7 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 	conn, err := rDialer.Dial(magicNetwork.Encode(), addr.String())
 	r.logger.Debug().
 		Str("target", addr.String()).
+		Str("source", srcConn.LocalAddr().String()).
 		Msg("juicity received a udp request")
 	if err != nil {
 		var netErr net.Error
