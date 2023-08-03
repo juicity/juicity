@@ -24,7 +24,7 @@ make juicity-client
 
 ## Configuration
 
-Mini config:
+Mini configuration:
 
 ```json
 {
@@ -39,7 +39,7 @@ Mini config:
 }
 ```
 
-Full config:
+Full configuration:
 
 ```json
 {
