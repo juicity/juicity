@@ -37,8 +37,7 @@ var (
 		Short: "To run juicity-server in the foreground.",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger = log.NewLogger(&log.Options{
-				TimeFormat:       time.DateTime,
-				EnableFileWriter: false,
+				TimeFormat: time.DateTime,
 			})
 
 			if cfgFile == "" {

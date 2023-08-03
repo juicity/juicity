@@ -13,15 +13,14 @@ import (
 type Logger = zerolog.Logger
 
 type Options struct {
-	TimeFormat       string
-	Format           string
-	NoColor          bool
-	EnableFileWriter bool
-	File             string
-	MaxSize          int
-	MaxBackups       int
-	MaxAge           int
-	Compress         bool
+	TimeFormat string
+	Format     string
+	NoColor    bool
+	File       string
+	MaxSize    int
+	MaxBackups int
+	MaxAge     int
+	Compress   bool
 }
 
 func NewLogger(opt *Options) *Logger {
@@ -46,7 +45,7 @@ func NewLogger(opt *Options) *Logger {
 
 	// fileWriter (additional log stream)
 	// https://github.com/natefinch/lumberjack
-	if opt.EnableFileWriter && opt.File != "" {
+	if opt.File != "" {
 		// this will write log to file in stdout format
 		f := zerolog.ConsoleWriter{
 			Out: &lumberjack.Logger{
@@ -65,7 +64,7 @@ func NewLogger(opt *Options) *Logger {
 	}
 
 	// fileWriter + jsonWriter
-	if opt.EnableFileWriter && opt.File != "" && opt.Format == "json" {
+	if opt.File != "" && opt.Format == "json" {
 		f := &lumberjack.Logger{
 			Filename:   opt.File,       // path
 			MaxSize:    opt.MaxSize,    // megabytes
