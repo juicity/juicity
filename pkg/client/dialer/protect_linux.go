@@ -48,8 +48,8 @@ func protect(fd int, unixPath string) error {
 	}
 	defer syscall.Close(socket)
 
-	syscall.SetsockoptTimeval(socket, syscall.SOL_SOCKET, syscall.SO_RCVTIMEO, &syscall.Timeval{Sec: 3})
-	syscall.SetsockoptTimeval(socket, syscall.SOL_SOCKET, syscall.SO_SNDTIMEO, &syscall.Timeval{Sec: 3})
+	_ = syscall.SetsockoptTimeval(socket, syscall.SOL_SOCKET, syscall.SO_RCVTIMEO, &syscall.Timeval{Sec: 3})
+	_ = syscall.SetsockoptTimeval(socket, syscall.SOL_SOCKET, syscall.SO_SNDTIMEO, &syscall.Timeval{Sec: 3})
 
 	err = syscall.Connect(socket, &syscall.SockaddrUnix{Name: unixPath})
 	if err != nil {
