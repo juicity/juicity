@@ -17,7 +17,7 @@ var (
 		Short:                 "To generate the hash of a full chain certificate.",
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				cmd.Help()
+				_ = cmd.Help()
 				os.Exit(1)
 			}
 			hash, err := generateCertChainHash(args[0])
