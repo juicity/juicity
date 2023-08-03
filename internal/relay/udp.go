@@ -89,7 +89,7 @@ func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwm
 	conn, err := rDialer.Dial(magicNetwork.Encode(), addr.String())
 	r.logger.Debug().
 		Str("target", addr.String()).
-		Str("source", srcConn.LocalAddr().String()).
+		Str("source", srcConn.RemoteAddr().String()).
 		Msg("juicity received a udp request")
 	if err != nil {
 		var netErr net.Error
