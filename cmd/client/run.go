@@ -143,7 +143,7 @@ func init() {
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify config file path")
 	runCmd.PersistentFlags().BoolVarP(&disableTimestamp, "disable-timestamp", "", false, "disable timestamp; default: false")
 	// log-related flags
-	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "", "", "write logs to file; default: /var/log/juicity/juicity.log")
+	runCmd.PersistentFlags().StringVarP(&logFile, "log-file", "", "", "write logs to file; default: not write to file")
 	runCmd.PersistentFlags().StringVarP(&logFormat, "log-format", "", "raw", "specify log format; options: [raw,json]; default: raw")
 	runCmd.PersistentFlags().BoolVarP(&logDisableColor, "log-disable-color", "", false, "disable colorful log output")
 	runCmd.PersistentFlags().IntVarP(&logMaxSize, "log-max-size", "", consts.LogMaxSize, "specify maximum size in megabytes of the log file before it gets rotated; default: 10 megabytes")
