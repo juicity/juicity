@@ -57,7 +57,7 @@ func NewLogger(opt *Options) *Logger {
 				Compress:   opt.Compress,   // enable by default
 			},
 			TimeFormat: opt.TimeFormat,
-			NoColor:    opt.NoColor,
+			NoColor:    false,
 		}
 
 		// set multiple write streams (default: [stdout, file])
