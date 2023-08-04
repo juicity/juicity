@@ -36,6 +36,8 @@ sudo apt install uuid-runtime
 uuidgen
 ```
 
+Also see [#63](https://github.com/juicity/juicity/issues/63)
+
 ## Run
 
 ```shell
