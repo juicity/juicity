@@ -16,6 +16,28 @@ cd juicity
 make CGO_ENABLED=0 juicity-server
 ```
 
+## UUID Generator
+
+For CN-User, you may make use of an [online uuid-generator](https://www.v2fly.org/awesome/tools.html) from [@v2fly](https://github.com/v2fly).
+
+Alternatively, for system that ships with Python (e.g Debian or Ubuntu), you may use the following commands to generate a UUID
+
+```bash
+python3 -c "from uuid import uuid4;print(uuid4())"
+```
+
+Or install a cross-platform binary `uuidgen`:
+
+```bash
+# debian
+sudo apt install uuid-runtime
+# arch
+# preinstalled
+
+# usage
+uuidgen
+```
+
 ## Run
 
 ```shell
