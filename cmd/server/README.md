@@ -29,10 +29,8 @@ python3 -c "from uuid import uuid4;print(uuid4())"
 Or install a cross-platform binary `uuidgen`:
 
 ```bash
-# debian
+# e.g debian
 sudo apt install uuid-runtime
-# arch
-# preinstalled
 
 # usage
 uuidgen
