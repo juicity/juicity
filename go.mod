@@ -32,7 +32,7 @@ require (
 	golang.org/x/tools v0.11.0 // indirect
 )
 
-replace github.com/nadoo/glider => github.com/juicity/glider v0.0.0-20230805121932-7031bab5f1ba
+replace github.com/nadoo/glider => github.com/juicity/glider v0.0.0-20230805143717-947042416fa6
 
 // replace github.com/daeuniverse/softwind => ../softwind
 
