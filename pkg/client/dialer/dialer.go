@@ -3,9 +3,9 @@ package dialer
 import (
 	"runtime"
 
+	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/protocol/direct"
 	"github.com/juicity/juicity/config"
-	"github.com/mzz2017/softwind/netproxy"
-	"github.com/mzz2017/softwind/protocol/direct"
 )
 
 var protectPath string

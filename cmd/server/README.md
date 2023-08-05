@@ -74,3 +74,25 @@ Full configuration:
 | `--log-max-backups`   | specify the maximum number of old log files to retain                                                       | 1 copy                 | no       |
 | `--log-max-age`       | specify the maximum number of days to retain old log files based on the timestamp encoded in their filename | 1 day                  | no       |
 | `--log-compress`      | enable log compression                                                                                      | true                   | no       |
+
+## UUID Generator
+
+You may make use of an [online uuid-generator](https://www.v2fly.org/en_US/awesome/tools.html) from [@v2fly](https://github.com/v2fly) to generate a legitimate uuid.
+
+Alternatively, for system that ships with Python (e.g Debian or Ubuntu), you may use the following commands to generate a UUID
+
+```bash
+python3 -c "from uuid import uuid4;print(uuid4())"
+```
+
+Or install a cross-platform binary `uuidgen`:
+
+```bash
+# e.g debian
+sudo apt install uuid-runtime
+
+# usage
+uuidgen
+```
+
+Also see [#63](https://github.com/juicity/juicity/issues/63)

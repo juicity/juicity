@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/mzz2017/softwind/netproxy"
+	"github.com/daeuniverse/softwind/netproxy"
 	gliderLog "github.com/nadoo/glider/pkg/log"
 	"github.com/nadoo/glider/proxy"
 	"github.com/nadoo/glider/proxy/http"

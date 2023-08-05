@@ -17,13 +17,13 @@ import (
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
+	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/protocol/direct"
+	"github.com/daeuniverse/softwind/protocol/juicity"
+	"github.com/daeuniverse/softwind/protocol/tuic"
+	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
-	"github.com/mzz2017/softwind/netproxy"
-	"github.com/mzz2017/softwind/protocol/direct"
-	"github.com/mzz2017/softwind/protocol/juicity"
-	"github.com/mzz2017/softwind/protocol/tuic"
-	"github.com/mzz2017/softwind/protocol/tuic/common"
 )
 
 const (
