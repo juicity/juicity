@@ -16,28 +16,6 @@ cd juicity
 make CGO_ENABLED=0 juicity-server
 ```
 
-## UUID Generator
-
-For CN-User, you may make use of an [online uuid-generator](https://www.v2fly.org/awesome/tools.html) from [@v2fly](https://github.com/v2fly).
-
-Alternatively, for system that ships with Python (e.g Debian or Ubuntu), you may use the following commands to generate a UUID
-
-```bash
-python3 -c "from uuid import uuid4;print(uuid4())"
-```
-
-Or install a cross-platform binary `uuidgen`:
-
-```bash
-# e.g debian
-sudo apt install uuid-runtime
-
-# usage
-uuidgen
-```
-
-Also see [#63](https://github.com/juicity/juicity/issues/63)
-
 ## Run
 
 ```shell
@@ -92,3 +70,25 @@ Full configuration:
 | `--log-file`          | write logs to file                      | /var/log/juicity/juicity.log | no       |
 | `--log-disable-color` | disable colorful log output             | false                        | no       |
 | `--log-format`        | specify log format; options: [raw,json] | raw                          | no       |
+
+## UUID Generator
+
+You may make use of an [online uuid-generator](https://www.v2fly.org/en_US/awesome/tools.html) from [@v2fly](https://github.com/v2fly) to generate a legitimate uuid.
+
+Alternatively, for system that ships with Python (e.g Debian or Ubuntu), you may use the following commands to generate a UUID
+
+```bash
+python3 -c "from uuid import uuid4;print(uuid4())"
+```
+
+Or install a cross-platform binary `uuidgen`:
+
+```bash
+# e.g debian
+sudo apt install uuid-runtime
+
+# usage
+uuidgen
+```
+
+Also see [#63](https://github.com/juicity/juicity/issues/63)
