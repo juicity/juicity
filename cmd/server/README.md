@@ -24,7 +24,7 @@ make CGO_ENABLED=0 juicity-server
 
 ## Configuration
 
-Min configuration:
+Mini configuration:
 
 ```json
 {
