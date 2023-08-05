@@ -52,13 +52,7 @@ var (
 					Err(err).
 					Msg("Failed to init logger")
 			}
-			if logger.GetLevel() <= zerolog.InfoLevel {
-				flag := 0
-				if !arguments.LogDisableTimestamp {
-					flag = stdlog.Ltime | stdlog.Ldate
-				}
-				gliderLog.Set(true, flag)
-			}
+			gliderLog.SetLogger(logger)
 
 			// QUIC_GO_ENABLE_GSO
 			gso, _ := strconv.ParseBool(os.Getenv("QUIC_GO_ENABLE_GSO"))
