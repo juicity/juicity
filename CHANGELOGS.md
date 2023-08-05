@@ -59,7 +59,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 **Full Changelog**: https://github.com/juicity/juicity/compare/v0.1.1...v0.1.2
 
-### v0.1.1 (Latest)
+### v0.1.1
 
 > Release date: 2023/07/31
 
