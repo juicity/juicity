@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/base64"
 	"fmt"
 	stdlog "log"
 	"net"
@@ -17,6 +20,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
+	"github.com/juicity/juicity/common"
 	"github.com/juicity/juicity/common/consts"
 	"github.com/juicity/juicity/config"
 	"github.com/juicity/juicity/pkg/client/dialer"
@@ -106,19 +110,33 @@ func Serve(conf *config.Config) error {
 	if conf.Sni == "" {
 		conf.Sni, _, _ = net.SplitHostPort(conf.Server)
 	}
+	tlsConfig := &tls.Config{
+		NextProtos:         []string{"h3"},
+		MinVersion:         tls.VersionTLS13,
+		ServerName:         conf.Sni,
+		InsecureSkipVerify: conf.AllowInsecure,
+	}
+	if conf.PinnedCertChainSha256 != "" {
+		pinnedHash, err := base64.StdEncoding.DecodeString(conf.PinnedCertChainSha256)
+		if err != nil {
+			return fmt.Errorf("decode pin_certchain_sha256: %w", err)
+		}
+		tlsConfig.InsecureSkipVerify = true
+		tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			if !bytes.Equal(common.GenerateCertChainHash(rawCerts), pinnedHash) {
+				return fmt.Errorf("pinned hash of cert chain does not match")
+			}
+			return nil
+		}
+	}
 	d, err := juicity.NewDialer(dialer.NewClientDialer(conf), protocol.Header{
 		ProxyAddress: conf.Server,
 		Feature1:     conf.CongestionControl,
-		TlsConfig: &tls.Config{
-			NextProtos:         []string{"h3"},
-			MinVersion:         tls.VersionTLS13,
-			ServerName:         conf.Sni,
-			InsecureSkipVerify: conf.AllowInsecure,
-		},
-		User:     conf.Uuid,
-		Password: conf.Password,
-		IsClient: true,
-		Flags:    0,
+		TlsConfig:    tlsConfig,
+		User:         conf.Uuid,
+		Password:     conf.Password,
+		IsClient:     true,
+		Flags:        0,
 	})
 	if err != nil {
 		return err
