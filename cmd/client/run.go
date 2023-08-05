@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
-	stdlog "log"
 	"net"
 	"os"
 	"os/signal"
@@ -17,7 +16,6 @@ import (
 	"github.com/daeuniverse/softwind/protocol"
 	"github.com/daeuniverse/softwind/protocol/juicity"
 	gliderLog "github.com/nadoo/glider/pkg/log"
-	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
 	"github.com/juicity/juicity/cmd/internal/shared"
