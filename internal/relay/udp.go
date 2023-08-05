@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/mzz2017/quic-go"
 	"github.com/mzz2017/softwind/netproxy"
 	"github.com/mzz2017/softwind/pool"
 	"github.com/mzz2017/softwind/protocol/juicity"
@@ -73,50 +72,14 @@ func (r *relay) SelectTimeout(packet []byte) time.Duration {
 }
 
 // RelayUoT relays UDP traffict over TCP
-func (r *relay) RelayUoT(rDialer netproxy.Dialer, lConn *juicity.PacketConn, fwmark int, srcConn quic.Connection) (err error) {
-	buf := pool.GetFullCap(consts.EthernetMtu)
-	defer pool.Put(buf)
-	_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
-	n, addr, err := lConn.ReadFrom(buf)
-	if err != nil {
-		return fmt.Errorf("ReadFrom: %w", err)
-	}
-
-	magicNetwork := netproxy.MagicNetwork{
-		Network: "udp",
-		Mark:    uint32(fwmark),
-	}
-	conn, err := rDialer.Dial(magicNetwork.Encode(), addr.String())
-	r.logger.Debug().
-		Str("target", addr.String()).
-		Str("source", srcConn.RemoteAddr().String()).
-		Msg("juicity received a udp request")
-	if err != nil {
-		var netErr net.Error
-		if errors.As(err, &netErr) && netErr.Timeout() {
-			return nil // ignore i/o timeout
-		}
-		return fmt.Errorf("Dial: %w", err)
-	}
-	rConn := conn.(netproxy.PacketConn)
-	_ = rConn.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
-	_, err = rConn.WriteTo(buf[:n], addr.String())
-	if errors.Is(err, net.ErrWriteToConnected) {
-		r.logger.Warn().
-			Err(err).
-			Msg("relayConnToUDP")
-	}
-	if err != nil {
-		return fmt.Errorf("WriteTo: %w", err)
-	}
-
+func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, bufLen int) (err error) {
 	eCh := make(chan error, 1)
 	go func() {
 		e := r.relayConnToUDP(rConn, lConn, consts.DefaultNatTimeout)
 		_ = rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		eCh <- e
 	}()
-	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, len(buf))
+	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, bufLen)
 	_ = lConn.CloseWrite()
 	_ = lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	var netErr net.Error
