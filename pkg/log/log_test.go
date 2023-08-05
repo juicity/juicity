@@ -23,14 +23,14 @@ func TestLogger(t *testing.T) {
 			condition: "JsonWriter (Alone)",
 			logger: NewLogger(&Options{
 				TimeFormat: time.DateTime,
-				Format:     "json",
+				FileFormat: "json",
 			}),
 		},
 		{
 			condition: "JsonWriter (Alone)",
 			logger: NewLogger(&Options{
 				TimeFormat: time.DateTime,
-				Format:     "raw",
+				FileFormat: "raw",
 			}),
 		},
 		{
@@ -53,7 +53,7 @@ func TestLogger(t *testing.T) {
 			logger: NewLogger(&Options{
 				TimeFormat: time.DateTime,
 				File:       "../../app_file_writer_json.log",
-				Format:     "json",
+				FileFormat: "json",
 			}),
 		},
 	}

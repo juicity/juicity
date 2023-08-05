@@ -5,7 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
+	"github.com/juicity/juicity/common"
 	"github.com/rs/zerolog"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -13,8 +15,9 @@ import (
 type Logger = zerolog.Logger
 
 type Options struct {
+	Output     string
 	TimeFormat string
-	Format     string
+	FileFormat string
 	NoColor    bool
 	File       string
 	MaxSize    int
@@ -24,60 +27,51 @@ type Options struct {
 }
 
 func NewLogger(opt *Options) *Logger {
-	var writer io.Writer
-
-	// default writer: ConsoleWriter
-	// additional writer options: [jsonWriter, fileWriter]
-
-	// consoleWriter
-	c := &zerolog.ConsoleWriter{
-		Out:        os.Stdout,
-		TimeFormat: opt.TimeFormat,
-		NoColor:    opt.NoColor,
+	var writerInputs []io.Writer
+	outputs := strings.Split(opt.Output, ",")
+	for i := range outputs {
+		outputs[i] = strings.TrimSpace(outputs[i])
 	}
-
-	// jsonWriter
-	if opt.Format == "json" {
-		writer = zerolog.MultiLevelWriter(os.Stdout)
-	} else {
-		writer = zerolog.MultiLevelWriter(c)
-	}
-
-	// fileWriter (additional log stream)
-	// https://github.com/natefinch/lumberjack
-	if opt.File != "" {
-		// this will write log to file in stdout format
-		f := zerolog.ConsoleWriter{
-			Out: &lumberjack.Logger{
+	outputs = common.Deduplicate(outputs)
+	for _, output := range outputs {
+		switch output {
+		case "file":
+			// File writer.
+			fw := &lumberjack.Logger{
 				Filename:   opt.File,       // path
 				MaxSize:    opt.MaxSize,    // megabytes
 				MaxBackups: opt.MaxBackups, // copies
 				MaxAge:     opt.MaxAge,     // days
 				Compress:   opt.Compress,   // enable by default
-			},
-			TimeFormat: opt.TimeFormat,
-			NoColor:    false,
-		}
+			}
 
-		// set multiple write streams (default: [stdout, file])
-		writer = zerolog.MultiLevelWriter(c, f)
+			if opt.File != "" {
+				switch opt.FileFormat {
+				case "json":
+					// Json format.
+					writerInputs = append(writerInputs, fw)
+				case "raw":
+					fallthrough
+				default:
+					// Raw format.
+					writerInputs = append(writerInputs, zerolog.ConsoleWriter{
+						Out:        fw,
+						TimeFormat: opt.TimeFormat,
+						NoColor:    opt.NoColor,
+					})
+				}
+			}
+		case "console":
+			// Write to os.Stdout directly.
+			writerInputs = append(writerInputs, &zerolog.ConsoleWriter{
+				Out:        os.Stdout,
+				TimeFormat: opt.TimeFormat,
+				NoColor:    opt.NoColor,
+			})
+		}
 	}
 
-	// fileWriter + jsonWriter
-	if opt.File != "" && opt.Format == "json" {
-		f := &lumberjack.Logger{
-			Filename:   opt.File,       // path
-			MaxSize:    opt.MaxSize,    // megabytes
-			MaxBackups: opt.MaxBackups, // copies
-			MaxAge:     opt.MaxAge,     // days
-			Compress:   opt.Compress,   // enable by default
-		}
-
-		// set multiple write streams (default: [stdout, file])
-		writer = zerolog.MultiLevelWriter(os.Stdout, f)
-	}
-
-	logger := zerolog.New(writer)
+	logger := zerolog.New(zerolog.MultiLevelWriter(writerInputs...))
 
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
 		return filepath.Base(file) + ":" + strconv.Itoa(line)
