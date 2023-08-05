@@ -28,6 +28,9 @@ type Options struct {
 
 func NewLogger(opt *Options) *Logger {
 	var writerInputs []io.Writer
+	if opt.Output == "" {
+		opt.Output = "console"
+	}
 	outputs := strings.Split(opt.Output, ",")
 	for i := range outputs {
 		outputs[i] = strings.TrimSpace(outputs[i])
