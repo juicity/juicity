@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mzz2017/softwind/protocol"
-	"github.com/mzz2017/softwind/protocol/juicity"
+	"github.com/daeuniverse/softwind/protocol"
+	"github.com/daeuniverse/softwind/protocol/juicity"
 	gliderLog "github.com/nadoo/glider/pkg/log"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
