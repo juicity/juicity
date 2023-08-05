@@ -82,7 +82,7 @@ func InitArgumentsFlags(cmd *cobra.Command) {
 	// flags
 	cmd.PersistentFlags().StringVarP(&defaultArguments.CfgFile, "config", "c", "", "specify config file path")
 	// log-related flags
-	cmd.PersistentFlags().StringVarP(&defaultArguments.LogOutput, "log-output", "", "console", "specify log format; options: [console|file|console,file]")
+	cmd.PersistentFlags().StringVarP(&defaultArguments.LogOutput, "log-output", "", "console", "specify the log outputs; options: [console|file|console,file]")
 	cmd.PersistentFlags().BoolVarP(&defaultArguments.LogDisableColor, "log-disable-color", "", false, "disable colorful log output")
 	// Deprecated: Use log-disable-timestamp instead.
 	cmd.PersistentFlags().BoolVarP(&defaultArguments.disableTimestamp, "disable-timestamp", "", false, "deprecated; use log-disable-timestamp instead")
