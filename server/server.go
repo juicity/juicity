@@ -7,17 +7,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"net"
 	"net/netip"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/juicity/juicity/common/consts"
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/pool"
 	"github.com/daeuniverse/softwind/protocol/direct"
 	"github.com/daeuniverse/softwind/protocol/juicity"
 	"github.com/daeuniverse/softwind/protocol/tuic"
@@ -99,7 +100,6 @@ func New(opts *Options) (*Server, error) {
 
 func (s *Server) Serve(addr string) (err error) {
 	quicMaxOpenIncomingStreams := int64(s.maxOpenIncomingStreams)
-	quicMaxOpenIncomingStreams = quicMaxOpenIncomingStreams + int64(math.Ceil(float64(quicMaxOpenIncomingStreams)/10.0))
 
 	listener, err := quic.ListenAddr(addr, s.tlsConfig, &quic.Config{
 		InitialStreamReceiveWindow:     common.InitialStreamReceiveWindow,
@@ -182,10 +182,10 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 	default:
 	}
 	mdata := lConn.Metadata
+	source := conn.RemoteAddr().String()
 	switch mdata.Network {
 	case "tcp":
 		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
-		source := conn.RemoteAddr().String()
 		s.logger.Debug().
 			Str("target", target).
 			Str("source", source).
@@ -215,10 +215,46 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 		}
 	case "udp":
 		// can dial any target
+		lConn := &juicity.PacketConn{Conn: lConn}
+		buf := pool.GetFullCap(consts.EthernetMtu)
+		defer pool.Put(buf)
+		_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
+		n, addr, err := lConn.ReadFrom(buf)
+		if err != nil {
+			return fmt.Errorf("ReadFrom: %w", err)
+		}
+
+		magicNetwork := netproxy.MagicNetwork{
+			Network: "udp",
+			Mark:    uint32(s.fwmark),
+		}
+		c, err := s.dialer.Dial(magicNetwork.Encode(), addr.String())
+		s.logger.Debug().
+			Str("target", addr.String()).
+			Str("source", source).
+			Msg("juicity received a udp request")
+		if err != nil {
+			var netErr net.Error
+			if errors.As(err, &netErr) && netErr.Timeout() {
+				return nil // ignore i/o timeout
+			}
+			return fmt.Errorf("Dial: %w", err)
+		}
+		rConn := c.(netproxy.PacketConn)
+		_ = rConn.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
+		_, err = rConn.WriteTo(buf[:n], addr.String())
+		if err != nil {
+			if errors.Is(err, net.ErrWriteToConnected) {
+				s.logger.Warn().
+					Err(err).
+					Msg("relayConnToUDP")
+			}
+			return fmt.Errorf("WriteTo: %w", err)
+		}
 		if err = s.relay.RelayUoT(
-			s.dialer,
-			&juicity.PacketConn{Conn: lConn},
-			s.fwmark,
+			rConn,
+			lConn,
+			len(buf),
 		); err != nil {
 			var netErr net.Error
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
