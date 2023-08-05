@@ -4,8 +4,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/mzz2017/softwind/netproxy"
-	"github.com/mzz2017/softwind/protocol/juicity"
+	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/protocol/juicity"
 
 	"github.com/juicity/juicity/pkg/log"
 )

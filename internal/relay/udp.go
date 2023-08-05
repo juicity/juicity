@@ -7,10 +7,10 @@ import (
 	"net/netip"
 	"time"
 
+	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/pool"
+	"github.com/daeuniverse/softwind/protocol/juicity"
 	"github.com/miekg/dns"
-	"github.com/mzz2017/softwind/netproxy"
-	"github.com/mzz2017/softwind/pool"
-	"github.com/mzz2017/softwind/protocol/juicity"
 
 	"github.com/juicity/juicity/common/consts"
 )

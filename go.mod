@@ -3,10 +3,10 @@ module github.com/juicity/juicity
 go 1.20
 
 require (
+	github.com/daeuniverse/softwind v0.0.0-20230805041143-2db4e28c8922
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
-	github.com/mzz2017/quic-go v0.0.0-20230731153658-2aabc7c97220
-	github.com/mzz2017/softwind v0.0.0-20230801175554-aea465387f93
+	github.com/mzz2017/quic-go v0.0.0-20230805032040-5e9a02f54eac
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.29.1
 	github.com/spf13/cobra v1.7.0
@@ -22,7 +22,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/onsi/ginkgo/v2 v2.11.0 // indirect
-	github.com/quic-go/qtls-go1-20 v0.3.0 // indirect
+	github.com/quic-go/qtls-go1-20 v0.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df // indirect
@@ -32,6 +32,6 @@ require (
 	golang.org/x/tools v0.11.0 // indirect
 )
 
-// replace github.com/mzz2017/softwind => ../softwind
+// replace github.com/daeuniverse/softwind => ../softwind
 
 // replace github.com/mzz2017/quic-go => ../quic-go
