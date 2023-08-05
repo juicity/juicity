@@ -31,7 +31,7 @@ Juicity is implemented with the following goals:
 Full parameters:
 
 ```shell
-juicity://uuid:password@122.12.31.66:port?congestion_control=bbr&sni=www.example.com&allow_insecure=0
+juicity://uuid:password@122.12.31.66:port?congestion_control=bbr&sni=www.example.com&allow_insecure=0&pinned_certchain_sha256=CERT_HASH
 ```
 
 Mini parameters:
