@@ -12,9 +12,53 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
+- [v0.1.2 (Latest)](#v012-latest)
+
 - [v0.1.1 (Latest)](#v011-latest)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
+
+### v0.1.2 (Latest)
+
+> Release date: 2023/08/05
+
+### Features
+
+- feat: support certificate pinning in [#61](https://github.com/juicity/juicity/pull/61) by (@mzz2017)
+- feat(internal/relay): add support to inspect source for UDP traffic in [#57](https://github.com/juicity/juicity/pull/57) by (@yqlbu)
+- feat(log): add exra cmd-flags for file logger in [#56](https://github.com/juicity/juicity/pull/56) by (@yqlbu)
+- feat(sever): add support to inspect source for TCP traffic in [#53](https://github.com/juicity/juicity/pull/53) by (@yqlbu)
+
+### Bug Fixes
+
+- fix(server): support to dial domain in UDP (quic) in [#54](https://github.com/juicity/juicity/pull/54) by (@mzz2017)
+- patch(server): fix golang lint warning in [#51](https://github.com/juicity/juicity/pull/51) by (@yqlbu)
+
+### Others
+
+- chore: upgrade softwind and quic(to 0.37.2) in [#67](https://github.com/juicity/juicity/pull/67) by (@mzz2017)
+- docs(server): add UUID Generator section in [#64](https://github.com/juicity/juicity/pull/64) by (@yqlbu)
+- ci: add linting workflow in [#52](https://github.com/juicity/juicity/pull/52) by (@yqlbu)
+
+### 特性支持
+
+- 特性: 支持证书固定 in [#61](https://github.com/juicity/juicity/pull/61) by (@mzz2017)
+- 特性(内部/中继): 添加支持打印 UDP 来源 in [#57](https://github.com/juicity/juicity/pull/57) by (@yqlbu)
+- 特性(日志): 为文件日志添加额外的命令标志 in [#56](https://github.com/juicity/juicity/pull/56) by (@yqlbu)
+- 特性(服务器): 添加支持打印 TCP 来源 in [#53](https://github.com/juicity/juicity/pull/53) by (@yqlbu)
+
+### 问题修复
+
+- 修复(服务器): 支持在 UDP（quic）中拨号到域名 in [#54](https://github.com/juicity/juicity/pull/54) by (@mzz2017)
+- 补丁(服务器): 修复 golang lint 报错 in [#51](https://github.com/juicity/juicity/pull/51) by (@yqlbu)
+
+### 其他变更
+
+- 杂项: 升级 softwind 和 quic (到 0.37.2) in [#67](https://github.com/juicity/juicity/pull/67) by (@mzz2017)
+- 文档(服务器): 添加 UUID 生成器部分 in [#64](https://github.com/juicity/juicity/pull/64) by (@yqlbu)
+- 自动化: 添加 linting 工作流程 in [#52](https://github.com/juicity/juicity/pull/52) by (@yqlbu)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.1.1...v0.1.2
 
 ### v0.1.1 (Latest)
 
