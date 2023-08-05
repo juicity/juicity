@@ -11,7 +11,6 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
-
 - [v0.1.2 (Latest)](#v012-latest)
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
