@@ -63,7 +63,7 @@ Full configuration:
 
 ## Arguments
 
-Run `juicity-client run -h` to get the full arguments.
+Run `juicity-server run -h` to get the full arguments.
 
 ## UUID Generator
 
