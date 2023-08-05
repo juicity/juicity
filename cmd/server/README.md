@@ -63,13 +63,7 @@ Full configuration:
 
 ## Arguments
 
-| Name                  | Description                             | Default Value                | Required |
-| --------------------- | --------------------------------------- | ---------------------------- | -------- |
-| `--config, -c`        | specify config file path                | NA                           | yes      |
-| `--disable-timestamp` | disable timestamp                       | false                        | no       |
-| `--log-file`          | write logs to file                      | /var/log/juicity/juicity.log | no       |
-| `--log-disable-color` | disable colorful log output             | false                        | no       |
-| `--log-format`        | specify log format; options: [raw,json] | raw                          | no       |
+Run `juicity-server run -h` to get the full arguments.
 
 ## UUID Generator
 

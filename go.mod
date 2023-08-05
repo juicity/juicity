@@ -8,7 +8,7 @@ require (
 	github.com/miekg/dns v1.1.55
 	github.com/mzz2017/quic-go v0.0.0-20230805032040-5e9a02f54eac
 	github.com/nadoo/glider v0.16.3
-	github.com/rs/zerolog v1.29.1
+	github.com/rs/zerolog v1.30.0
 	github.com/spf13/cobra v1.7.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -31,6 +31,8 @@ require (
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
 )
+
+replace github.com/nadoo/glider => github.com/juicity/glider v0.0.0-20230805143717-947042416fa6
 
 // replace github.com/daeuniverse/softwind => ../softwind
 

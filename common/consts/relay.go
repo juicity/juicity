@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// default value for relay (internal/relay)
 const (
 	EthernetMtu       = 1500
 	DefaultNatTimeout = 3 * time.Minute

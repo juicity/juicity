@@ -14,3 +14,19 @@ func GenerateCertChainHash(rawCerts [][]byte) (chainHash []byte) {
 	}
 	return chainHash
 }
+
+func Deduplicate[T comparable](list []T) []T {
+	if list == nil {
+		return nil
+	}
+	res := make([]T, 0, len(list))
+	m := make(map[T]struct{})
+	for _, v := range list {
+		if _, ok := m[v]; ok {
+			continue
+		}
+		m[v] = struct{}{}
+		res = append(res, v)
+	}
+	return res
+}
