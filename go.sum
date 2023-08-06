@@ -1,7 +1,7 @@
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/daeuniverse/softwind v0.0.0-20230805041143-2db4e28c8922 h1:TQkiCTLMY82prw7vfGqOtSCWOuX9MvnCa3g6ufvPgxg=
-github.com/daeuniverse/softwind v0.0.0-20230805041143-2db4e28c8922/go.mod h1:hL69hHFjobbgKxTJ5cknnuZT1DCglxdl30uJ3dS8nco=
+github.com/daeuniverse/softwind v0.0.0-20230806041638-9b6d650a9c95 h1:m+JAtxzMPC3zEua6/jWBsJC6m5jy+XbX9pNKaTmvk3w=
+github.com/daeuniverse/softwind v0.0.0-20230806041638-9b6d650a9c95/go.mod h1:SXBNF3LXl1cfYKxoRJO/aK5ycoTNdou280mM9cGZYr4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -32,8 +32,8 @@ github.com/mattn/go-isatty v0.0.19 h1:JITubQf0MOLdlGRuRq+jtsDlekdYPia9ZFsB8h/APP
 github.com/mattn/go-isatty v0.0.19/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/miekg/dns v1.1.55 h1:GoQ4hpsj0nFLYe+bWiCToyrBEJXkQfOOIvFGFy0lEgo=
 github.com/miekg/dns v1.1.55/go.mod h1:uInx36IzPl7FYnDcMeVWxj9byh7DutNykX4G9Sj60FY=
-github.com/mzz2017/quic-go v0.0.0-20230805032040-5e9a02f54eac h1:luSUVeRYonUjk7Pxx8zViDj9Vpf42DZmfR/CbQcXKt0=
-github.com/mzz2017/quic-go v0.0.0-20230805032040-5e9a02f54eac/go.mod h1:DBA25b2LoPhrfSzOPE8KcDOicysx00qvvnqe0BpA8DQ=
+github.com/mzz2017/quic-go v0.0.0-20230806040851-f9ecab3bb42a h1:clBJMmZdRtli4Tko2ZdQ+3n1cA4Es/0ao3tB5vXvctY=
+github.com/mzz2017/quic-go v0.0.0-20230806040851-f9ecab3bb42a/go.mod h1:DBA25b2LoPhrfSzOPE8KcDOicysx00qvvnqe0BpA8DQ=
 github.com/onsi/ginkgo/v2 v2.11.0 h1:WgqUCUt/lT6yXoQ8Wef0fsNn5cAuMK7+KT9UFRz2tcU=
 github.com/onsi/ginkgo/v2 v2.11.0/go.mod h1:ZhrRA5XmEE3x3rhlzamx/JJvujdZoJ2uvgI7kR0iZvM=
 github.com/onsi/gomega v1.27.8 h1:gegWiwZjBsf2DgiSbf5hpokZ98JVDMcWkUiigk6/KXc=
