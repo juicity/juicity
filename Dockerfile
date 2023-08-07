@@ -5,7 +5,7 @@ FROM golang:1.20-alpine AS builder
 
 ARG APP_DIR
 
-RUN apk add --no-cache make
+RUN apk add --no-cache make git
 
 WORKDIR ${APP_DIR}
 
