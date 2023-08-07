@@ -47,7 +47,7 @@ func generateCertChainHash(file string) (string, error) {
 	if len(rawCerts) == 0 {
 		return "", fmt.Errorf("not a certificate file")
 	}
-	return base64.StdEncoding.EncodeToString(common.GenerateCertChainHash(rawCerts)), nil
+	return base64.URLEncoding.EncodeToString(common.GenerateCertChainHash(rawCerts)), nil
 }
 
 func init() {

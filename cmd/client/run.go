@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net"
 	"os"
@@ -84,9 +85,15 @@ func Serve(conf *config.Config) error {
 		InsecureSkipVerify: conf.AllowInsecure,
 	}
 	if conf.PinnedCertChainSha256 != "" {
-		pinnedHash, err := base64.StdEncoding.DecodeString(conf.PinnedCertChainSha256)
+		pinnedHash, err := base64.URLEncoding.DecodeString(conf.PinnedCertChainSha256)
 		if err != nil {
-			return fmt.Errorf("decode pin_certchain_sha256: %w", err)
+			pinnedHash, err = base64.StdEncoding.DecodeString(conf.PinnedCertChainSha256)
+			if err != nil {
+				pinnedHash, err = hex.DecodeString(conf.PinnedCertChainSha256)
+				if err != nil {
+					return fmt.Errorf("failed to decode PinnedCertChainSha256")
+				}
+			}
 		}
 		tlsConfig.InsecureSkipVerify = true
 		tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
