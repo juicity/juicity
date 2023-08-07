@@ -8,6 +8,11 @@ ARG APP_DIR
 RUN apk add --no-cache make
 
 WORKDIR ${APP_DIR}
+
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
 COPY . .
 
 ENV CGO_ENABLED=0
