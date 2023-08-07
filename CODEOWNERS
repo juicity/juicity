@@ -1,4 +1,10 @@
 * @juicity/governance
+
 docs/** @juicity/docs
+
 CHANGELOGS.md @juicity/docs @juicity/release
+
 /.github/** @juicity/infra
+Dockerfile @juicity/infra
+.dockerignore @juicity/infra
+docker-compose.yml @juicity/infra
