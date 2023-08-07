@@ -18,9 +18,9 @@ import (
 
 var (
 	genLinkCmd = &cobra.Command{
-		Use:                   "generate-sharinglink [config_file]",
+		Use:                   "generate-sharelink [config_file]",
 		DisableFlagsInUseLine: true,
-		Short:                 "To generate the sharing link from the config file.",
+		Short:                 "To generate the sharelink from the config file.",
 		Run: func(cmd *cobra.Command, args []string) {
 			link, err := generateLink(shared.GetArguments())
 			if err != nil {
