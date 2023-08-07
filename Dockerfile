@@ -28,4 +28,4 @@ RUN set -ex \
     && rm -rf /var/cache/apk/*
 
 COPY --from=builder ${APP_DIR}/juicity-server /usr/bin/juicity-server
-CMD ["juicity-server", "run", "-c", "/etc/juicity/config.json"]
+CMD ["juicity-server", "run", "-c", "/etc/juicity/server.json"]
