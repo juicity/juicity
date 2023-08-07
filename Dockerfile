@@ -24,7 +24,7 @@ ARG APP_DIR
 
 RUN set -ex \
     && apk upgrade \
-    && apk add bash tzdata ca-certificates \
+    && apk add tzdata ca-certificates \
     && rm -rf /var/cache/apk/*
 
 COPY --from=builder ${APP_DIR}/juicity-server /usr/bin/juicity-server
