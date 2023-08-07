@@ -2,8 +2,7 @@
 .vscode/
 .github/
 
-*.md
 **/*.md
 
-/juicity-client
-/juicity-server
+juicity-client
+juicity-server
