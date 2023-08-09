@@ -16,8 +16,8 @@ Juicity is implemented with the following goals:
 - [x] More stable.
 - [x] More actively maintained.
 - [x] Better UDP implementation.
-- [x] Better compatibility and consistency with clients in golang.
-- [x] Support self-signed certificates.
+- [x] Better compatibility and consistency with clients in Golang.
+- [x] Support certificate pinning.
 
 ## [juicity-server](cmd/server/README.md)
 
