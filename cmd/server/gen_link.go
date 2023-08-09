@@ -61,11 +61,7 @@ func generateLink(arguments shared.Arguments) (string, error) {
 		return "", err
 	}
 
-	// Get cert hash.
-	hash, err := generateCertChainHash(conf.Certificate)
-	if err != nil {
-		return "", fmt.Errorf("generateCertChainHash: %w", err)
-	}
+	// Get IP address.
 	timeout := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -78,8 +74,6 @@ func generateLink(arguments shared.Arguments) (string, error) {
 			return d.DialContext(ctx, "tcp", "208.67.222.222:53")
 		},
 	}
-
-	// Get IP address.
 	addrs, _ := r.LookupHost(ctx, "myip.opendns.com")
 	if len(addrs) == 0 {
 		http.DefaultClient.Timeout = timeout
@@ -96,15 +90,46 @@ func generateLink(arguments shared.Arguments) (string, error) {
 		}
 		addrs = []string{respBody.IP}
 	}
+	query := url.Values{
+		"congestion_control": []string{"bbr"},
+		"sni":                []string{cert.Subject.CommonName},
+	}
+
+	// Judge whether this cert needs to pin.
+	{
+		rootCAs, err := x509.SystemCertPool()
+		if err != nil {
+			return "", err
+		}
+		opts := x509.VerifyOptions{
+			Roots:         rootCAs,
+			CurrentTime:   time.Now(),
+			DNSName:       cert.Subject.CommonName,
+			Intermediates: x509.NewCertPool(),
+		}
+
+		for _, rawCert := range tlsCert.Certificate[1:] {
+			c, err := x509.ParseCertificate(rawCert)
+			if err != nil {
+				return "", err
+			}
+			opts.Intermediates.AddCert(c)
+		}
+		_, err = cert.Verify(opts)
+		if err != nil {
+			// Get cert hash to pin.
+			hash, err := generateCertChainHash(conf.Certificate)
+			if err != nil {
+				return "", fmt.Errorf("generateCertChainHash: %w", err)
+			}
+			query.Set("pinned_certchain_sha256", hash)
+		}
+	}
 	link := url.URL{
-		Scheme: "juicity",
-		User:   url.UserPassword(uuid, password),
-		Host:   net.JoinHostPort(addrs[0], port),
-		RawQuery: url.Values{
-			"congestion_control":      []string{"bbr"},
-			"sni":                     []string{cert.Subject.CommonName},
-			"pinned_certchain_sha256": []string{hash},
-		}.Encode(),
+		Scheme:   "juicity",
+		User:     url.UserPassword(uuid, password),
+		Host:     net.JoinHostPort(addrs[0], port),
+		RawQuery: query.Encode(),
 	}
 	return link.String(), nil
 }

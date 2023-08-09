@@ -90,7 +90,7 @@ Also see [#63](https://github.com/juicity/juicity/issues/63)
 ## Generate ShareLink
 
 ```bash
-juicity-server generate-sharinglink -c /etc/juicity/server.json
+juicity-server generate-sharelink -c /etc/juicity/server.json
 # output
 juicity://00000000-0000-0000-0000-000000000000:mypassword@1.2.3.4:15333?congestion_control=bbr&pinned_certchain_sha256=5ykL73pOK7NAu92A48dCrFjDqDowdChUSmlpQzudmvc%3D&sni=example.com
 ```
