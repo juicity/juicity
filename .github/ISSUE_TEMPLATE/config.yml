@@ -1,0 +1,22 @@
+blank_issues_enabled: true
+contact_links:
+  - name: '📚 Support/Q&A'
+    url: https://github.com/juicity/juicity/discussions/categories/q-a-support
+    about: >-
+      Some questions are already answered in our github discussions Q&A section If you don't find an answer, [create a support ticket](https://github.com/juicity/juicity/discussions/new?category=q-a-support)
+
+  - name: '💬 juicity Documentation Link (Server)'
+    url: https://github.com/juicity/juicity/blob/main/cmd/server/README.md
+    about: 'juicity Documentation Link'
+
+  - name: '💬 juicity Documentation Link (Client)'
+    url: https://github.com/juicity/juicity/blob/main/cmd/client/README.md
+    about: 'juicity Documentation Link'
+
+  - name: '💬 juicity Telegram Support'
+    url: https://t.me/daeuniverse
+    about: 'juicity Telegram Support Channel'
+
+  - name: '💬 juicity GitHub Discussion Support'
+    url: https://github.com/juicity/juicity/discussions
+    about: 'juicity GitHub Discussion Portal'
