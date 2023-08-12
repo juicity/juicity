@@ -4,7 +4,7 @@ Juicity 的设计理念为简约且能将 quic 发挥得当。
 
 ## 约定
 
-协议规范中出现的关键词“必须”、“应当”、“不应”需要按照 [RFC2119](https://datatracker.ietf.org/doc/html/rfc2119) 中的描述进行解释。
+协议规范中出现的关键词“必须”、“应当”、“不应”应按照 [RFC2119](https://datatracker.ietf.org/doc/html/rfc2119) 中的描述进行解释。
 
 1. “必须”：对应 RFC2119 中的 “MUST”，意味着该定义是规范的绝对要求。
 1. “应当”、“不应”：对应 RFC2119 中的 “SHOULD”、“SHOULD NOT”，意味着在特定情况下忽略该定义可能存在正当理由，但在选择不同的方式之前必须理解并仔细权衡其全部含义。
@@ -13,7 +13,7 @@ Juicity 的设计理念为简约且能将 quic 发挥得当。
 
 Juicity 使用的传输层是 quic，quic 保证了信息安全、多路复用、可靠性以及高带宽。
 
-Juicity 要求 tls 的版本必须 1.3 以上， alpn 必须使用 h3。要求 quic 至少支持 bbr 拥塞控制算法。
+Juicity 要求 quic 至少支持 bbr 拥塞控制算法；要求 tls 的版本必须 1.3 以上， alpn 必须使用 h3。
 
 需要注意的是，一般情况下，quic 对 maxOpenIncomingStreams 存在限制，客户端必须维护对端 quic connection 可用 stream 的动态数量，在可用数量不足时建立新的 connection 处理该 stream 的打开请求。当客户端不具有这样的能力时，例如 quic 底层库未暴露该接口时，客户端必须在同一个 connection 中打开累计 30 个 streams 后新建一个 connection 处理后续 stream 的打开。一般地，quic 底层库暴露的数量是准确的，从上层通过 close 和 open 来维护该数量是不准确的，实现不应通过这种方式维护该数量。
 
@@ -105,7 +105,7 @@ Juicity 不解决长度混淆问题，因此代理头可单独发送，也可与
 
 #### UDP
 
-Juicity 的 UDP 数据报基于 quic stream 传输，类似于 udp-over-tcp。为了实现更好的 full-cone，每一个源地址三元组（<sip, sport, udp>）的数据报应当在同一个 stream 中传输，源地址三元组没有对应的 stream 时打开一个 stream。
+Juicity 的 UDP 数据报基于 quic stream 传输，类似于 UDP over TCP。为了实现更好的 full-cone NAT，每一个源地址三元组（<sip, sport, UDP>）的数据报应当在同一个 stream 中传输，源地址三元组没有对应的 stream 时打开一个 stream。
 
 由于每个 UDP 数据报均可指定不同的目的地址，因此对于每个 UDP 数据报的代理请求均要发送代理头和荷载，其中 Network 为 UDP。也即是说，在一个承载 UDP 的  stream 中可能会发送多次代理头。与 TCP 不同的是，荷载前需要给出 2 字节的荷载长度，如下：
 
@@ -113,17 +113,17 @@ Juicity 的 UDP 数据报基于 quic stream 传输，类似于 udp-over-tcp。�
 [proxy header][len][payload]
 ```
 
-在客户端维护源地址三元组与 stream 的映射，并通过 nat timeout 控制映射和 stream 的生命周期。具体地，在没有收到和发送任何数据包超过 timeout 后，stream 可被关闭，并删除映射。
+在客户端维护源地址三元组与 stream 的映射，并通过 NAT timeout 控制映射和 stream 的生命周期。具体地，在没有收到和发送任何数据包超过 timeout 后，stream 可被关闭，并删除映射。
 
-在服务端，一个 stream 对应一个 outbound udp 端点，在 stream 关闭后删除 udp 端点映射，服务端也可（MAY）建立 nat timeout 机制，在 timeout 后关闭 stream。在这种情况下，服务端的 nat timeout 应当大于建议值 3 分钟。
+在服务端，一个 stream 对应一个 outbound UDP 端点，在 stream 关闭后删除 UDP 端点映射，服务端也可（MAY）建立 nat timeout 机制，在 timeout 后关闭 stream。在这种情况下，服务端的 nat timeout 应当大于建议值 3 分钟。
 
-Juicity 的 UDP 支持 dial domain，服务端实现需要为每个承载 udp 的 stream 建立一个域名到 ip 的映射，以便于在读出代理头的时候并其转为 IP 时保持映射稳定。
+Juicity 的 UDP 支持 dial domain，服务端实现需要为每个承载 UDP 的 stream 建立一个域名到 ip 的映射，以便于在读出代理头的时候并其转为 IP 时保持映射稳定。
 
-# 协议特点
+## 协议特点
 
 Juicity 是基于 Tuic 的改进，主要改进 Tuic 的 UDP 所存在的一些问题。
 
-1. 当 Tuic 的 udp_relay_mode 使用 raw 时，在丢包线路中的应用层重试将变得严重，例如 DNS 的重试通常会发生在几秒后，较为影响体验。
-1. 当 Tuic 的 udp_relay_mode 使用 quic 时，每一个 UDP 数据报均使用单独的 unistream 传输，消耗不必要的资源。
+1. 当 Tuic 的 UDP_relay_mode 使用 raw 时，在丢包线路中的应用层重试将变得严重，例如 DNS 的重试通常会发生在几秒后，较为影响体验。
+1. 当 Tuic 的 UDP_relay_mode 使用 quic 时，每一个 UDP 数据报均使用单独的 unistream 传输，消耗不必要的资源。
 
 Juicity 使用 UDP over Stream 解决这上述问题，并在规范中给出更多实现建议和约束，以避免其他可能出现的问题。
