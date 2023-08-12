@@ -49,7 +49,7 @@ header command_t {
 
 其中 version 为 0，token 使用如下方式产生：
 
-> ExportKeyingMaterial returns length bytes of exported key material in a new slice as defined in RFC 5705. If context is nil, it is not used as part of the seed. If the connection was set to allow renegotiation via Config.Renegotiation, this function will return an error.
+> ExportKeyingMaterial returns length bytes of exported key material in a new slice as defined in RFC 5705.
 
 ```go
 token = quicConnState.TLS.ExportKeyingMaterial(uuid, password, length=32)
