@@ -25,7 +25,7 @@ Juicity 要求 quic 至少支持 bbr 拥塞控制算法；要求 tls 的版本�
 
 Juicity 通过 UUID 和 password 对用户进行鉴权。一个 quic connection 可以承载多个 streams，对于每个 quic connection，认证只需要一次即可。
 
-与 Tuic 一样，Juicity 的认证发生在建立 connection 时，客户端打开一个 unistream 发送认证请求到服务端。
+与 Tuic 一样，Juicity 的认证发生在建立 connection 时，客户端打开一个 unidirectional_stream 发送认证请求到服务端。
 
 ```p4
 enum bit<8> CmdType {
@@ -123,7 +123,7 @@ Juicity 的 UDP 支持 dial domain，服务端实现需要为每个承载 UDP �
 
 Juicity 是基于 Tuic 的改进，主要改进 Tuic 的 UDP 所存在的一些问题。
 
-1. 当 Tuic 的 UDP_relay_mode 使用 raw 时，在丢包线路中的应用层重试将变得严重，例如 DNS 的重试通常会发生在几秒后，较为影响体验。
-1. 当 Tuic 的 UDP_relay_mode 使用 quic 时，每一个 UDP 数据报均使用单独的 unistream 传输，消耗不必要的资源。
+1. 当 Tuic 的 UDP_relay_mode 使用 native 时，在丢包线路中的应用层重试将变得严重，例如 DNS 的重试通常会发生在几秒后，较为影响体验。
+1. 当 Tuic 的 UDP_relay_mode 使用 quic 时，每一个 UDP 数据报均使用单独的 unidirectional_stream 传输，消耗不必要的资源。
 
 Juicity 使用 UDP over Stream 解决这上述问题，并在规范中给出更多实现建议和约束，以避免其他可能出现的问题。
