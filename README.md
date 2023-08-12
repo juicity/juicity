@@ -23,9 +23,10 @@ Juicity is implemented with the following goals:
 
 ## Client
 
-- [juicity/juicity-client](cmd/client/README.md) (Official)
-- [daeuniverse/dae](https://github.com/daeuniverse/dae) (Official, Linux Only)
-- [daeuniverse/daed](https://github.com/daeuniverse/daed) (Official, Linux Only)
+- [juicity/juicity-client](cmd/client/README.md) (Official, Cross-platform, CLI)
+- [daeuniverse/dae](https://github.com/daeuniverse/dae) (Linux, CLI)
+- [daeuniverse/daed](https://github.com/daeuniverse/daed) (Linux, Web UI)
+- [v2rayA/v2ryaA](https://github.com/v2rayA/v2ryaA) (Cross-platform, Web UI)
 
 ## Link Format
 
