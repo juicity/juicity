@@ -9,13 +9,19 @@ Juicity 的设计理念为简约且能将 quic 发挥得当。
 1. “必须”：对应 RFC2119 中的 “MUST”，意味着该定义是规范的绝对要求。
 1. “应当”、“不应”：对应 RFC2119 中的 “SHOULD”、“SHOULD NOT”，意味着在特定情况下忽略该定义可能存在正当理由，但在选择不同的方式之前必须理解并仔细权衡其全部含义。
 
+协议规范中出现的 connection 一般指的是 quic connection。在 Juicity 中，TCP connection 承载在 quic connection 的 stream 上，因此：
+```
+  quic connection : quic stream : TCP connection
+= 1               : N           : N
+```
+
 ## 传输层
 
 Juicity 使用的传输层是 quic，quic 保证了信息安全、多路复用、可靠性以及高带宽。
 
-Juicity 要求 quic 至少支持 bbr 拥塞控制算法；要求 tls 的版本必须 1.3 以上， alpn 必须使用 h3。
+Juicity 要求 quic 应当至少支持 bbr 拥塞控制算法；要求 tls 的版本必须 1.3 以上， alpn 必须使用 h3。
 
-需要注意的是，一般情况下，quic 对 maxOpenIncomingStreams 存在限制，客户端必须维护对端 quic connection 可用 stream 的动态数量，在可用数量不足时建立新的 connection 处理该 stream 的打开请求。当客户端不具有这样的能力时，例如 quic 底层库未暴露该接口时，客户端必须在同一个 connection 中打开累计 30 个 streams 后新建一个 connection 处理后续 stream 的打开。一般地，quic 底层库暴露的数量是准确的，从上层通过 close 和 open 来维护该数量是不准确的，实现不应通过这种方式维护该数量。
+需要注意的是，一般情况下，quic 对 maxOpenIncomingStreams 存在限制，客户端必须维护对端 quic connection 可用 stream 的动态数量，在可用数量不足时建立新的 connection 处理该 stream 的打开请求。当客户端不具有这样的能力时，例如 quic 底层库未暴露该接口时，客户端必须在同一个 quic connection 中打开累计 30 个 streams 后新建一个 quic connection 处理后续 stream 的打开。一般地，quic 底层库暴露的数量是准确的，从上层通过 close 和 open 计数来维护该数量是不准确的，实现不应通过这种方式维护该数量。
 
 服务端的 maxOpenIncomingStreams 参数必须大于等于 30，客户端无此要求。
 
@@ -23,9 +29,9 @@ Juicity 要求 quic 至少支持 bbr 拥塞控制算法；要求 tls 的版本�
 
 ### Authenticate
 
-Juicity 通过 UUID 和 password 对用户进行鉴权。一个 quic connection 可以承载多个 streams，对于每个 quic connection，认证只需要一次即可。
+Juicity 通过 UUID 和 password 对用户进行鉴权。一个 quic connection 可以承载多个 quic streams，对于每个 quic connection，认证只需要一次即可。
 
-与 Tuic 一样，Juicity 的认证发生在建立 connection 时，客户端打开一个 unidirectional_stream 发送认证请求到服务端。
+与 Tuic 一样，Juicity 的认证发生在建立 quic connection 时，客户端打开一个 unidirectional_stream 发送认证请求到服务端。
 
 ```p4
 enum bit<8> CmdType {
@@ -55,7 +61,7 @@ header command_t {
 token = quicConnState.TLS.ExportKeyingMaterial(uuid, password, length=32)
 ```
 
-认证请求没有应答。在客户端，代理请求无须也无法等待认证流程的结束，代理请求和认证请求可同时发送。在服务端，可同时接收认证请求和代理请求，但只有在认证成功后才开始处理代理请求，认证失败时则关闭整个 connection。
+认证请求没有应答。在客户端，代理请求无须也无法等待认证流程的结束，代理请求和认证请求可同时发送。在服务端，可同时接收认证请求和代理请求，但只有在认证成功后才开始处理代理请求，认证失败时则关闭整个 quic connection。
 
 ### Proxy
 
