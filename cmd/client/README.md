@@ -50,8 +50,8 @@ Full configuration:
   "sni": "www.example.com",
   "allow_insecure": false,
   "congestion_control": "bbr",
-  "pinned_certchain_sha256": "aQc4fdF4Nh1PD6MsCB3eofRyfRz5R8jJ1afgr37ABZs=",
   "log_level": "info",
+  "pinned_certchain_sha256": "aQc4fdF4Nh1PD6MsCB3eofRyfRz5R8jJ1afgr37ABZs=",
   "forward": {
     "127.0.0.1:12322": "127.0.0.1:22",
     "0.0.0.0:5201": "127.0.0.1:5201"
