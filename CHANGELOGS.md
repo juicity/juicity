@@ -11,10 +11,58 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
+
+- [v0.1.3 (Latest)](#v013-latest)
 - [v0.1.2 (Latest)](#v012-latest)
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
+
+### v0.1.3 (Latest)
+
+> Release date: 2023/08/13
+
+### Features
+
+- optimize(generate-sharelink): judge whether really need to pin in [#80](https://github.com/juicity/juicity/pull/80) by (@mzz2017)
+- feat(server): support cmd generate-sharelink in [#74](https://github.com/juicity/juicity/pull/74) by (@mzz2017)
+
+### Others
+
+- docs: add lang switch for spec.md in [#85](https://github.com/juicity/juicity/pull/85) by (@mzz2017)
+- docs(spec): add English version specification in [#84](https://github.com/juicity/juicity/pull/84) by (@mzz2017)
+- docs: add protocol spec in [#83](https://github.com/juicity/juicity/pull/83) by (@mzz2017)
+- chore: bump quic-go to v0.37.4 to support go1.21 in [#81](https://github.com/juicity/juicity/pull/81) by (@mzz2017)
+- chore(pr_template): update pr_template section headers in [#79](https://github.com/juicity/juicity/pull/79) by (@yqlbu)
+- docs(readme): add self-signed certs to goals in [#78](https://github.com/juicity/juicity/pull/78) by (@yqlbu)
+- chore/refactor: rework issue_templates in [#77](https://github.com/juicity/juicity/pull/77) by (@yqlbu)
+- ci/optimize: docker refinement in [#75](https://github.com/juicity/juicity/pull/75) by (@yqlbu)
+- ci: add Dockerfile in [#73](https://github.com/juicity/juicity/pull/73) by (@EkkoG)
+- chore: upgrade quic-go to v0.37.3 in [#70](https://github.com/juicity/juicity/pull/70) by (@mzz2017)
+
+### 特性支持
+
+- 优化(生成共享链接): 判断是否真的需要固定 in [#80](https://github.com/juicity/juicity/pull/80) by (@mzz2017)
+- 特性(服务器): 支持命令生成共享链接 in [#74](https://github.com/juicity/juicity/pull/74) by (@mzz2017)
+
+### 其他变更
+
+- 文档: 为 spec.md 添加语言切换 in [#85](https://github.com/juicity/juicity/pull/85) by (@mzz2017)
+- 文档(spec): 添加英文版本规范 in [#84](https://github.com/juicity/juicity/pull/84) by (@mzz2017)
+- 文档: 添加协议规范 in [#83](https://github.com/juicity/juicity/pull/83) by (@mzz2017)
+- 杂项: 升级 quic-go 至 v0.37.4 以支持 go1.21 in [#81](https://github.com/juicity/juicity/pull/81) by (@mzz2017)
+- 杂项(pr_template): 更新 pr_template 部分标题 in [#79](https://github.com/juicity/juicity/pull/79) by (@yqlbu)
+- 文档(readme): 在目标中添加自签名证书 in [#78](https://github.com/juicity/juicity/pull/78) by (@yqlbu)
+- 杂项/重构: 重新设计 issue_templates in [#77](https://github.com/juicity/juicity/pull/77) by (@yqlbu)
+- 自动化(优化): Docker 优化 in [#75](https://github.com/juicity/juicity/pull/75) by (@yqlbu)
+- 自动化: 在 [#73](https://github.com/juicity/juicity/pull/73) 中添加 Dockerfile by (@EkkoG)
+- 杂项: 将 quic-go 升级至 v0.37.3 in [#70](https://github.com/juicity/juicity/pull/70) by (@mzz2017)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.1.2...v0.1.3
+
+### New Contributors
+
+- @EkkoG made their first contribution in #73
 
 ### v0.1.2 (Latest)
 
