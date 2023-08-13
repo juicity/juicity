@@ -51,7 +51,12 @@ Full configuration:
   "allow_insecure": false,
   "congestion_control": "bbr",
   "pinned_certchain_sha256": "aQc4fdF4Nh1PD6MsCB3eofRyfRz5R8jJ1afgr37ABZs=",
-  "log_level": "info"
+  "log_level": "info",
+  "forward": {
+    "127.0.0.1:12322": "127.0.0.1:22",
+    "0.0.0.0:5201": "127.0.0.1:5201"
+    "0.0.0.0:5353": "8.8.8.8:53"
+  },
 }
 ```
 
@@ -60,6 +65,7 @@ Full configuration:
 - `sni` can be omitted if domain is given in `server`.
 - `pinned_certchain_sha256` is the pinned hash of remote TLS certificate chain. You can generate it by `juicity-server generate-certchain-hash [fullchain_cert_file]`. See <https://github.com/juicity/juicity/issues/34>.
 - Set environment variable `QUIC_GO_ENABLE_GSO=true` to enable GSO, which can greatly improve the performance of sending and receiving packets. Notice that this option needs the support of NIC features. See more: <https://github.com/juicity/juicity/discussions/42>
+- Forward format is `"<Local Address>": "<Remote Address>"`. Remote address can be local or another host.
 
 ## Arguments
 
