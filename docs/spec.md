@@ -1,5 +1,7 @@
 # Juicity 协议规范
 
+[**简体中文**](./spec.md) | [**English**](./spec_en.md)
+
 Juicity 的设计理念为简约且能将 quic 发挥得当。
 
 ## 约定

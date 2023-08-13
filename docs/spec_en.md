@@ -1,5 +1,7 @@
 # Juicity Protocol Specification
 
+[**简体中文**](./spec.md) | [**English**](./spec_en.md)
+
 The design philosophy of Juicity is to be simple yet effective in utilizing QUIC.
 
 ## Conventions

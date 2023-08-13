@@ -43,7 +43,7 @@ juicity://uuid:password@example.com:port?congestion_control=bbr
 
 ## Juicity Specification
 
-About the specification of the protocol, you can find it [here](docs/spec.md).
+About the specification of the protocol, you can find it [here](docs/spec_en.md).
 
 ## License
 
