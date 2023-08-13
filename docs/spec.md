@@ -19,7 +19,7 @@ Juicity 的设计理念为简约且能将 quic 发挥得当。
 
 Juicity 使用的传输层是 quic，quic 保证了信息安全、多路复用、可靠性以及高带宽。
 
-Juicity 要求 quic 应当至少支持 bbr 拥塞控制算法；要求 tls 的版本必须 1.3 以上， alpn 必须使用 h3。
+Juicity 要求 quic 应当至少支持 bbr 拥塞控制算法；要求 tls 的版本必须 1.3 以上， alpn 必须是 h3。
 
 需要注意的是，一般情况下，quic 对 maxOpenIncomingStreams 存在限制，客户端必须维护对端 quic connection 可用 stream 的动态数量，在可用数量不足时建立新的 connection 处理该 stream 的打开请求。当客户端不具有这样的能力时，例如 quic 底层库未暴露该接口时，客户端必须在同一个 quic connection 中打开累计 30 个 streams 后新建一个 quic connection 处理后续 stream 的打开。一般地，quic 底层库暴露的数量是准确的，从上层通过 close 和 open 计数来维护该数量是不准确的，实现不应通过这种方式维护该数量。
 
@@ -113,7 +113,7 @@ Juicity 不解决长度混淆问题，因此代理头可单独发送，也可与
 
 Juicity 的 UDP 数据报基于 quic stream 传输，类似于 UDP over TCP。为了实现更好的 full-cone NAT，每一个源地址三元组（<sip, sport, UDP>）的数据报应当在同一个 stream 中传输，源地址三元组没有对应的 stream 时打开一个 stream。
 
-由于每个 UDP 数据报均可指定不同的目的地址，因此对于每个 UDP 数据报的代理请求均要发送代理头和荷载，其中 Network 为 UDP。也即是说，在一个承载 UDP 的  stream 中可能会发送多次代理头。与 TCP 不同的是，荷载前需要给出 2 字节的荷载长度，如下：
+由于每个 UDP 数据报均可指定不同的目的地址，因此对于每个 UDP 数据报的代理请求均要发送代理头和荷载，其中 Network 为 UDP。与 TCP 不同的是，荷载前需要给出 2 字节的荷载长度，如下：
 
 ```
 [proxy header][len][payload]
@@ -129,7 +129,7 @@ Juicity 的 UDP 支持 dial domain，服务端实现需要为每个承载 UDP �
 
 Juicity 是基于 Tuic 的改进，主要改进 Tuic 的 UDP 所存在的一些问题。
 
-1. 当 Tuic 的 UDP_relay_mode 使用 native 时，在丢包线路中的应用层重试将变得严重，例如 DNS 的重试通常会发生在几秒后，较为影响体验。
-1. 当 Tuic 的 UDP_relay_mode 使用 quic 时，每一个 UDP 数据报均使用单独的 unidirectional_stream 传输，消耗不必要的资源。
+1. 当 Tuic 的 udp_relay_mode 使用 native 时，在丢包线路中的应用层重试将变得严重，例如 DNS 的重试通常会发生在几秒后，较为影响体验。
+1. 当 Tuic 的 udp_relay_mode 使用 quic 时，每一个 UDP 数据报均使用单独的 unidirectional_stream 传输，消耗不必要的资源。
 
 Juicity 使用 UDP over Stream 解决这上述问题，并在规范中给出更多实现建议和约束，以避免其他可能出现的问题。
