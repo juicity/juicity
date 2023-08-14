@@ -168,8 +168,8 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 }
 
 func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) error {
-	defer stream.Close()
 	lConn := juicity.NewConn(stream, nil, nil)
+	defer lConn.Close()
 	// Read the header and initiate the metadata
 	_, err := lConn.Read(nil)
 	if err != nil {
