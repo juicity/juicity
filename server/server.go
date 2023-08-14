@@ -139,10 +139,10 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	common.SetCongestionController(conn, s.congestionControl, s.cwnd)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	authCtx, authDone := context.WithCancel(ctx)
+	authCtx, authDone := context.WithTimeout(ctx, AuthenticateTimeout)
 	defer authDone()
 	go func() {
-		if _, err := s.handleAuth(ctx, conn); err != nil {
+		if _, err := s.handleAuth(authCtx, conn); err != nil {
 			s.logger.Warn().
 				Err(err).
 				Msg("handleAuth")
@@ -157,19 +157,19 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 		if err != nil {
 			return err
 		}
-		go func(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) {
+		go func(stream quic.Stream) {
 			if err = s.handleStream(ctx, authCtx, conn, stream); err != nil {
 				s.logger.Warn().
 					Err(err).
 					Send()
 			}
-		}(ctx, authCtx, conn, stream)
+		}(stream)
 	}
 }
 
 func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) error {
-	defer stream.Close()
 	lConn := juicity.NewConn(stream, nil, nil)
+	defer lConn.Close()
 	// Read the header and initiate the metadata
 	_, err := lConn.Read(nil)
 	if err != nil {
@@ -269,8 +269,6 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 }
 
 func (s *Server) handleAuth(ctx context.Context, conn quic.Connection) (uuid *uuid.UUID, err error) {
-	ctx, cancel := context.WithTimeout(ctx, AuthenticateTimeout)
-	defer cancel()
 	uniStream, err := conn.AcceptUniStream(ctx)
 	if err != nil {
 		return nil, err
@@ -301,7 +299,7 @@ func (s *Server) handleAuth(ctx context.Context, conn quic.Connection) (uuid *uu
 				if token == authenticate.TOKEN {
 					return &authenticate.UUID, nil
 				} else {
-					_ = conn.CloseWithError(tuic.AuthenticationFailed, ErrAuthenticationFailed.Error())
+					_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
 				}
 			}
 			return nil, fmt.Errorf("%w: %v", ErrAuthenticationFailed, authenticate.UUID)
