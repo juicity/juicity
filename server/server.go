@@ -75,13 +75,19 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	d := direct.FullconeDirect
-	if opts.SendThrough != "" {
+	var d netproxy.Dialer
+	uesFullconeDialer := opts.DialerLink == ""
+	switch {
+	case opts.SendThrough != "":
 		lAddr, err := netip.ParseAddr(opts.SendThrough)
 		if err != nil {
 			return nil, fmt.Errorf("parse send_through: %w", err)
 		}
-		d = direct.NewDirectDialerLaddr(true, lAddr)
+		d = direct.NewDirectDialerLaddr(uesFullconeDialer, lAddr)
+	case uesFullconeDialer:
+		d = direct.FullconeDirect
+	default:
+		d = direct.SymmetricDirect
 	}
 	if opts.DialerLink != "" {
 		var property *dialer.Property
