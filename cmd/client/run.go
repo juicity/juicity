@@ -144,7 +144,7 @@ func Serve(conf *config.Config) error {
 	}
 	if len(conf.Forward) != 0 {
 		for local, remote := range conf.Forward {
-			forwarder, err := server.NewForwarder(&server.ForwarderOptions{
+			forwarder, err := server.NewForwarder(server.ForwarderOptions{
 				Logger:     logger,
 				Dialer:     d,
 				LocalAddr:  local,
