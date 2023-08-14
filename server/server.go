@@ -16,6 +16,7 @@ import (
 	"github.com/juicity/juicity/common/consts"
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
+	"github.com/sirupsen/logrus"
 
 	"github.com/daeuniverse/softwind/netproxy"
 	"github.com/daeuniverse/softwind/pool"
@@ -25,6 +26,8 @@ import (
 	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
+
+	"github.com/daeuniverse/dae/component/outbound/dialer"
 )
 
 const (
@@ -46,6 +49,7 @@ type Options struct {
 	CongestionControl string
 	Fwmark            int
 	SendThrough       string
+	DialerLink        string
 }
 
 type Server struct {
@@ -73,18 +77,40 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	dialer := direct.FullconeDirect
+	d := direct.FullconeDirect
 	if opts.SendThrough != "" {
 		lAddr, err := netip.ParseAddr(opts.SendThrough)
 		if err != nil {
 			return nil, fmt.Errorf("parse send_through: %w", err)
 		}
-		dialer = direct.NewDirectDialerLaddr(true, lAddr)
+		d = direct.NewDirectDialerLaddr(true, lAddr)
+	}
+	if opts.DialerLink != "" {
+		var property *dialer.Property
+		if d, property, err = dialer.NewNetproxyDialerFromLink(d, &dialer.GlobalOption{
+			// NOTICE: Log was not used by 2023.08.14.
+			Log:               logrus.StandardLogger(),
+			TcpCheckOptionRaw: dialer.TcpCheckOptionRaw{},
+			CheckDnsOptionRaw: dialer.CheckDnsOptionRaw{},
+			CheckInterval:     0,
+			CheckTolerance:    0,
+			CheckDnsTcp:       false,
+			AllowInsecure:     false,
+			TlsImplementation: "",
+			UtlsImitate:       "",
+		}, opts.DialerLink); err != nil {
+			return nil, fmt.Errorf("parse DialerLink: %w", err)
+		}
+		opts.Logger.Info().
+			Str("name", property.Name).
+			Str("proto", property.Protocol).
+			Str("addr", property.Address).
+			Msg("Dial use given dialer")
 	}
 	return &Server{
 		logger: opts.Logger,
 		relay:  relay.NewRelay(opts.Logger),
-		dialer: dialer,
+		dialer: d,
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
 			MinVersion:   tls.VersionTLS13,

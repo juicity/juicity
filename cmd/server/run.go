@@ -9,14 +9,13 @@ import (
 	"syscall"
 	"time"
 
-	_ "net/http/pprof"
-
-	"github.com/spf13/cobra"
-
 	"github.com/juicity/juicity/cmd/internal/shared"
 	"github.com/juicity/juicity/config"
 	"github.com/juicity/juicity/pkg/log"
 	"github.com/juicity/juicity/server"
+
+	_ "github.com/daeuniverse/dae/component/outbound"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -88,6 +87,7 @@ func Serve(conf *config.Config) (err error) {
 		CongestionControl: conf.CongestionControl,
 		Fwmark:            int(fwmark),
 		SendThrough:       conf.SendThrough,
+		DialerLink:        conf.DialerLink,
 	})
 	if err != nil {
 		return err
