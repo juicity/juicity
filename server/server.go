@@ -16,8 +16,8 @@ import (
 	"github.com/juicity/juicity/common/consts"
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
-	"github.com/sirupsen/logrus"
 
+	"github.com/daeuniverse/outbound/dialer"
 	"github.com/daeuniverse/softwind/netproxy"
 	"github.com/daeuniverse/softwind/pool"
 	"github.com/daeuniverse/softwind/protocol/direct"
@@ -26,8 +26,6 @@ import (
 	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
 	"github.com/mzz2017/quic-go"
-
-	"github.com/daeuniverse/dae/component/outbound/dialer"
 )
 
 const (
@@ -87,14 +85,7 @@ func New(opts *Options) (*Server, error) {
 	}
 	if opts.DialerLink != "" {
 		var property *dialer.Property
-		if d, property, err = dialer.NewNetproxyDialerFromLink(d, &dialer.GlobalOption{
-			// NOTICE: Log was not used by 2023.08.14.
-			Log:               logrus.StandardLogger(),
-			TcpCheckOptionRaw: dialer.TcpCheckOptionRaw{},
-			CheckDnsOptionRaw: dialer.CheckDnsOptionRaw{},
-			CheckInterval:     0,
-			CheckTolerance:    0,
-			CheckDnsTcp:       false,
+		if d, property, err = dialer.NewNetproxyDialerFromLink(d, &dialer.ExtraOption{
 			AllowInsecure:     false,
 			TlsImplementation: "",
 			UtlsImitate:       "",

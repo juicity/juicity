@@ -14,7 +14,6 @@ import (
 	"github.com/juicity/juicity/pkg/log"
 	"github.com/juicity/juicity/server"
 
-	_ "github.com/daeuniverse/dae/component/outbound"
 	"github.com/spf13/cobra"
 )
 
