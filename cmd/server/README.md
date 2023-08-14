@@ -50,9 +50,10 @@ Full configuration:
   "certificate": "/path/to/fullchain.cer",
   "private_key": "/path/to/private.key",
   "congestion_control": "bbr",
+  "log_level": "info",
   "fwmark": "0x1000",
   "send_through": "113.25.132.3",
-  "log_level": "info"
+  "dialer_link": "socks5://127.0.0.1:1080"
 }
 ```
 
@@ -60,6 +61,7 @@ Full configuration:
 - `fwmark` is useful for iptables/nft.
 - `send_through` is the interface IP to specify to use.
 - Set environment variable `QUIC_GO_ENABLE_GSO=true` to enable GSO, which can greatly improve the performance of sending and receiving packets. Notice that this option needs the support of NIC features. See more: <https://github.com/juicity/juicity/discussions/42>
+- `dialer_link` can be extreme flexible. Juicity support many protocols, even proxy chains. See [proxy-protocols](https://github.com/daeuniverse/dae/blob/main/docs/en/proxy-protocols.md) [中文](https://github.com/daeuniverse/dae/blob/main/docs/zh/proxy-protocols.md).
 
 ## Arguments
 
