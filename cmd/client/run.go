@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
@@ -17,6 +18,7 @@ import (
 	"github.com/daeuniverse/softwind/protocol"
 	"github.com/daeuniverse/softwind/protocol/juicity"
 	gliderLog "github.com/nadoo/glider/pkg/log"
+	"github.com/sourcegraph/conc/pool"
 	"github.com/spf13/cobra"
 
 	"github.com/juicity/juicity/cmd/internal/shared"
@@ -115,16 +117,57 @@ func Serve(conf *config.Config) error {
 	if err != nil {
 		return err
 	}
-	s, err := server.NewMixed("mixed://"+conf.Listen, d)
-	if err != nil {
-		return err
+	if conf.Listen == "" && len(conf.Forward) == 0 {
+		logger.Fatal().Msg("Please fill in at least one of `listen` and `forward` in the config file.")
 	}
-	if conf.Listen == "" {
-		return fmt.Errorf(`"Listen" is required`)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	wg := pool.New().WithErrors().WithContext(ctx).WithCancelOnError()
+	if conf.Listen != "" {
+		s, err := server.NewMixed("mixed://"+conf.Listen, d)
+		if err != nil {
+			return err
+		}
+		wg.Go(func(ctx context.Context) error {
+			ch := make(chan struct{}, 1)
+			go func() {
+				s.ListenAndServe()
+				ch <- struct{}{}
+			}()
+			select {
+			case <-ch:
+				return fmt.Errorf("ListenAndServe: unexpected error")
+			case <-ctx.Done():
+				return nil
+			}
+		})
 	}
-	logger.Info().Msg("Listen http and socks5 at " + conf.Listen)
-	s.ListenAndServe()
-	return nil
+	if len(conf.Forward) != 0 {
+		for local, remote := range conf.Forward {
+			forwarder, err := server.NewForwarder(server.ForwarderOptions{
+				Logger:     logger,
+				Dialer:     d,
+				LocalAddr:  local,
+				RemoteAddr: remote,
+			})
+			if err != nil {
+				return err
+			}
+			wg.Go(func(ctx context.Context) (err error) {
+				ch := make(chan error, 1)
+				go func() {
+					ch <- forwarder.Serve()
+				}()
+				select {
+				case err := <-ch:
+					return err
+				case <-ctx.Done():
+					return nil
+				}
+			})
+		}
+	}
+	return wg.Wait()
 }
 
 func init() {

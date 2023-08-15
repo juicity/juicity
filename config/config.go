@@ -11,13 +11,14 @@ var (
 
 type Config struct {
 	// Client
-	Server                string `json:"server"`
-	Uuid                  string `json:"uuid"`
-	Password              string `json:"password"`
-	Sni                   string `json:"sni"`
-	AllowInsecure         bool   `json:"allow_insecure"`
-	PinnedCertChainSha256 string `json:"pinned_certchain_sha256"`
-	ProtectPath           string `json:"protect_path"`
+	Server                string            `json:"server"`
+	Uuid                  string            `json:"uuid"`
+	Password              string            `json:"password"`
+	Sni                   string            `json:"sni"`
+	AllowInsecure         bool              `json:"allow_insecure"`
+	PinnedCertChainSha256 string            `json:"pinned_certchain_sha256"`
+	ProtectPath           string            `json:"protect_path"`
+	Forward               map[string]string `json:"forward"`
 
 	// Server
 	Users       map[string]string `json:"users"`

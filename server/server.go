@@ -51,7 +51,7 @@ type Options struct {
 type Server struct {
 	logger                 *log.Logger
 	relay                  relay.Relay
-	dialer                 netproxy.Dialer
+	dialer                 netproxy.ContextDialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
@@ -84,7 +84,9 @@ func New(opts *Options) (*Server, error) {
 	return &Server{
 		logger: opts.Logger,
 		relay:  relay.NewRelay(opts.Logger),
-		dialer: dialer,
+		dialer: &netproxy.ContextDialerConverter{
+			Dialer: dialer,
+		},
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
 			MinVersion:   tls.VersionTLS13,
@@ -194,7 +196,9 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			Network: "tcp",
 			Mark:    uint32(s.fwmark),
 		}
-		rConn, err := s.dialer.Dial(magicNetwork.Encode(), target)
+		ctx, cancel := context.WithTimeout(context.Background(), consts.DefaultDialTimeout)
+		defer cancel()
+		rConn, err := s.dialer.DialContext(ctx, magicNetwork.Encode(), target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -228,7 +232,9 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			Network: "udp",
 			Mark:    uint32(s.fwmark),
 		}
-		c, err := s.dialer.Dial(magicNetwork.Encode(), addr.String())
+		ctx, cancel := context.WithTimeout(context.Background(), consts.DefaultDialTimeout)
+		defer cancel()
+		c, err := s.dialer.DialContext(ctx, magicNetwork.Encode(), addr.String())
 		s.logger.Debug().
 			Str("target", addr.String()).
 			Str("source", source).
