@@ -3,10 +3,10 @@ module github.com/juicity/juicity
 go 1.20
 
 require (
-	github.com/daeuniverse/softwind v0.0.0-20230814143152-387d19f00f24
+	github.com/daeuniverse/softwind v0.0.0-20230819114735-f9ac67136333
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
-	github.com/mzz2017/quic-go v0.0.0-20230809140948-2ea096492e36
+	github.com/mzz2017/quic-go v0.0.0-20230819114412-3a32ba300654
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.30.0
 	github.com/sourcegraph/conc v0.3.0
