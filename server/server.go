@@ -17,6 +17,7 @@ import (
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
+	"github.com/daeuniverse/outbound/dialer"
 	"github.com/daeuniverse/softwind/netproxy"
 	"github.com/daeuniverse/softwind/pool"
 	"github.com/daeuniverse/softwind/protocol/direct"
@@ -46,6 +47,7 @@ type Options struct {
 	CongestionControl string
 	Fwmark            int
 	SendThrough       string
+	DialerLink        string
 }
 
 type Server struct {
@@ -73,19 +75,40 @@ func New(opts *Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	dialer := direct.FullconeDirect
-	if opts.SendThrough != "" {
+	var d netproxy.Dialer
+	uesFullconeDialer := opts.DialerLink == ""
+	switch {
+	case opts.SendThrough != "":
 		lAddr, err := netip.ParseAddr(opts.SendThrough)
 		if err != nil {
 			return nil, fmt.Errorf("parse send_through: %w", err)
 		}
-		dialer = direct.NewDirectDialerLaddr(true, lAddr)
+		d = direct.NewDirectDialerLaddr(uesFullconeDialer, lAddr)
+	case uesFullconeDialer:
+		d = direct.FullconeDirect
+	default:
+		d = direct.SymmetricDirect
+	}
+	if opts.DialerLink != "" {
+		var property *dialer.Property
+		if d, property, err = dialer.NewNetproxyDialerFromLink(d, &dialer.ExtraOption{
+			AllowInsecure:     false,
+			TlsImplementation: "",
+			UtlsImitate:       "",
+		}, opts.DialerLink); err != nil {
+			return nil, fmt.Errorf("parse DialerLink: %w", err)
+		}
+		opts.Logger.Info().
+			Str("name", property.Name).
+			Str("proto", property.Protocol).
+			Str("addr", property.Address).
+			Msg("Dial use given dialer")
 	}
 	return &Server{
 		logger: opts.Logger,
 		relay:  relay.NewRelay(opts.Logger),
 		dialer: &netproxy.ContextDialerConverter{
-			Dialer: dialer,
+			Dialer: d,
 		},
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.

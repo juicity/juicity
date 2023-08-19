@@ -26,6 +26,7 @@ type Config struct {
 	PrivateKey  string            `json:"private_key"`
 	Fwmark      string            `json:"fwmark"`
 	SendThrough string            `json:"send_through"`
+	DialerLink  string            `json:"dialer_link"`
 
 	// Common
 	Listen            string `json:"listen"`
