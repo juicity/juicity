@@ -11,13 +11,48 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
-- [v0.1.3 (Latest)](#v013-latest)
+- [v0.2.0 (Latest)](#v020-latest)
+- [v0.1.3](#v013)
 - [v0.1.2](#v012)
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.1.3 (Latest)
+### v0.2.0 (Latest)
+
+> Release date: 2023/08/19
+
+### Features
+
+- feat(server): support dial using socks5, http, vmess, vless... in [#92](https://github.com/juicity/juicity/pull/92) by (@mzz2017)
+- feat: support port forwarding in [#86](https://github.com/juicity/juicity/pull/86) by (@mzz2017)
+
+### Bug Fixes
+
+- fix: fail to trigger auth timeout in some cases in [#93](https://github.com/juicity/juicity/pull/93) by (@mzz2017)
+- fix: panic: unaligned 64-bit atomic operation in [#91](https://github.com/juicity/juicity/pull/91) by (@mzz2017)
+
+### Others
+
+- chore: bump quic-go to v0.37.5 in [#96](https://github.com/juicity/juicity/pull/96) by (@mzz2017)
+
+### 特性支持
+
+- 特性(服务器): 支持使用 socks5、http、vmess、vless 等进行拨号 in [#92](https://github.com/juicity/juicity/pull/92) by (@mzz2017)
+- 特性: 支持端口转发 in [#86](https://github.com/juicity/juicity/pull/86) by (@mzz2017)
+
+### 问题修复
+
+- 修复: 某些情况下无法触发身份验证超时 in [#93](https://github.com/juicity/juicity/pull/93) by (@mzz2017)
+- 修复: panic: 未对齐的 64 位原子操作 in [#91](https://github.com/juicity/juicity/pull/91) by (@mzz2017)
+
+### 其他变更
+
+- 杂项: 升级 quic-go 至 v0.37.5 in [#96](https://github.com/juicity/juicity/pull/96) by (@mzz2017)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.1.3...v0.2.0
+
+### v0.1.3
 
 > Release date: 2023/08/13
 
