@@ -10,6 +10,7 @@ require (
 	github.com/mzz2017/quic-go v0.0.0-20230809140948-2ea096492e36
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.30.0
+	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -42,6 +43,8 @@ require (
 	github.com/seiflotfy/cuckoofilter v0.0.0-20220411075957-e3b120b3f5fb // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	gitlab.com/yawning/chacha20.git v0.0.0-20230427033715-7877545b1b37 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/exp v0.0.0-20230728194245-b0cb94b80691 // indirect
 	golang.org/x/mod v0.12.0 // indirect

@@ -15,7 +15,7 @@ import (
 	"github.com/juicity/juicity/common/consts"
 )
 
-func (r *relay) RelayUDP(dst *net.UDPConn, laddr net.Addr, src net.PacketConn, timeout time.Duration) (err error) {
+func (r *relay) RelayUDP(dst net.PacketConn, laddr net.Addr, src net.PacketConn, timeout time.Duration) (err error) {
 	var n int
 	buf := pool.GetFullCap(consts.EthernetMtu)
 	defer pool.Put(buf)

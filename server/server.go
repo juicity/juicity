@@ -53,7 +53,7 @@ type Options struct {
 type Server struct {
 	logger                 *log.Logger
 	relay                  relay.Relay
-	dialer                 netproxy.Dialer
+	dialer                 netproxy.ContextDialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
@@ -107,7 +107,9 @@ func New(opts *Options) (*Server, error) {
 	return &Server{
 		logger: opts.Logger,
 		relay:  relay.NewRelay(opts.Logger),
-		dialer: d,
+		dialer: &netproxy.ContextDialerConverter{
+			Dialer: d,
+		},
 		tlsConfig: &tls.Config{
 			NextProtos:   []string{"h3"}, // h3 only.
 			MinVersion:   tls.VersionTLS13,
@@ -162,10 +164,10 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	common.SetCongestionController(conn, s.congestionControl, s.cwnd)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	authCtx, authDone := context.WithCancel(ctx)
+	authCtx, authDone := context.WithTimeout(ctx, AuthenticateTimeout)
 	defer authDone()
 	go func() {
-		if _, err := s.handleAuth(ctx, conn); err != nil {
+		if _, err := s.handleAuth(authCtx, conn); err != nil {
 			s.logger.Warn().
 				Err(err).
 				Msg("handleAuth")
@@ -180,19 +182,19 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 		if err != nil {
 			return err
 		}
-		go func(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) {
+		go func(stream quic.Stream) {
 			if err = s.handleStream(ctx, authCtx, conn, stream); err != nil {
 				s.logger.Warn().
 					Err(err).
 					Send()
 			}
-		}(ctx, authCtx, conn, stream)
+		}(stream)
 	}
 }
 
 func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) error {
-	defer stream.Close()
 	lConn := juicity.NewConn(stream, nil, nil)
+	defer lConn.Close()
 	// Read the header and initiate the metadata
 	_, err := lConn.Read(nil)
 	if err != nil {
@@ -217,7 +219,9 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			Network: "tcp",
 			Mark:    uint32(s.fwmark),
 		}
-		rConn, err := s.dialer.Dial(magicNetwork.Encode(), target)
+		ctx, cancel := context.WithTimeout(context.Background(), consts.DefaultDialTimeout)
+		defer cancel()
+		rConn, err := s.dialer.DialContext(ctx, magicNetwork.Encode(), target)
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -251,7 +255,9 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			Network: "udp",
 			Mark:    uint32(s.fwmark),
 		}
-		c, err := s.dialer.Dial(magicNetwork.Encode(), addr.String())
+		ctx, cancel := context.WithTimeout(context.Background(), consts.DefaultDialTimeout)
+		defer cancel()
+		c, err := s.dialer.DialContext(ctx, magicNetwork.Encode(), addr.String())
 		s.logger.Debug().
 			Str("target", addr.String()).
 			Str("source", source).
@@ -292,8 +298,6 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 }
 
 func (s *Server) handleAuth(ctx context.Context, conn quic.Connection) (uuid *uuid.UUID, err error) {
-	ctx, cancel := context.WithTimeout(ctx, AuthenticateTimeout)
-	defer cancel()
 	uniStream, err := conn.AcceptUniStream(ctx)
 	if err != nil {
 		return nil, err
@@ -324,7 +328,7 @@ func (s *Server) handleAuth(ctx context.Context, conn quic.Connection) (uuid *uu
 				if token == authenticate.TOKEN {
 					return &authenticate.UUID, nil
 				} else {
-					_ = conn.CloseWithError(tuic.AuthenticationFailed, ErrAuthenticationFailed.Error())
+					_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
 				}
 			}
 			return nil, fmt.Errorf("%w: %v", ErrAuthenticationFailed, authenticate.UUID)
