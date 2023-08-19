@@ -11,9 +11,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
-
 - [v0.2.0 (Latest)](#v020-latest)
-- [v0.1.3 (Latest)](#v013-latest)
+- [v0.1.3](#v013)
 - [v0.1.2](#v012)
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
@@ -53,7 +52,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 **Full Changelog**: https://github.com/juicity/juicity/compare/v0.1.3...v0.2.0
 
-### v0.1.3 (Latest)
+### v0.1.3
 
 > Release date: 2023/08/13
 
