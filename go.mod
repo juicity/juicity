@@ -3,11 +3,11 @@ module github.com/juicity/juicity
 go 1.21.0
 
 require (
-	github.com/daeuniverse/softwind v0.0.0-20230819114735-f9ac67136333
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
+	github.com/daeuniverse/softwind v0.0.0-20230820153831-295ddb4d7a68
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
-	github.com/mzz2017/quic-go v0.0.0-20230819114412-3a32ba300654
+	github.com/mzz2017/quic-go v0.0.0-20230820052354-b1f9b30e2593
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.30.0
 	github.com/sourcegraph/conc v0.3.0
