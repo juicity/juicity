@@ -83,8 +83,8 @@ enum bit<8> AddrType {
 };
 
 header domain_address_t {
-    bit<2>      len;
-    varbit<256> domain;
+    bit<8>       len;
+    varbit<2048> domain;
 };
 
 // address_t can be one of ipv4, ipv6 and domain.
