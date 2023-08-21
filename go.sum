@@ -4,8 +4,8 @@ github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSV
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843 h1:DQCB9XdxWmI9ySh7lh1Yyer+1RM+d+1oXG586NBPJ5U=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843/go.mod h1:0MOSc+twby808YzJjBA2VOSd928vLQFhUzHLSdL7aKM=
-github.com/daeuniverse/softwind v0.0.0-20230821140004-bd5ed564a66e h1:akx++3x7kAF21+og1DlCrbi2QY2R8plynadGrlYp04c=
-github.com/daeuniverse/softwind v0.0.0-20230821140004-bd5ed564a66e/go.mod h1:msDwqsQcevrfE1YNMfREU1It2LJCYptgvdwhuQ194UY=
+github.com/daeuniverse/softwind v0.0.0-20230821142121-f4d871b5a8c9 h1:88k/mjYFuA5294C50M3rXMqRYaqSNAnuk9hnjY/xGMM=
+github.com/daeuniverse/softwind v0.0.0-20230821142121-f4d871b5a8c9/go.mod h1:K9Au9LY2ttqfAhZXxPPnyqt4Bue1dd/Xi8WPsZEgxOk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -68,8 +68,8 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/mzz2017/disk-bloom v1.0.1 h1:rEF9MiXd9qMW3ibRpqcerLXULoTgRlM21yqqJl1B90M=
 github.com/mzz2017/disk-bloom v1.0.1/go.mod h1:JLHETtUu44Z6iBmsqzkOtFlRvXSlKnxjwiBRDapizDI=
-github.com/mzz2017/quic-go v0.0.0-20230820052354-b1f9b30e2593 h1:WfhfXZs6AIZo1DhVoeExDIxDmT35tZJ0OaGgUKzPIgU=
-github.com/mzz2017/quic-go v0.0.0-20230820052354-b1f9b30e2593/go.mod h1:DBA25b2LoPhrfSzOPE8KcDOicysx00qvvnqe0BpA8DQ=
+github.com/mzz2017/quic-go v0.0.0-20230821141654-3dd2575ee6bc h1:2gjLlS2yBxXUGICgHSWGLS5LyRa0Lr6+w5GFiqOco/o=
+github.com/mzz2017/quic-go v0.0.0-20230821141654-3dd2575ee6bc/go.mod h1:j4yzgjc6nLseaxzQT/As8D7VRQMKASjVWXBunJGTF8Y=
 github.com/onsi/ginkgo/v2 v2.11.0 h1:WgqUCUt/lT6yXoQ8Wef0fsNn5cAuMK7+KT9UFRz2tcU=
 github.com/onsi/ginkgo/v2 v2.11.0/go.mod h1:ZhrRA5XmEE3x3rhlzamx/JJvujdZoJ2uvgI7kR0iZvM=
 github.com/onsi/gomega v1.27.8 h1:gegWiwZjBsf2DgiSbf5hpokZ98JVDMcWkUiigk6/KXc=
@@ -77,8 +77,8 @@ github.com/onsi/gomega v1.27.8/go.mod h1:2J8vzI/s+2shY9XHRApDkdgPo1TKT7P2u6fXeJK
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/quic-go/qtls-go1-20 v0.3.1 h1:O4BLOM3hwfVF3AcktIylQXyl7Yi2iBNVy5QsV+ySxbg=
-github.com/quic-go/qtls-go1-20 v0.3.1/go.mod h1:X9Nh97ZL80Z+bX/gUXMbipO6OxdiDi58b/fMC9mAL+k=
+github.com/quic-go/qtls-go1-20 v0.3.2 h1:rRgN3WfnKbyik4dBV8A6girlJVxGand/d+jVKbQq5GI=
+github.com/quic-go/qtls-go1-20 v0.3.2/go.mod h1:X9Nh97ZL80Z+bX/gUXMbipO6OxdiDi58b/fMC9mAL+k=
 github.com/quic-go/quic-go v0.37.4 h1:ke8B73yMCWGq9MfrCCAw0Uzdm7GaViC3i39dsIdDlH4=
 github.com/quic-go/quic-go v0.37.4/go.mod h1:YsbH1r4mSHPJcLF4k4zruUkLBqctEMBDR6VPvcYjIsU=
 github.com/refraction-networking/utls v1.4.3 h1:BdWS3BSzCwWCFfMIXP3mjLAyQkdmog7diaD/OqFbAzM=
