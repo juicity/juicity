@@ -4,8 +4,8 @@ github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSV
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843 h1:DQCB9XdxWmI9ySh7lh1Yyer+1RM+d+1oXG586NBPJ5U=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843/go.mod h1:0MOSc+twby808YzJjBA2VOSd928vLQFhUzHLSdL7aKM=
-github.com/daeuniverse/softwind v0.0.0-20230820153831-295ddb4d7a68 h1:bEA1Y9Vzoppg3FEcE5YQwHY2mjX5hwK24n4oEM2dGD4=
-github.com/daeuniverse/softwind v0.0.0-20230820153831-295ddb4d7a68/go.mod h1:msDwqsQcevrfE1YNMfREU1It2LJCYptgvdwhuQ194UY=
+github.com/daeuniverse/softwind v0.0.0-20230821140004-bd5ed564a66e h1:akx++3x7kAF21+og1DlCrbi2QY2R8plynadGrlYp04c=
+github.com/daeuniverse/softwind v0.0.0-20230821140004-bd5ed564a66e/go.mod h1:msDwqsQcevrfE1YNMfREU1It2LJCYptgvdwhuQ194UY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
