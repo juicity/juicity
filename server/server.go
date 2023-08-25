@@ -205,7 +205,7 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf pool.PB, ulA
 			masterKey := metadata.([]byte)
 			salt := pool.Get(cipherConf.SaltLen)
 			defer salt.Put()
-			fastrand.Read(salt)
+			_, _ = fastrand.Read(salt)
 			salt[0] = 0
 			salt[1] = 0
 			buf, err := shadowsocks.EncryptUDPFromPool(&shadowsocks.Key{
@@ -245,7 +245,7 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf pool.PB, ulA
 					copy(buf, decrypted)
 					buf = buf[:len(decrypted)]
 					decrypted.Put()
-					s.inFlightUnderlayKeyTgt.Delete(current.Key())
+					_ = s.inFlightUnderlayKeyTgt.Delete(current.Key())
 					break
 				}
 			}
@@ -424,11 +424,11 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			Msg("juicity received an [underlay] request")
 		psk := pool.Get(64)
 		defer psk.Put()
-		fastrand.Read(psk)
+		_, _ = fastrand.Read(psk)
 		if _, err = lConn.Write(psk); err != nil {
 			return err
 		}
-		s.inFlightUnderlayKeyTgt.Set(string(psk), []byte(target))
+		_ = s.inFlightUnderlayKeyTgt.Set(string(psk), []byte(target))
 	default:
 		return fmt.Errorf("unexpected network: %v", mdata.Network)
 	}

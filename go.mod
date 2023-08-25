@@ -1,6 +1,6 @@
 module github.com/juicity/juicity
 
-go 1.21.0
+go 1.21
 
 require (
 	github.com/allegro/bigcache/v3 v3.1.0
