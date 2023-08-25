@@ -170,7 +170,7 @@ func (s *Forwarder) Serve() (err error) {
 				go func(buf pool.PB, lAddr netip.AddrPort) {
 					defer buf.Put()
 					endpoint, isNew, err := s.udpEndpointPool.GetOrCreate(lAddr, &UdpEndpointOptions{
-						Handler: func(data []byte, from netip.AddrPort) error {
+						Handler: func(data []byte, from netip.AddrPort, metadata any) error {
 							_, err := s.udpListener.WriteToUDPAddrPort(data, lAddr)
 							return err
 						},

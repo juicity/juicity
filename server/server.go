@@ -13,15 +13,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/allegro/bigcache/v3"
 	"github.com/juicity/juicity/common/consts"
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/daeuniverse/outbound/dialer"
+	"github.com/daeuniverse/softwind/ciphers"
 	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/pkg/fastrand"
 	"github.com/daeuniverse/softwind/pool"
 	"github.com/daeuniverse/softwind/protocol/direct"
 	"github.com/daeuniverse/softwind/protocol/juicity"
+	"github.com/daeuniverse/softwind/protocol/shadowsocks"
 	"github.com/daeuniverse/softwind/protocol/tuic"
 	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
@@ -38,6 +42,8 @@ var (
 	ErrUnexpectedCmdType    = fmt.Errorf("unexpected cmd type")
 	ErrAuthenticationFailed = fmt.Errorf("authentication failed")
 )
+
+type UnderlayPsk [64]byte
 
 type Options struct {
 	Logger            *log.Logger
@@ -60,6 +66,8 @@ type Server struct {
 	cwnd                   int
 	users                  map[uuid.UUID]string
 	fwmark                 int
+	inFlight               *bigcache.BigCache
+	udpEndpointPool        *UdpEndpointPool
 }
 
 func New(opts *Options) (*Server, error) {
@@ -104,29 +112,36 @@ func New(opts *Options) (*Server, error) {
 			Str("addr", property.Address).
 			Msg("Dial use given dialer")
 	}
+	inFlight, err := bigcache.New(context.TODO(), bigcache.DefaultConfig(10*time.Second))
+	if err != nil {
+		return nil, err
+	}
 	return &Server{
-		logger: opts.Logger,
-		relay:  relay.NewRelay(opts.Logger),
-		dialer: &netproxy.ContextDialerConverter{
-			Dialer: d,
-		},
-		tlsConfig: &tls.Config{
-			NextProtos:   []string{"h3"}, // h3 only.
-			MinVersion:   tls.VersionTLS13,
-			Certificates: []tls.Certificate{cert},
-		},
+		logger:                 opts.Logger,
+		relay:                  relay.NewRelay(opts.Logger),
+		dialer:                 &netproxy.ContextDialerConverter{Dialer: d},
+		tlsConfig:              &tls.Config{NextProtos: []string{"h3"}, MinVersion: tls.VersionTLS13, Certificates: []tls.Certificate{cert}},
 		maxOpenIncomingStreams: 100,
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
 		fwmark:                 opts.Fwmark,
+		inFlight:               inFlight,
+		udpEndpointPool:        NewUdpEndpointPool(),
 	}, nil
 }
 
 func (s *Server) Serve(addr string) (err error) {
 	quicMaxOpenIncomingStreams := int64(s.maxOpenIncomingStreams)
 
-	listener, err := quic.ListenAddr(addr, s.tlsConfig, &quic.Config{
+	pktConn, err := net.ListenPacket("udp", addr)
+	if err != nil {
+		return err
+	}
+	transport := quic.Transport{
+		Conn: pktConn,
+	}
+	listener, err := transport.Listen(s.tlsConfig, &quic.Config{
 		InitialStreamReceiveWindow:     common.InitialStreamReceiveWindow,
 		MaxStreamReceiveWindow:         common.MaxStreamReceiveWindow,
 		InitialConnectionReceiveWindow: common.InitialConnectionReceiveWindow,
@@ -141,6 +156,29 @@ func (s *Server) Serve(addr string) (err error) {
 	if err != nil {
 		return err
 	}
+	go func() {
+		buf := pool.GetFullCap(consts.EthernetMtu)
+		defer buf.Put()
+		for {
+			n, addr, err := transport.ReadNonQUICPacket(context.Background(), buf)
+			if err != nil {
+				s.logger.Error().
+					Err(err).
+					Send()
+				return
+			}
+			newBuf := pool.Get(n)
+			copy(newBuf, buf)
+			go func(transport *quic.Transport, buf pool.PB, ulAddr *net.UDPAddr) {
+				defer buf.Put()
+				if err := s.handleNonQuicPacket(transport, buf, ulAddr); err != nil {
+					s.logger.Info().
+						Err(err).
+						Send()
+				}
+			}(&transport, newBuf, addr.(*net.UDPAddr))
+		}
+	}()
 	for {
 		conn, err := listener.Accept(context.Background())
 		if err != nil {
@@ -158,6 +196,95 @@ func (s *Server) Serve(addr string) (err error) {
 			}
 		}(conn)
 	}
+}
+
+func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf pool.PB, ulAddr *net.UDPAddr) (err error) {
+	cipherConf := ciphers.AeadCiphersConf["chacha20-poly1305"]
+	lAddr := ulAddr.AddrPort()
+	// source ip/port -> dst mapping.
+	endpoint, isNew, err := s.udpEndpointPool.GetOrCreate(lAddr, &UdpEndpointOptions{
+		Handler: func(data []byte, from netip.AddrPort, metadata any) error {
+			masterKey := metadata.([]byte)
+			salt := pool.Get(cipherConf.SaltLen)
+			defer salt.Put()
+			fastrand.Read(salt)
+			salt[0] = 0
+			salt[1] = 0
+			buf, err := shadowsocks.EncryptUDPFromPool(&shadowsocks.Key{
+				CipherConf: cipherConf,
+				MasterKey:  masterKey,
+			}, data, salt, ciphers.JuicityReusedInfo)
+			if err != nil {
+				return err
+			}
+			defer buf.Put()
+			_, err = transport.WriteTo(buf, ulAddr)
+			return err
+		},
+		NatTimeout: 0,
+		GetDialOption: func() (*DialOption, error) {
+			var (
+				found     bool
+				masterKey []byte
+				tgt       string
+			)
+			iterator := s.inFlight.Iterator()
+			for iterator.SetNext() {
+				current, err := iterator.Value()
+				if err == nil {
+					masterKey = []byte(current.Key())
+					tgt = string(current.Value())
+					decrypted, err := shadowsocks.DecryptUDPFromPool(&shadowsocks.Key{
+						CipherConf: cipherConf,
+						MasterKey:  masterKey,
+					}, buf, ciphers.JuicityReusedInfo)
+					if err != nil {
+						// Next.
+						continue
+					}
+					// Found.
+					found = true
+					copy(buf, decrypted)
+					buf = buf[:len(decrypted)]
+					decrypted.Put()
+					s.inFlight.Delete(current.Key())
+					break
+				}
+			}
+			if !found {
+				return nil, fmt.Errorf("invalid underlay traffic")
+			}
+			return &DialOption{
+				Target:   tgt,
+				Dialer:   s.dialer,
+				Metadata: masterKey,
+			}, nil
+		},
+	})
+	if err != nil {
+		return err
+	}
+	if !isNew {
+		masterKey := endpoint.Metadata.([]byte)
+		decrypted, err := shadowsocks.DecryptUDPFromPool(&shadowsocks.Key{
+			CipherConf: cipherConf,
+			MasterKey:  masterKey,
+		}, buf, ciphers.JuicityReusedInfo)
+		if err != nil {
+			return err
+		}
+		defer decrypted.Put()
+		buf = decrypted
+	} else {
+		s.logger.Debug().
+			Str("target", endpoint.DialTarget).
+			Str("source", lAddr.String()).
+			Msg("juicity performed an [underlay] request")
+	}
+	if _, err = endpoint.WriteTo(buf, endpoint.DialTarget); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Server) handleConn(conn quic.Connection) (err error) {
@@ -214,7 +341,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 		s.logger.Debug().
 			Str("target", target).
 			Str("source", source).
-			Msg("juicity received a tcp request")
+			Msg("juicity received a [tcp] request")
 		magicNetwork := netproxy.MagicNetwork{
 			Network: "tcp",
 			Mark:    uint32(s.fwmark),
@@ -261,7 +388,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 		s.logger.Debug().
 			Str("target", addr.String()).
 			Str("source", source).
-			Msg("juicity received a udp request")
+			Msg("juicity received an [udp] request")
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -291,6 +418,20 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			}
 			return fmt.Errorf("relay udp error: %w", err)
 		}
+	case "underlay":
+		target := net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))
+		s.logger.Debug().
+			Str("target", target).
+			Str("source", source).
+			Msg("juicity received an [underlay] request")
+		// InFlight.
+		psk := pool.Get(64)
+		defer psk.Put()
+		fastrand.Read(psk)
+		if _, err = lConn.Write(psk); err != nil {
+			return err
+		}
+		s.inFlight.Set(string(psk), []byte(target))
 	default:
 		return fmt.Errorf("unexpected network: %v", mdata.Network)
 	}

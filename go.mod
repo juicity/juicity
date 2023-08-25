@@ -3,8 +3,9 @@ module github.com/juicity/juicity
 go 1.21.0
 
 require (
+	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
-	github.com/daeuniverse/softwind v0.0.0-20230821142121-f4d871b5a8c9
+	github.com/daeuniverse/softwind v0.0.0-20230825150650-699b729c361b
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
 	github.com/mzz2017/quic-go v0.0.0-20230821141654-3dd2575ee6bc
