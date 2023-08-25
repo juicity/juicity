@@ -43,8 +43,6 @@ var (
 	ErrAuthenticationFailed = fmt.Errorf("authentication failed")
 )
 
-type UnderlayPsk [64]byte
-
 type Options struct {
 	Logger            *log.Logger
 	Users             map[string]string
@@ -66,7 +64,7 @@ type Server struct {
 	cwnd                   int
 	users                  map[uuid.UUID]string
 	fwmark                 int
-	inFlight               *bigcache.BigCache
+	inFlightUnderlayKeyTgt *bigcache.BigCache
 	udpEndpointPool        *UdpEndpointPool
 }
 
@@ -126,7 +124,7 @@ func New(opts *Options) (*Server, error) {
 		cwnd:                   10,
 		users:                  users,
 		fwmark:                 opts.Fwmark,
-		inFlight:               inFlight,
+		inFlightUnderlayKeyTgt: inFlight,
 		udpEndpointPool:        NewUdpEndpointPool(),
 	}, nil
 }
@@ -228,7 +226,7 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf pool.PB, ulA
 				masterKey []byte
 				tgt       string
 			)
-			iterator := s.inFlight.Iterator()
+			iterator := s.inFlightUnderlayKeyTgt.Iterator()
 			for iterator.SetNext() {
 				current, err := iterator.Value()
 				if err == nil {
@@ -247,7 +245,7 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf pool.PB, ulA
 					copy(buf, decrypted)
 					buf = buf[:len(decrypted)]
 					decrypted.Put()
-					s.inFlight.Delete(current.Key())
+					s.inFlightUnderlayKeyTgt.Delete(current.Key())
 					break
 				}
 			}
@@ -424,14 +422,13 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			Str("target", target).
 			Str("source", source).
 			Msg("juicity received an [underlay] request")
-		// InFlight.
 		psk := pool.Get(64)
 		defer psk.Put()
 		fastrand.Read(psk)
 		if _, err = lConn.Write(psk); err != nil {
 			return err
 		}
-		s.inFlight.Set(string(psk), []byte(target))
+		s.inFlightUnderlayKeyTgt.Set(string(psk), []byte(target))
 	default:
 		return fmt.Errorf("unexpected network: %v", mdata.Network)
 	}
