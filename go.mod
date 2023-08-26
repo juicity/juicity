@@ -1,6 +1,6 @@
 module github.com/juicity/juicity
 
-go 1.21
+go 1.21.0
 
 require (
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
