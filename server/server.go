@@ -461,11 +461,6 @@ func (s *Server) handleUnderlayAuth(ctx context.Context, uniStream quic.ReceiveS
 	if _, err = auth.Unpack(uniStream); err != nil {
 		return err
 	}
-	s.logger.Debug().
-		Uints8("iv", auth.IV).
-		Str("tgt", auth.Metadata.Hostname).
-		Uint16("port", auth.Metadata.Port).
-		Msg("handleUnderlayAuth")
 
 	// Store the key.
 	s.inFlightUnderlayKey.Store(inFlightKey(auth.IV), &auth)

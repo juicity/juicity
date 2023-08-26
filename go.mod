@@ -4,10 +4,10 @@ go 1.21
 
 require (
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
-	github.com/daeuniverse/softwind v0.0.0-20230826091010-fda80f835a5c
+	github.com/daeuniverse/softwind v0.0.0-20230826094450-4d95a4601b9a
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
-	github.com/mzz2017/quic-go v0.0.0-20230825151712-911c648fd461
+	github.com/mzz2017/quic-go v0.0.0-20230826094347-f6ce422906f4
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.30.0
 	github.com/sourcegraph/conc v0.3.0
