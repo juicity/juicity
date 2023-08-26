@@ -1,13 +1,11 @@
-github.com/allegro/bigcache/v3 v3.1.0 h1:H2Vp8VOvxcrB91o86fUSVJFqeuz8kpyyB02eH3bSzwk=
-github.com/allegro/bigcache/v3 v3.1.0/go.mod h1:aPyh7jEvrog9zAwx5N7+JUQX5dZTSGpxF1LAR4dr35I=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843 h1:DQCB9XdxWmI9ySh7lh1Yyer+1RM+d+1oXG586NBPJ5U=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843/go.mod h1:0MOSc+twby808YzJjBA2VOSd928vLQFhUzHLSdL7aKM=
-github.com/daeuniverse/softwind v0.0.0-20230825151811-81c035d41785 h1:XSvglD5L9ZPkCAm0bGA6AvWeNqvzq5smHcUW5P4k+sc=
-github.com/daeuniverse/softwind v0.0.0-20230825151811-81c035d41785/go.mod h1:nHhtfBue2xXWuLcczn612HpfQc3Dy1D4J0jSAk7gKC4=
+github.com/daeuniverse/softwind v0.0.0-20230826091010-fda80f835a5c h1:HYdu6hmmAUpriVE/KmePh9w5lUkoZzmlUe2ZEoo618E=
+github.com/daeuniverse/softwind v0.0.0-20230826091010-fda80f835a5c/go.mod h1:nHhtfBue2xXWuLcczn612HpfQc3Dy1D4J0jSAk7gKC4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -3,9 +3,8 @@ module github.com/juicity/juicity
 go 1.21
 
 require (
-	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
-	github.com/daeuniverse/softwind v0.0.0-20230825151811-81c035d41785
+	github.com/daeuniverse/softwind v0.0.0-20230826091010-fda80f835a5c
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
 	github.com/mzz2017/quic-go v0.0.0-20230825151712-911c648fd461
@@ -63,3 +62,4 @@ replace github.com/nadoo/glider => github.com/juicity/glider v0.0.0-202308051437
 // replace github.com/daeuniverse/softwind => ../softwind
 
 // replace github.com/mzz2017/quic-go => ../quic-go
+// replace github.com/mzz2017/quic-go => github.com/mzz2017/quic-go v0.0.0-20230821141654-3dd2575ee6bc
