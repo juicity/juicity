@@ -285,7 +285,13 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 			default:
 			}
 			if err = s.handleUnderlayAuth(ctx, uniStream); err != nil {
-				s.logger.Debug().
+				if errors.Is(err, io.EOF) {
+					s.logger.Debug().
+						Err(err).
+						Msg("handleUnderlayAuth: maybe is an old client?")
+					return
+				}
+				s.logger.Error().
 					Err(err).
 					Msg("handleUnderlayAuth")
 				return
@@ -458,9 +464,6 @@ func (s *Server) handleUnderlayAuth(ctx context.Context, uniStream quic.ReceiveS
 	// Read an auth from the connection.
 	var auth juicity.UnderlayAuth
 	if _, err = auth.Unpack(uniStream); err != nil {
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
 		return err
 	}
 
