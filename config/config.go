@@ -21,13 +21,13 @@ type Config struct {
 	Forward               map[string]string `json:"forward"`
 
 	// Server
-	Users         map[string]string `json:"users"`
-	Certificate   string            `json:"certificate"`
-	PrivateKey    string            `json:"private_key"`
-	Fwmark        string            `json:"fwmark"`
-	SendThrough   string            `json:"send_through"`
-	DialerLink    string            `json:"dialer_link"`
-	DisableUdp443 bool              `json:"disable_udp443"`
+	Users                 map[string]string `json:"users"`
+	Certificate           string            `json:"certificate"`
+	PrivateKey            string            `json:"private_key"`
+	Fwmark                string            `json:"fwmark"`
+	SendThrough           string            `json:"send_through"`
+	DialerLink            string            `json:"dialer_link"`
+	DisableOutboundUdp443 bool              `json:"disable_outbound_udp443"`
 
 	// Common
 	Listen            string `json:"listen"`

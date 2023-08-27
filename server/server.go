@@ -45,15 +45,15 @@ var (
 )
 
 type Options struct {
-	Logger            *log.Logger
-	Users             map[string]string
-	Certificate       string
-	PrivateKey        string
-	CongestionControl string
-	Fwmark            int
-	SendThrough       string
-	DialerLink        string
-	DisableUdp443     bool
+	Logger                *log.Logger
+	Users                 map[string]string
+	Certificate           string
+	PrivateKey            string
+	CongestionControl     string
+	Fwmark                int
+	SendThrough           string
+	DialerLink            string
+	DisableOutboundUdp443 bool
 }
 
 type Server struct {
@@ -66,7 +66,7 @@ type Server struct {
 	cwnd                   int
 	users                  map[uuid.UUID]string
 	fwmark                 int
-	disableUdp443          bool
+	disableOutboundUdp443  bool
 	inFlightUnderlayKey    *InFlightUnderlayKey
 	udpEndpointPool        *UdpEndpointPool
 }
@@ -124,7 +124,7 @@ func New(opts *Options) (*Server, error) {
 		cwnd:                   10,
 		users:                  users,
 		fwmark:                 opts.Fwmark,
-		disableUdp443:          opts.DisableUdp443,
+		disableOutboundUdp443:  opts.DisableOutboundUdp443,
 		inFlightUnderlayKey:    NewInFlightUnderlayKey(inFlightUnderlayTtl),
 		udpEndpointPool:        NewUdpEndpointPool(),
 	}, nil
@@ -229,7 +229,7 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf []byte, ulAd
 			if auth == nil {
 				return nil, fmt.Errorf("[underlay] auth fail")
 			}
-			if s.disableUdp443 && auth.Metadata.Port == 443 && auth.Metadata.Network == "udp" {
+			if s.disableOutboundUdp443 && auth.Metadata.Port == 443 && auth.Metadata.Network == "udp" {
 				return nil, ErrDisabledTrafficType
 			}
 			return &DialOption{
@@ -376,7 +376,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			return fmt.Errorf("relay tcp error: %w", err)
 		}
 	case "udp":
-		if s.disableUdp443 && mdata.Port == 443 {
+		if s.disableOutboundUdp443 && mdata.Port == 443 {
 			s.logger.Debug().
 				Str("target", net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))).
 				Str("source", source).

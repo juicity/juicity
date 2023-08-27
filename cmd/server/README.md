@@ -35,7 +35,7 @@ Mini configuration:
   "certificate": "/path/to/fullchain.cer",
   "private_key": "/path/to/private.key",
   "congestion_control": "bbr",
-  "disable_udp443": true,
+  "disable_outbound_udp443": true,
   "log_level": "info"
 }
 ```
@@ -55,7 +55,7 @@ Full configuration:
   "fwmark": "0x1000",
   "send_through": "113.25.132.3",
   "dialer_link": "socks5://127.0.0.1:1080",
-  "disable_udp443": true
+  "disable_outbound_udp443": true
 }
 ```
 
@@ -63,7 +63,7 @@ Full configuration:
 - `fwmark` is useful for iptables/nft.
 - `send_through` is the interface IP to specify to use.
 - `dialer_link` can be extreme flexible. Juicity support many protocols, even proxy chains. See [proxy-protocols](https://github.com/daeuniverse/dae/blob/main/docs/en/proxy-protocols.md) [中文](https://github.com/daeuniverse/dae/blob/main/docs/zh/proxy-protocols.md).
-- `disable_udp443`: usually quic traffic. Suggest to disable it because quic usually consumes too much cpu/mem resources.
+- `disable_outbound_udp443`: usually quic traffic. Suggest to disable it because quic usually consumes too much cpu/mem resources.
 
 ## Arguments
 
