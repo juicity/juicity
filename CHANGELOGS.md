@@ -11,12 +11,38 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
+
+- [v0.2.1 (Latest)](#v021-latest)
 - [v0.2.0 (Latest)](#v020-latest)
 - [v0.1.3](#v013)
 - [v0.1.2](#v012)
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
+
+### v0.2.1 (Latest)
+
+> Release date: 2023/08/27
+
+### Features
+
+- optimize: use raw udp conn to solve quic in quic problem in [#103](https://github.com/juicity/juicity/pull/103) by (@mzz2017)
+
+### Others
+
+- chore: bump quic-go to v0.38.0 in [#101](https://github.com/juicity/juicity/pull/101) by (@mzz2017)
+- chore: upgrade quic-go to v0.37.6 in [#100](https://github.com/juicity/juicity/pull/100) by (@mzz2017)
+
+### 特性支持
+
+- 优化: 使用原始的 UDP 连接来解决 QUIC in QUIC 的问题 in [#103](https://github.com/juicity/juicity/pull/103) by (@mzz2017)
+
+### 其他变更
+
+- 杂项: 升级 quic-go 至 v0.38.0 in [#101](https://github.com/juicity/juicity/pull/101) by (@mzz2017)
+- 杂项: 升级 quic-go 至 v0.37.6 in [#100](https://github.com/juicity/juicity/pull/100) by (@mzz2017)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.2.0...v0.2.1
 
 ### v0.2.0 (Latest)
 
