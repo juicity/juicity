@@ -12,7 +12,7 @@ import (
 	"github.com/juicity/juicity/common/consts"
 )
 
-type UdpHandler func(data []byte, from netip.AddrPort) error
+type UdpHandler func(data []byte, from netip.AddrPort, metadata any) error
 
 type UdpEndpoint struct {
 	conn netproxy.PacketConn
@@ -22,7 +22,9 @@ type UdpEndpoint struct {
 	handler       UdpHandler
 	NatTimeout    time.Duration
 
-	Dialer netproxy.Dialer
+	Dialer     netproxy.Dialer
+	Metadata   any
+	DialTarget string
 }
 
 func (ue *UdpEndpoint) start() {
@@ -36,7 +38,7 @@ func (ue *UdpEndpoint) start() {
 		ue.mu.Lock()
 		ue.deadlineTimer.Reset(ue.NatTimeout)
 		ue.mu.Unlock()
-		if err = ue.handler(buf[:n], from); err != nil {
+		if err = ue.handler(buf[:n], from, ue.Metadata); err != nil {
 			break
 		}
 	}
@@ -59,8 +61,9 @@ func (ue *UdpEndpoint) Close() error {
 }
 
 type DialOption struct {
-	Target string
-	Dialer netproxy.Dialer
+	Target   string
+	Dialer   netproxy.Dialer
+	Metadata any
 }
 
 // UdpEndpointPool is a full-cone udp conn pool
@@ -132,6 +135,7 @@ begin:
 		}
 		ue := &UdpEndpoint{
 			conn: udpConn.(netproxy.PacketConn),
+			mu:   sync.Mutex{},
 			deadlineTimer: time.AfterFunc(createOption.NatTimeout, func() {
 				if ue, ok := p.pool.LoadAndDelete(lAddr); ok {
 					ue.(*UdpEndpoint).Close()
@@ -140,6 +144,8 @@ begin:
 			handler:    createOption.Handler,
 			NatTimeout: createOption.NatTimeout,
 			Dialer:     dialOption.Dialer,
+			Metadata:   dialOption.Metadata,
+			DialTarget: dialOption.Target,
 		}
 		_ue = ue
 		p.pool.Store(lAddr, ue)

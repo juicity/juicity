@@ -18,10 +18,13 @@ import (
 	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/daeuniverse/outbound/dialer"
+	"github.com/daeuniverse/softwind/ciphers"
 	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/softwind/pkg/fastrand"
 	"github.com/daeuniverse/softwind/pool"
 	"github.com/daeuniverse/softwind/protocol/direct"
 	"github.com/daeuniverse/softwind/protocol/juicity"
+	"github.com/daeuniverse/softwind/protocol/shadowsocks"
 	"github.com/daeuniverse/softwind/protocol/tuic"
 	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
@@ -31,23 +34,26 @@ import (
 const (
 	AuthenticateTimeout = 10 * time.Second
 	AcceptTimeout       = AuthenticateTimeout
+	inFlightUnderlayTtl = AuthenticateTimeout
 )
 
 var (
 	ErrUnexpectedVersion    = fmt.Errorf("unexpected version")
 	ErrUnexpectedCmdType    = fmt.Errorf("unexpected cmd type")
 	ErrAuthenticationFailed = fmt.Errorf("authentication failed")
+	ErrDisabledTrafficType  = fmt.Errorf("disabled traffic type")
 )
 
 type Options struct {
-	Logger            *log.Logger
-	Users             map[string]string
-	Certificate       string
-	PrivateKey        string
-	CongestionControl string
-	Fwmark            int
-	SendThrough       string
-	DialerLink        string
+	Logger                *log.Logger
+	Users                 map[string]string
+	Certificate           string
+	PrivateKey            string
+	CongestionControl     string
+	Fwmark                int
+	SendThrough           string
+	DialerLink            string
+	DisableOutboundUdp443 bool
 }
 
 type Server struct {
@@ -60,6 +66,9 @@ type Server struct {
 	cwnd                   int
 	users                  map[uuid.UUID]string
 	fwmark                 int
+	disableOutboundUdp443  bool
+	inFlightUnderlayKey    *InFlightUnderlayKey
+	udpEndpointPool        *UdpEndpointPool
 }
 
 func New(opts *Options) (*Server, error) {
@@ -104,29 +113,34 @@ func New(opts *Options) (*Server, error) {
 			Str("addr", property.Address).
 			Msg("Dial use given dialer")
 	}
+
 	return &Server{
-		logger: opts.Logger,
-		relay:  relay.NewRelay(opts.Logger),
-		dialer: &netproxy.ContextDialerConverter{
-			Dialer: d,
-		},
-		tlsConfig: &tls.Config{
-			NextProtos:   []string{"h3"}, // h3 only.
-			MinVersion:   tls.VersionTLS13,
-			Certificates: []tls.Certificate{cert},
-		},
+		logger:                 opts.Logger,
+		relay:                  relay.NewRelay(opts.Logger),
+		dialer:                 &netproxy.ContextDialerConverter{Dialer: d},
+		tlsConfig:              &tls.Config{NextProtos: []string{"h3"}, MinVersion: tls.VersionTLS13, Certificates: []tls.Certificate{cert}},
 		maxOpenIncomingStreams: 100,
 		congestionControl:      opts.CongestionControl,
 		cwnd:                   10,
 		users:                  users,
 		fwmark:                 opts.Fwmark,
+		disableOutboundUdp443:  opts.DisableOutboundUdp443,
+		inFlightUnderlayKey:    NewInFlightUnderlayKey(inFlightUnderlayTtl),
+		udpEndpointPool:        NewUdpEndpointPool(),
 	}, nil
 }
 
 func (s *Server) Serve(addr string) (err error) {
 	quicMaxOpenIncomingStreams := int64(s.maxOpenIncomingStreams)
 
-	listener, err := quic.ListenAddr(addr, s.tlsConfig, &quic.Config{
+	pktConn, err := net.ListenPacket("udp", addr)
+	if err != nil {
+		return err
+	}
+	transport := quic.Transport{
+		Conn: pktConn,
+	}
+	listener, err := transport.Listen(s.tlsConfig, &quic.Config{
 		InitialStreamReceiveWindow:     common.InitialStreamReceiveWindow,
 		MaxStreamReceiveWindow:         common.MaxStreamReceiveWindow,
 		InitialConnectionReceiveWindow: common.InitialConnectionReceiveWindow,
@@ -141,6 +155,29 @@ func (s *Server) Serve(addr string) (err error) {
 	if err != nil {
 		return err
 	}
+	go func() {
+		buf := pool.GetFullCap(consts.EthernetMtu)
+		defer buf.Put()
+		for {
+			n, addr, err := transport.ReadNonQUICPacket(context.Background(), buf)
+			if err != nil {
+				s.logger.Error().
+					Err(err).
+					Send()
+				return
+			}
+			newBuf := pool.Get(n)
+			copy(newBuf, buf)
+			go func(transport *quic.Transport, buf pool.PB, ulAddr *net.UDPAddr) {
+				defer buf.Put()
+				if err := s.handleNonQuicPacket(transport, buf, ulAddr); err != nil {
+					s.logger.Info().
+						Err(err).
+						Send()
+				}
+			}(&transport, newBuf, addr.(*net.UDPAddr))
+		}
+	}()
 	for {
 		conn, err := listener.Accept(context.Background())
 		if err != nil {
@@ -160,6 +197,81 @@ func (s *Server) Serve(addr string) (err error) {
 	}
 }
 
+func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf []byte, ulAddr *net.UDPAddr) (err error) {
+	if len(buf) < juicity.CipherConf.SaltLen {
+		return fmt.Errorf("insuffient [underlay] data: len %v", len(buf))
+	}
+	lAddr := ulAddr.AddrPort()
+	// source ip/port -> dst mapping.
+	endpoint, isNew, err := s.udpEndpointPool.GetOrCreate(lAddr, &UdpEndpointOptions{
+		Handler: func(data []byte, from netip.AddrPort, metadata any) error {
+			masterKey := metadata.([]byte)
+			salt := pool.Get(juicity.CipherConf.SaltLen)
+			defer salt.Put()
+			_, _ = fastrand.Read(salt)
+			salt[0] = 0
+			salt[1] = 0
+			buf, err := shadowsocks.EncryptUDPFromPool(&shadowsocks.Key{
+				CipherConf: juicity.CipherConf,
+				MasterKey:  masterKey,
+			}, data, salt, ciphers.JuicityReusedInfo)
+			if err != nil {
+				return err
+			}
+			defer buf.Put()
+			_, err = transport.WriteTo(buf, ulAddr)
+			return err
+		},
+		NatTimeout: 0,
+		GetDialOption: func() (*DialOption, error) {
+			iv := buf[:juicity.CipherConf.SaltLen]
+			auth := s.inFlightUnderlayKey.Evict(inFlightKey(iv))
+			if auth == nil {
+				return nil, fmt.Errorf("[underlay] auth fail")
+			}
+			if s.disableOutboundUdp443 && auth.Metadata.Port == 443 && auth.Metadata.Network == "udp" {
+				return nil, ErrDisabledTrafficType
+			}
+			return &DialOption{
+				Target:   net.JoinHostPort(auth.Metadata.Hostname, strconv.Itoa(int(auth.Metadata.Port))),
+				Dialer:   s.dialer,
+				Metadata: auth.Psk,
+			}, nil
+		},
+	})
+	if err != nil {
+		if errors.Is(err, ErrDisabledTrafficType) {
+			s.logger.Debug().
+				Str("target", endpoint.DialTarget).
+				Str("source", lAddr.String()).
+				Msg("juicity blocked an [underlay] request")
+			return nil
+		}
+		return err
+	}
+	if !isNew {
+		masterKey := endpoint.Metadata.([]byte)
+		decrypted, err := shadowsocks.DecryptUDPFromPool(&shadowsocks.Key{
+			CipherConf: juicity.CipherConf,
+			MasterKey:  masterKey,
+		}, buf, ciphers.JuicityReusedInfo)
+		if err != nil {
+			return err
+		}
+		defer decrypted.Put()
+		buf = decrypted
+	} else {
+		s.logger.Debug().
+			Str("target", endpoint.DialTarget).
+			Str("source", lAddr.String()).
+			Msg("juicity performed an [underlay] request")
+	}
+	if _, err = endpoint.WriteTo(buf, endpoint.DialTarget); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Server) handleConn(conn quic.Connection) (err error) {
 	common.SetCongestionController(conn, s.congestionControl, s.cwnd)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -167,7 +279,11 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	authCtx, authDone := context.WithTimeout(ctx, AuthenticateTimeout)
 	defer authDone()
 	go func() {
-		if _, err := s.handleAuth(authCtx, conn); err != nil {
+		var (
+			uniStream quic.ReceiveStream
+			err       error
+		)
+		if _, uniStream, err = s.handleConnAuth(authCtx, conn); err != nil {
 			s.logger.Warn().
 				Err(err).
 				Msg("handleAuth")
@@ -176,6 +292,25 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 			return
 		}
 		authDone()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			if err = s.handleUnderlayAuth(ctx, uniStream); err != nil {
+				if errors.Is(err, io.EOF) {
+					s.logger.Debug().
+						Err(err).
+						Msg("handleUnderlayAuth: maybe is an old client?")
+					return
+				}
+				s.logger.Error().
+					Err(err).
+					Msg("handleUnderlayAuth")
+				return
+			}
+		}
 	}()
 	for {
 		stream, err := conn.AcceptStream(ctx)
@@ -214,7 +349,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 		s.logger.Debug().
 			Str("target", target).
 			Str("source", source).
-			Msg("juicity received a tcp request")
+			Msg("juicity received a [tcp] request")
 		magicNetwork := netproxy.MagicNetwork{
 			Network: "tcp",
 			Mark:    uint32(s.fwmark),
@@ -241,7 +376,13 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			return fmt.Errorf("relay tcp error: %w", err)
 		}
 	case "udp":
-		// can dial any target
+		if s.disableOutboundUdp443 && mdata.Port == 443 {
+			s.logger.Debug().
+				Str("target", net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))).
+				Str("source", source).
+				Msg("juicity blocked a [udp] request")
+			return nil
+		}
 		lConn := &juicity.PacketConn{Conn: lConn}
 		buf := pool.GetFullCap(consts.EthernetMtu)
 		defer pool.Put(buf)
@@ -261,7 +402,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 		s.logger.Debug().
 			Str("target", addr.String()).
 			Str("source", source).
-			Msg("juicity received a udp request")
+			Msg("juicity received a [udp] request")
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -297,45 +438,56 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 	return nil
 }
 
-func (s *Server) handleAuth(ctx context.Context, conn quic.Connection) (uuid *uuid.UUID, err error) {
-	uniStream, err := conn.AcceptUniStream(ctx)
+func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (uuid *uuid.UUID, uniStream quic.ReceiveStream, err error) {
+	uniStream, err = conn.AcceptUniStream(authCtx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	r := bufio.NewReader(uniStream)
 	v, err := r.Peek(1)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	switch v[0] {
 	case juicity.Version0:
 		commandHead, err := tuic.ReadCommandHead(r)
 		if err != nil {
-			return nil, fmt.Errorf("ReadCommandHead: %w", err)
+			return nil, nil, fmt.Errorf("ReadCommandHead: %w", err)
 		}
 		switch commandHead.TYPE {
 		case tuic.AuthenticateType:
 			authenticate, err := tuic.ReadAuthenticateWithHead(commandHead, r)
 			if err != nil {
-				return nil, fmt.Errorf("ReadAuthenticateWithHead: %w", err)
+				return nil, nil, fmt.Errorf("ReadAuthenticateWithHead: %w", err)
 			}
 			var token [32]byte
 			if password, ok := s.users[authenticate.UUID]; ok {
 				token, err = tuic.GenToken(conn.ConnectionState(), authenticate.UUID, password)
 				if err != nil {
-					return nil, fmt.Errorf("GenToken: %w", err)
+					return nil, nil, fmt.Errorf("GenToken: %w", err)
 				}
 				if token == authenticate.TOKEN {
-					return &authenticate.UUID, nil
+					return &authenticate.UUID, uniStream, nil
 				} else {
 					_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
 				}
 			}
-			return nil, fmt.Errorf("%w: %v", ErrAuthenticationFailed, authenticate.UUID)
+			return nil, nil, fmt.Errorf("%w: %v", ErrAuthenticationFailed, authenticate.UUID)
 		default:
-			return nil, fmt.Errorf("%w: %v", ErrUnexpectedCmdType, commandHead.TYPE)
+			return nil, nil, fmt.Errorf("%w: %v", ErrUnexpectedCmdType, commandHead.TYPE)
 		}
 	default:
-		return nil, fmt.Errorf("%w: %v", ErrUnexpectedVersion, v)
+		return nil, nil, fmt.Errorf("%w: %v", ErrUnexpectedVersion, v)
 	}
+}
+func (s *Server) handleUnderlayAuth(ctx context.Context, uniStream quic.ReceiveStream) (err error) {
+	// Read an auth from the connection.
+	var auth juicity.UnderlayAuth
+	if _, err = auth.Unpack(uniStream); err != nil {
+		return err
+	}
+
+	// Store the key.
+	s.inFlightUnderlayKey.Store(inFlightKey(auth.IV), &auth)
+	return nil
 }

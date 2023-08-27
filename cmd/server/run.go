@@ -73,14 +73,15 @@ func Serve(conf *config.Config) (err error) {
 		}
 	}
 	s, err := server.New(&server.Options{
-		Logger:            logger,
-		Users:             conf.Users,
-		Certificate:       conf.Certificate,
-		PrivateKey:        conf.PrivateKey,
-		CongestionControl: conf.CongestionControl,
-		Fwmark:            int(fwmark),
-		SendThrough:       conf.SendThrough,
-		DialerLink:        conf.DialerLink,
+		Logger:                logger,
+		Users:                 conf.Users,
+		Certificate:           conf.Certificate,
+		PrivateKey:            conf.PrivateKey,
+		CongestionControl:     conf.CongestionControl,
+		Fwmark:                int(fwmark),
+		SendThrough:           conf.SendThrough,
+		DialerLink:            conf.DialerLink,
+		DisableOutboundUdp443: conf.DisableOutboundUdp443,
 	})
 	if err != nil {
 		return err

@@ -4,10 +4,10 @@ go 1.21.0
 
 require (
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
-	github.com/daeuniverse/softwind v0.0.0-20230821142121-f4d871b5a8c9
+	github.com/daeuniverse/softwind v0.0.0-20230827075246-db555b38f9f7
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
-	github.com/mzz2017/quic-go v0.0.0-20230821141654-3dd2575ee6bc
+	github.com/mzz2017/quic-go v0.0.0-20230826094347-f6ce422906f4
 	github.com/nadoo/glider v0.16.3
 	github.com/rs/zerolog v1.30.0
 	github.com/sourcegraph/conc v0.3.0
@@ -37,7 +37,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mzz2017/disk-bloom v1.0.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.11.0 // indirect
-	github.com/quic-go/qtls-go1-20 v0.3.2 // indirect
+	github.com/quic-go/qtls-go1-20 v0.3.3 // indirect
 	github.com/quic-go/quic-go v0.37.4 // indirect
 	github.com/refraction-networking/utls v1.4.3 // indirect
 	github.com/seiflotfy/cuckoofilter v0.0.0-20220411075957-e3b120b3f5fb // indirect
@@ -62,3 +62,4 @@ replace github.com/nadoo/glider => github.com/juicity/glider v0.0.0-202308051437
 // replace github.com/daeuniverse/softwind => ../softwind
 
 // replace github.com/mzz2017/quic-go => ../quic-go
+// replace github.com/mzz2017/quic-go => github.com/mzz2017/quic-go v0.0.0-20230821141654-3dd2575ee6bc
