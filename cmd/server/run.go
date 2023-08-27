@@ -81,6 +81,7 @@ func Serve(conf *config.Config) (err error) {
 		Fwmark:            int(fwmark),
 		SendThrough:       conf.SendThrough,
 		DialerLink:        conf.DialerLink,
+		DisableUdp443:     conf.DisableUdp443,
 	})
 	if err != nil {
 		return err

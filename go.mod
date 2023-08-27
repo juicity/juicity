@@ -4,7 +4,7 @@ go 1.21.0
 
 require (
 	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
-	github.com/daeuniverse/softwind v0.0.0-20230826094450-4d95a4601b9a
+	github.com/daeuniverse/softwind v0.0.0-20230827075246-db555b38f9f7
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
 	github.com/mzz2017/quic-go v0.0.0-20230826094347-f6ce422906f4
