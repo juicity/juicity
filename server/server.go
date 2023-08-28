@@ -229,7 +229,11 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf []byte, ulAd
 			if auth == nil {
 				return nil, fmt.Errorf("[underlay] auth fail")
 			}
-			if s.disableOutboundUdp443 && auth.Metadata.Port == 443 && auth.Metadata.Network == "udp" {
+			if s.disableOutboundUdp443 && auth.Metadata.Port == 443 {
+				s.logger.Debug().
+					Str("target", net.JoinHostPort(auth.Metadata.Hostname, strconv.Itoa(int(auth.Metadata.Port)))).
+					Str("source", lAddr.String()).
+					Msg("juicity blocked an [underlay] request")
 				return nil, ErrDisabledTrafficType
 			}
 			return &DialOption{
@@ -241,10 +245,6 @@ func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf []byte, ulAd
 	})
 	if err != nil {
 		if errors.Is(err, ErrDisabledTrafficType) {
-			s.logger.Debug().
-				Str("target", endpoint.DialTarget).
-				Str("source", lAddr.String()).
-				Msg("juicity blocked an [underlay] request")
 			return nil
 		}
 		return err
