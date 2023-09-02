@@ -11,6 +11,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
+
+- [v0.3.0 (Latest)](#v030-latest)
 - [v0.2.1 (Latest)](#v021-latest)
 - [v0.2.0](#v020)
 - [v0.1.3](#v013)
@@ -18,6 +20,28 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
+
+### v0.3.0 (Latest)
+
+> Release date: 2023/09/02
+
+### Bug Fixes
+
+- fix: disable_outbound_udp443 not work and revert #103 in [#107](https://github.com/juicity/juicity/pull/107) by (@mzz2017)
+
+### Others
+
+- chore: fix IsGSOError judgement in [#109](https://github.com/juicity/juicity/pull/109) by (@mzz2017)
+
+### 问题修复
+
+- 修复: disable_outbound_udp443 不起作用并还原 #103 in [#107](https://github.com/juicity/juicity/pull/107) 由 (@mzz2017)
+
+### 其他变更
+
+- 杂项: 修复 IsGSOError 判断 in [#109](https://github.com/juicity/juicity/pull/109) 由 (@mzz2017)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.2.1...v0.3.0
 
 ### v0.2.1 (Latest)
 
