@@ -4,8 +4,8 @@ github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSV
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843 h1:DQCB9XdxWmI9ySh7lh1Yyer+1RM+d+1oXG586NBPJ5U=
 github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843/go.mod h1:0MOSc+twby808YzJjBA2VOSd928vLQFhUzHLSdL7aKM=
-github.com/daeuniverse/softwind v0.0.0-20230827075246-db555b38f9f7 h1:3gbOD+bVTILxwwfsDufnPjGDXZgoNjcbls0INqr1/j4=
-github.com/daeuniverse/softwind v0.0.0-20230827075246-db555b38f9f7/go.mod h1:Didl+N+gp/UIZ6+n9lwHQjdQEBNWYbdFXvRlmlVcth8=
+github.com/daeuniverse/softwind v0.0.0-20230902043208-c591289f5700 h1:FsWBHkhV0x+FsNXGjpWP0ho/yJRH2W475W6EF2AY80M=
+github.com/daeuniverse/softwind v0.0.0-20230902043208-c591289f5700/go.mod h1:oUzDGY0PDAiXCEIm5DNMewP4KpCAOEXOzZJ7JEP1080=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -68,8 +68,8 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/mzz2017/disk-bloom v1.0.1 h1:rEF9MiXd9qMW3ibRpqcerLXULoTgRlM21yqqJl1B90M=
 github.com/mzz2017/disk-bloom v1.0.1/go.mod h1:JLHETtUu44Z6iBmsqzkOtFlRvXSlKnxjwiBRDapizDI=
-github.com/mzz2017/quic-go v0.0.0-20230826094347-f6ce422906f4 h1:GlGWHALzJpMsdbJMKIRg0XNjkjkWjL7x0x7JfiGQaBI=
-github.com/mzz2017/quic-go v0.0.0-20230826094347-f6ce422906f4/go.mod h1:tWtXPktBZvMi0SzXP4QFO8SKDNsAkGEijAeiNe8QmyM=
+github.com/mzz2017/quic-go v0.0.0-20230902042923-a727c1c479d4 h1:7T4E6LsmEhclfkgOt5pCiBgZNRC7h45sIvLj3FunUO8=
+github.com/mzz2017/quic-go v0.0.0-20230902042923-a727c1c479d4/go.mod h1:tWtXPktBZvMi0SzXP4QFO8SKDNsAkGEijAeiNe8QmyM=
 github.com/onsi/ginkgo/v2 v2.11.0 h1:WgqUCUt/lT6yXoQ8Wef0fsNn5cAuMK7+KT9UFRz2tcU=
 github.com/onsi/ginkgo/v2 v2.11.0/go.mod h1:ZhrRA5XmEE3x3rhlzamx/JJvujdZoJ2uvgI7kR0iZvM=
 github.com/onsi/gomega v1.27.8 h1:gegWiwZjBsf2DgiSbf5hpokZ98JVDMcWkUiigk6/KXc=
