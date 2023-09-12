@@ -13,12 +13,12 @@ all: juicity-server juicity-client
 
 juicity-server:
 	go build -o $@ -trimpath \
-		 -ldflags "-s -w -X 'github.com/juicity/juicity/config.Version=$(VERSION)' -X 'github.com/juicity/juicity/config.Runtime=$(RUNTIME)'" \
+		 -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" \
 		 ./cmd/server
 
 juicity-client:
 	go build -o $@ -trimpath \
-		 -ldflags "-s -w -X 'github.com/juicity/juicity/config.Version=$(VERSION)' -X 'github.com/juicity/juicity/config.Runtime=$(RUNTIME)'" \
+		 -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" \
 		 ./cmd/client
 
 .PHONY: juicity-server juicity-client all

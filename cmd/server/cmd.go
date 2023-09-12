@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/juicity/juicity/config"
 	"github.com/spf13/cobra"
@@ -24,7 +25,8 @@ func init() {
 		Use:   "version",
 		Short: "Print out version info",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("juicity-server version %v\n%v\n", config.Version, config.Runtime)
+			fmt.Printf("juicity-client version %v\n", config.Version)
+			fmt.Printf("go version %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 			if val, isSet := os.LookupEnv("CGO_ENALBED"); !isSet {
 				fmt.Print("CGO_ENALBED: NOT SET\n")
 			} else {
