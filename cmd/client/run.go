@@ -40,7 +40,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("juicity-client version %v\n", config.Version)
 			fmt.Printf("go version %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
-			fmt.Printf("CGO_ENALBED: %v\n", cgoEnabled)
+			fmt.Printf("CGO_ENABLED: %v\n", cgoEnabled)
 		},
 	}
 
