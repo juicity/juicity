@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"os/signal"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -21,6 +22,16 @@ var (
 	logger = log.NewLogger(&log.Options{
 		TimeFormat: time.DateTime,
 	})
+
+	versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "Print out version info",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("juicity-client version %v\n", config.Version)
+			fmt.Printf("go version %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
+			fmt.Printf("CGO_ENALBED: %v\n", cgoEnabled)
+		},
+	}
 
 	runCmd = &cobra.Command{
 		Use:   "run",
@@ -99,6 +110,7 @@ func Serve(conf *config.Config) (err error) {
 func init() {
 	// cmds
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(versionCmd)
 
 	// flags
 	shared.InitArgumentsFlags(runCmd)

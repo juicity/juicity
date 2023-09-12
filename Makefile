@@ -8,16 +8,19 @@ else
 	VERSION ?= unstable-$(date).r$(count).$(commit)
 endif
 RUNTIME=$(shell go version)
+ifndef CGO_ENALBED
+    CGO_ENALBED := 0
+endif
 
 all: juicity-server juicity-client
 
 juicity-server:
-	go build -o $@ -trimpath \
+	CGO_ENALBED=$CGO_ENALBED go build -o $@ -trimpath \
 		 -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" \
 		 ./cmd/server
 
 juicity-client:
-	go build -o $@ -trimpath \
+	CGO_ENALBED=$CGO_ENALBED go build -o $@ -trimpath \
 		 -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" \
 		 ./cmd/client
 
