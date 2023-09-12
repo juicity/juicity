@@ -156,8 +156,8 @@ jobs:
       - name: Smoke test
         if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
         run: |
-          ./build/juicity-server --version
-          ./build/juicity-client --version
+          ./build/juicity-server version
+          ./build/juicity-client version
 
       - name: Create binary ZIP archive and Signature
         run: |
@@ -184,4 +184,3 @@ jobs:
           app_id: ${{ secrets.app_id }}
           private_key: ${{ secrets.private_key }}
           id: "juicity-bot[bot]/build"
-
