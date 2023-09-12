@@ -25,7 +25,11 @@ func init() {
 		Short: "Print out version info",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("juicity-server version %v\n%v\n", config.Version, config.Runtime)
-			fmt.Printf("CGO_ENALBED: %v\n", os.Getenv("CGO_ENALBED"))
+			if val, isSet := os.LookupEnv("CGO_ENALBED"); !isSet {
+				fmt.Print("CGO_ENALBED: NOT SET\n")
+			} else {
+				fmt.Printf("CGO_ENALBED: %v\n", val)
+			}
 		},
 	})
 }
