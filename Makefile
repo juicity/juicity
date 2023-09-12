@@ -7,13 +7,18 @@ ifeq ($(wildcard .git/.),)
 else
 	VERSION ?= unstable-$(date).r$(count).$(commit)
 endif
+RUNTIME=$(shell go version)
 
 all: juicity-server juicity-client
 
 juicity-server:
-	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" ./cmd/server
+	go build -o $@ -trimpath \
+		 -ldflags "-s -w -X 'github.com/juicity/juicity/config.Version=$(VERSION)' -X 'github.com/juicity/juicity/config.Runtime=$(RUNTIME)'" \
+		 ./cmd/server
 
 juicity-client:
-	go build -o $@ -trimpath -ldflags "-s -w -X github.com/juicity/juicity/config.Version=$(VERSION)" ./cmd/client
+	go build -o $@ -trimpath \
+		 -ldflags "-s -w -X 'github.com/juicity/juicity/config.Version=$(VERSION)' -X 'github.com/juicity/juicity/config.Runtime=$(RUNTIME)'" \
+		 ./cmd/client
 
 .PHONY: juicity-server juicity-client all

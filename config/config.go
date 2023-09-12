@@ -7,6 +7,7 @@ import (
 
 var (
 	Version = "unknown"
+	Runtime = "unknown"
 )
 
 type Config struct {
