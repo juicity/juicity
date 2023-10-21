@@ -1,16 +1,15 @@
 package main
 
 import (
-	"github.com/juicity/juicity/config"
 	"github.com/spf13/cobra"
 )
 
 var (
-	rootCmd = &cobra.Command{
-		Use:     "juicity-server [flags] [command [argument ...]]",
-		Short:   "juicity-server is a quic-based proxy server.",
-		Long:    "juicity-server is a quic-based proxy server.",
-		Version: config.Version,
+	cgoEnabled = 0
+	rootCmd    = &cobra.Command{
+		Use:   "juicity-server [flags] [command [argument ...]]",
+		Short: "juicity-server is a quic-based proxy server.",
+		Long:  "juicity-server is a quic-based proxy server.",
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
 		},

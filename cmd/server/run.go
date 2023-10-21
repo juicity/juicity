@@ -22,6 +22,14 @@ var (
 		TimeFormat: time.DateTime,
 	})
 
+	versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "Print out version info",
+		Run: func(cmd *cobra.Command, args []string) {
+			shared.PrintVersion(cgoEnabled)
+		},
+	}
+
 	runCmd = &cobra.Command{
 		Use:   "run",
 		Short: "To run juicity-server in the foreground.",
@@ -97,8 +105,12 @@ func Serve(conf *config.Config) (err error) {
 }
 
 func init() {
+	// version
+	rootCmd.Version = shared.GetVersion(cgoEnabled)
+
 	// cmds
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(versionCmd)
 
 	// flags
 	shared.InitArgumentsFlags(runCmd)
