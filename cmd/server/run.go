@@ -5,7 +5,6 @@ import (
 	"math"
 	"os"
 	"os/signal"
-	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -27,9 +26,7 @@ var (
 		Use:   "version",
 		Short: "Print out version info",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("juicity-client version %v\n", config.Version)
-			fmt.Printf("go version %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
-			fmt.Printf("CGO_ENABLED: %v\n", cgoEnabled)
+			shared.PrintVersion(cgoEnabled)
 		},
 	}
 
@@ -108,6 +105,9 @@ func Serve(conf *config.Config) (err error) {
 }
 
 func init() {
+	// version
+	rootCmd.Version = shared.GetVersion(cgoEnabled)
+
 	// cmds
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(versionCmd)
