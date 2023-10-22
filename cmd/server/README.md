@@ -22,6 +22,18 @@ make CGO_ENABLED=0 juicity-server
 ./juicity-server run -c config.json
 ```
 
+Or with Docker
+
+```
+docker run --name juicity \
+  --restart always \
+  —-network host \
+  -v /path/to/config.json:/etc/juicity/server.json \
+  -v /path/to/fullchain.cer:/path/to/fullchain.cer \
+  -v /path/to/private.key:/path/to/private.key \
+  -dit ghcr.io/juicity/juicity:main
+```
+
 ## Configuration
 
 Mini configuration:
