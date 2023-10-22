@@ -10,8 +10,24 @@ on:
     branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*' ]
+    paths:
+      - "**/*.go"
+      - "**/*.c"
+      - "**/*.h"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/pr-build.yml"
+      - ".github/workflows/seed-build.yml"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - "**/*.go"
+      - "**/*.c"
+      - "**/*.h"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/pr-build.yml"
+      - ".github/workflows/seed-build.yml"
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -19,10 +35,8 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,7 +44,6 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
