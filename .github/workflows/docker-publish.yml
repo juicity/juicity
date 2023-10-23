@@ -18,6 +18,7 @@ on:
       - "go.sum"
       - ".github/workflows/pr-build.yml"
       - ".github/workflows/seed-build.yml"
+      - ".github/workflows/docker-publish.yml"
   pull_request:
     branches: [ "main" ]
     paths:
@@ -28,6 +29,7 @@ on:
       - "go.sum"
       - ".github/workflows/pr-build.yml"
       - ".github/workflows/seed-build.yml"
+      - ".github/workflows/docker-publish.yml"
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -83,6 +85,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
