@@ -11,6 +11,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 ## Releases
 
 <!-- BEGIN NEW TOC ENTRY -->
+
+- [v0.4.0rc1 (Pre-release)](#v040rc1-pre-release)
 - [v0.3.0 (Latest)](#v030-latest)
 - [v0.2.1](#v021)
 - [v0.2.0](#v020)
@@ -19,6 +21,38 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
+
+### v0.4.0rc1 (Pre-release)
+
+> Release date: 2023/12/30
+
+### Features
+
+- feat(cmd/version): add copy right and license info in [#134](https://github.com/juicity/juicity/pull/134) by (@yqlbu)
+- feat(cmd): enhance version print in [#123](https://github.com/juicity/juicity/pull/123) by (@yqlbu)
+
+### Others
+
+- ci(lint): upgrade linter ver. in [#142](https://github.com/juicity/juicity/pull/142) by (@sumire88)
+- chore: upgrade softwind and quic-go to v0.40.1 in [#141](https://github.com/juicity/juicity/pull/141) by (@mzz2017)
+- ci(docker-publish): limit workflow triggers in [#132](https://github.com/juicity/juicity/pull/132) by (@yqlbu)
+
+### 特性
+
+- 特性(cmd/version): 在 [#134](https://github.com/juicity/juicity/pull/134) 中添加版权和许可信息 by (@yqlbu)
+- 特性(cmd): 在 [#123](https://github.com/juicity/juicity/pull/123) 中增强版本打印功能 by (@yqlbu)
+
+### 其他
+
+- 自动化(lint): 在 [#142](https://github.com/juicity/juicity/pull/142) 中升级 linter 版本 by (@sumire88)
+- 杂项: 在 [#141](https://github.com/juicity/juicity/pull/141) 中将 softwind 和 quic-go 升级至 v0.40.1 by (@mzz2017)
+- 自动化(docker-publish): 在 [#132](https://github.com/juicity/juicity/pull/132) 中限制工作流触发条件 by (@yqlbu)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.3.0...v0.4.0rc1
+
+### New Contributors
+
+- @sumire88 made their first contribution in #142
 
 ### v0.3.0 (Latest)
 
