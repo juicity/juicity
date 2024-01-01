@@ -3,7 +3,7 @@ module github.com/juicity/juicity
 go 1.21.0
 
 require (
-	github.com/daeuniverse/outbound v0.0.0-20230814161100-5d9b25e38843
+	github.com/daeuniverse/outbound v0.0.0-20240101085641-7932e7df927d
 	github.com/daeuniverse/softwind v0.0.0-20231230065827-eed67f20d2c1
 	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.55
