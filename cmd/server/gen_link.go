@@ -123,6 +123,7 @@ func generateLink(arguments shared.Arguments) (string, error) {
 				return "", fmt.Errorf("generateCertChainHash: %w", err)
 			}
 			query.Set("pinned_certchain_sha256", hash)
+			query.Set("allow_insecure", "1")
 		}
 	}
 	link := url.URL{
