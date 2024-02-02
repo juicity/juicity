@@ -12,8 +12,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
-- [v0.4.0rc1 (Pre-release)](#v040rc1-pre-release)
-- [v0.3.0 (Latest)](#v030-latest)
+- [v0.4.0 (Latest)](#v040-latest)
+- [v0.3.0](#v030)
 - [v0.2.1](#v021)
 - [v0.2.0](#v020)
 - [v0.1.3](#v013)
@@ -22,9 +22,9 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.4.0rc1 (Pre-release)
+### v0.4.0 (Latest)
 
-> Release date: 2023/12/30
+> Release date: 2024/02/02
 
 #### Features
 
@@ -54,7 +54,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 - @sumire88 made their first contribution in #142
 
-### v0.3.0 (Latest)
+### v0.3.0
 
 > Release date: 2023/09/02
 
