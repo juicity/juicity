@@ -18,6 +18,7 @@ import (
 	"github.com/juicity/juicity/pkg/log"
 
 	"github.com/daeuniverse/outbound/dialer"
+	"github.com/daeuniverse/quic-go"
 	"github.com/daeuniverse/softwind/ciphers"
 	"github.com/daeuniverse/softwind/netproxy"
 	"github.com/daeuniverse/softwind/pkg/fastrand"
@@ -28,7 +29,6 @@ import (
 	"github.com/daeuniverse/softwind/protocol/tuic"
 	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
-	"github.com/mzz2017/quic-go"
 )
 
 const (
