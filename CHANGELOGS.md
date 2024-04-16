@@ -12,7 +12,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
-- [v0.4.0 (Latest)](#v040-latest)
+- [v0.4.1 (Latest)](#v041-latest)
+- [v0.4.0](#v040)
 - [v0.3.0](#v030)
 - [v0.2.1](#v021)
 - [v0.2.0](#v020)
@@ -22,7 +23,27 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.4.0 (Latest)
+### v0.4.1 (Latest)
+
+> Release date: 2024/04/16
+
+#### Features
+
+- feat/chore: support to forward to v2ray-plugin nodes in [#145](https://github.com/juicity/juicity/pull/145) by (@mzz2017)
+
+#### Bug Fixes
+
+- fix: add allow_insecore=1 when cert need to pin in [#146](https://github.com/juicity/juicity/pull/146) by (@mzz2017)
+
+#### Others
+
+- chore(changelogs): release-v0.4.0rc1 -> release-v0.4.0 in [#149](https://github.com/juicity/juicity/pull/149) by (@sumire88)
+- chore: upgrade quic-go to 0.42.0 and utls to 1.6.4 in [#155](https://github.com/juicity/juicity/pull/155) by (@mzz2017)
+- ci(generate-changelogs): update workflow logic in [#156](https://github.com/juicity/juicity/pull/156) by (@sumire88)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.4.0...v0.4.1
+
+### v0.4.0
 
 > Release date: 2024/02/02
 
