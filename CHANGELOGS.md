@@ -13,8 +13,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 <!-- BEGIN NEW TOC ENTRY -->
 
 - [v0.4.2 (Latest)](#v042-latest)
-
-- [v0.4.1 (Latest)](#v041-latest)
+- [v0.4.1](#v041)
 - [v0.4.0](#v040)
 - [v0.3.0](#v030)
 - [v0.2.1](#v021)
@@ -39,7 +38,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 **Full Changelog**: https://github.com/juicity/juicity/compare/v0.4.1...v0.4.2
 
-### v0.4.1 (Latest)
+### v0.4.1
 
 > Release date: 2024/04/16
 
