@@ -146,8 +146,8 @@ jobs:
       - name: Smoke test
         if: matrix.goarch == 'amd64' && matrix.goamd64 == 'v1'
         run: |
-          ./build/juicity-server version
-          ./build/juicity-client version
+          ./build/juicity-server -v
+          ./build/juicity-client -v
 
       - name: Create binary ZIP archive and Signature
         run: |
