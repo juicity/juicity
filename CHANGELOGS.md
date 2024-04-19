@@ -12,7 +12,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
-- [v0.4.1 (Latest)](#v041-latest)
+- [v0.4.2 (Latest)](#v042-latest)
+- [v0.4.1](#v041)
 - [v0.4.0](#v040)
 - [v0.3.0](#v030)
 - [v0.2.1](#v021)
@@ -23,7 +24,21 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.4.1 (Latest)
+### v0.4.2 (Latest)
+
+> Release date: 2024/04/19
+
+#### Bug Fixes
+
+- fix(cmd): use generic version flag to display ver info in [#159](https://github.com/juicity/juicity/pull/159) by (@sumire88)
+
+#### Others
+
+- ci(seed-build): update smoke test step in [#160](https://github.com/juicity/juicity/pull/160) by (@sumire88)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.4.1...v0.4.2
+
+### v0.4.1
 
 > Release date: 2024/04/16
 
