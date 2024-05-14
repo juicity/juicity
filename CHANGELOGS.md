@@ -12,7 +12,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
-- [v0.4.2 (Latest)](#v042-latest)
+- [v0.4.3 (Latest)](#v043-latest)
+- [v0.4.2](#v042)
 - [v0.4.1](#v041)
 - [v0.4.0](#v040)
 - [v0.3.0](#v030)
@@ -24,7 +25,17 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.4.2 (Latest)
+### v0.4.3 (Latest)
+
+> Release date: 2024/05/14
+
+#### Bug Fixes
+
+- fix: disable gso on client by default in [#165](https://github.com/juicity/juicity/pull/165) by (@mzz2017)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.4.2...v0.4.3
+
+### v0.4.2
 
 > Release date: 2024/04/19
 
