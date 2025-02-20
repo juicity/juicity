@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/daeuniverse/softwind/protocol/juicity"
+	"github.com/daeuniverse/outbound/protocol/juicity"
 )
 
 type inFlightKey = [juicity.UnderlaySaltLen]byte

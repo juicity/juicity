@@ -3,8 +3,8 @@ package relay
 import (
 	"time"
 
-	"github.com/daeuniverse/softwind/netproxy"
-	io2 "github.com/daeuniverse/softwind/pkg/zeroalloc/io"
+	"github.com/daeuniverse/outbound/netproxy"
+	io2 "github.com/daeuniverse/outbound/pkg/zeroalloc/io"
 )
 
 func (r *relay) RelayTCP(lConn, rConn netproxy.Conn) (err error) {

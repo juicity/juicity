@@ -17,17 +17,17 @@ import (
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
+	"github.com/daeuniverse/outbound/ciphers"
 	"github.com/daeuniverse/outbound/dialer"
+	"github.com/daeuniverse/outbound/netproxy"
+	"github.com/daeuniverse/outbound/pkg/fastrand"
+	"github.com/daeuniverse/outbound/pool"
+	"github.com/daeuniverse/outbound/protocol/direct"
+	"github.com/daeuniverse/outbound/protocol/juicity"
+	"github.com/daeuniverse/outbound/protocol/shadowsocks"
+	"github.com/daeuniverse/outbound/protocol/tuic"
+	"github.com/daeuniverse/outbound/protocol/tuic/common"
 	"github.com/daeuniverse/quic-go"
-	"github.com/daeuniverse/softwind/ciphers"
-	"github.com/daeuniverse/softwind/netproxy"
-	"github.com/daeuniverse/softwind/pkg/fastrand"
-	"github.com/daeuniverse/softwind/pool"
-	"github.com/daeuniverse/softwind/protocol/direct"
-	"github.com/daeuniverse/softwind/protocol/juicity"
-	"github.com/daeuniverse/softwind/protocol/shadowsocks"
-	"github.com/daeuniverse/softwind/protocol/tuic"
-	"github.com/daeuniverse/softwind/protocol/tuic/common"
 	"github.com/google/uuid"
 )
 
@@ -59,7 +59,7 @@ type Options struct {
 type Server struct {
 	logger                 *log.Logger
 	relay                  relay.Relay
-	dialer                 netproxy.ContextDialer
+	dialer                 netproxy.Dialer
 	tlsConfig              *tls.Config
 	maxOpenIncomingStreams int64
 	congestionControl      string
@@ -117,7 +117,7 @@ func New(opts *Options) (*Server, error) {
 	return &Server{
 		logger:                 opts.Logger,
 		relay:                  relay.NewRelay(opts.Logger),
-		dialer:                 &netproxy.ContextDialerConverter{Dialer: d},
+		dialer:                 d,
 		tlsConfig:              &tls.Config{NextProtos: []string{"h3"}, MinVersion: tls.VersionTLS13, Certificates: []tls.Certificate{cert}},
 		maxOpenIncomingStreams: 100,
 		congestionControl:      opts.CongestionControl,
