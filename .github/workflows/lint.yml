@@ -35,6 +35,7 @@ jobs:
           cache: false
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
+          install-mode: "goinstall"
           version: v1.54
