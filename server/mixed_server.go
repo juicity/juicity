@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/outbound/netproxy"
 	gliderLog "github.com/nadoo/glider/pkg/log"
 	"github.com/nadoo/glider/proxy"
 	"github.com/nadoo/glider/proxy/http"
@@ -38,7 +38,9 @@ type forwarder struct {
 
 // Dial implements proxy.Proxy.
 func (f *forwarder) Dial(network string, addr string) (c net.Conn, dialer proxy.Dialer, err error) {
-	conn, err := f.d.Dial("tcp", addr)
+	ctx, cancel := netproxy.NewDialTimeoutContext()
+	defer cancel()
+	conn, err := f.d.DialContext(ctx, "tcp", addr)
 	if err != nil {
 		return nil, defaultFakeDialer, err
 	}
@@ -51,15 +53,14 @@ func (f *forwarder) Dial(network string, addr string) (c net.Conn, dialer proxy.
 
 // DialUDP implements proxy.Proxy.
 func (f *forwarder) DialUDP(network string, addr string) (pc net.PacketConn, dialer proxy.UDPDialer, err error) {
-	conn, err := f.d.Dial("udp", addr)
+	ctx, cancel := netproxy.NewDialTimeoutContext()
+	defer cancel()
+	conn, err := f.d.DialContext(ctx, "udp", addr)
 	if err != nil {
 		return nil, defaultFakeDialer, err
 	}
-	return &netproxy.FakeNetPacketConn{
-		PacketConn: conn.(netproxy.PacketConn),
-		LAddr:      nil,
-		RAddr:      nil,
-	}, defaultFakeDialer, nil
+	fc := netproxy.NewFakeNetPacketConn(conn.(netproxy.PacketConn), nil, nil)
+	return fc, defaultFakeDialer, nil
 }
 
 // NextDialer implements proxy.Proxy.

@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/daeuniverse/softwind/netproxy"
-	"github.com/daeuniverse/softwind/pool"
+	"github.com/daeuniverse/outbound/netproxy"
+	"github.com/daeuniverse/outbound/pool"
 	"github.com/juicity/juicity/common/consts"
 )
 
@@ -121,12 +121,9 @@ begin:
 		if err != nil {
 			return nil, false, err
 		}
-		cd := netproxy.ContextDialerConverter{
-			Dialer: dialOption.Dialer,
-		}
 		ctx, cancel := context.WithTimeout(context.TODO(), consts.DefaultDialTimeout)
 		defer cancel()
-		udpConn, err := cd.DialContext(ctx, "udp", dialOption.Target)
+		udpConn, err := dialOption.Dialer.DialContext(ctx, "udp", dialOption.Target)
 		if err != nil {
 			return nil, true, err
 		}
