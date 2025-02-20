@@ -12,7 +12,7 @@ repos:
       - id: double-quote-string-fixer
       - id: end-of-file-fixer
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.52.2
+    rev: v1.64.5
     hooks:
       - id: golangci-lint
   - repo: local

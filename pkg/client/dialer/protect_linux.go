@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"syscall"
 
-	"github.com/daeuniverse/softwind/netproxy"
+	"github.com/daeuniverse/outbound/netproxy"
 )
 
 func init() {

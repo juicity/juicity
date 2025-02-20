@@ -11,8 +11,8 @@ import (
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
-	"github.com/daeuniverse/softwind/netproxy"
-	"github.com/daeuniverse/softwind/pool"
+	"github.com/daeuniverse/outbound/netproxy"
+	"github.com/daeuniverse/outbound/pool"
 	concPool "github.com/sourcegraph/conc/pool"
 )
 
@@ -115,7 +115,9 @@ func (s *Forwarder) Serve() (err error) {
 				}
 				go func(lConn net.Conn) {
 					defer lConn.Close()
-					rConn, err := s.Dialer.Dial("tcp", s.RemoteAddr)
+					ctx, cancel := netproxy.NewDialTimeoutContext()
+					defer cancel()
+					rConn, err := s.Dialer.DialContext(ctx, "tcp", s.RemoteAddr)
 					if err != nil {
 						s.Logger.Info().
 							Err(err).
