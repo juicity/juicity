@@ -37,5 +37,5 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          install-mode: "goinstall"
+          install-mode: "binary"
           version: v1.54
