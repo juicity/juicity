@@ -44,7 +44,7 @@ jobs:
   build:
     needs: [pre-actions]
     if: ${{ github.event.pull_request.draft == false }}
-    uses: MarksonHon/juicity/.github/workflows/seed-build.yml@main
+    uses: juicity/juicity/.github/workflows/seed-build.yml@main
     with:
       ref: ${{ github.event.pull_request.head.sha }}
       pr_number: ${{ github.event.pull_request.number }}
