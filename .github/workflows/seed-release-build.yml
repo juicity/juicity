@@ -161,7 +161,7 @@ jobs:
           echo "$(shasum -a 512 $FILE)""  sha512" >> $FILE.dgst
 
       - name: Upload files to Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: juicity-${{ steps.get_filename.outputs.ASSET_NAME }}.zip
           path: ./*.zip*
