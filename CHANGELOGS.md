@@ -12,7 +12,8 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
-- [v0.4.3 (Latest)](#v043-latest)
+- [v0.5.0 (Latest)](#v050-latest)
+- [v0.4.3](#v043)
 - [v0.4.2](#v042)
 - [v0.4.1](#v041)
 - [v0.4.0](#v040)
@@ -25,7 +26,20 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
 
-### v0.4.3 (Latest)
+### v0.5.0 (Latest)
+
+> Release date: 2025/06/30
+
+#### Others
+
+- ci(release): draft release v0.4.3 in [#167](https://github.com/juicity/juicity/pull/167) by (@juicity-bot)
+- ci: update checkout and setup-go to latest in [#177](https://github.com/juicity/juicity/pull/177) by (@MarksonHon)
+- chore: update outbound in [#176](https://github.com/juicity/juicity/pull/176) by (@mzz2017)
+- ci: reset to use origin seed in [#178](https://github.com/juicity/juicity/pull/178) by (@MarksonHon)
+
+**Full Changelog**: https://github.com/juicity/juicity/compare/v0.4.3...v0.5.0
+
+### v0.4.3
 
 > Release date: 2024/05/14
 
