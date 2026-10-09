@@ -80,9 +80,9 @@ enum bit<8> Network {
 };
 
 enum bit<8> AddrType {
-    IPV4       = 0,
-    IPV6       = 1,
-    DOMAIN     = 2
+    IPV4       = 1,
+    IPV6       = 4,
+    DOMAIN     = 3
 };
 
 header domain_address_t {
@@ -104,6 +104,8 @@ header proxy_t {
     bit<16>   port;
 };
 ```
+
+地址类型 `2` 在内部用于命令消息（`MetadataTypeMsg`），不得用于地址。
 
 #### TCP
 

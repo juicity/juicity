@@ -10,12 +10,14 @@ import (
 	"github.com/daeuniverse/outbound/netproxy"
 	"github.com/daeuniverse/outbound/pool"
 	"github.com/juicity/juicity/common/consts"
+	"github.com/juicity/juicity/pkg/log"
 )
 
 type UdpHandler func(data []byte, from netip.AddrPort, metadata any) error
 
 type UdpEndpoint struct {
-	conn netproxy.PacketConn
+	conn   netproxy.PacketConn
+	logger *log.Logger
 	// mu protects deadlineTimer
 	mu            sync.Mutex
 	deadlineTimer *time.Timer
@@ -28,12 +30,18 @@ type UdpEndpoint struct {
 }
 
 func (ue *UdpEndpoint) start() {
-	buf := pool.GetFullCap(consts.EthernetMtu)
+	buf := pool.Get(consts.MaxUDPPayload + 1)
 	defer pool.Put(buf)
 	for {
 		n, from, err := ue.conn.ReadFrom(buf[:])
 		if err != nil {
 			break
+		}
+		if n > consts.MaxUDPPayload {
+			if ue.logger != nil {
+				ue.logger.Debug().Int("size", n).Msg("juicity dropped an oversized [udp] packet")
+			}
+			continue
 		}
 		ue.mu.Lock()
 		ue.deadlineTimer.Reset(ue.NatTimeout)
@@ -72,6 +80,7 @@ type UdpEndpointPool struct {
 	createMuMap sync.Map
 }
 type UdpEndpointOptions struct {
+	Logger     *log.Logger
 	Handler    UdpHandler
 	NatTimeout time.Duration
 	// GetTarget is useful only if the underlay does not support Full-cone.
@@ -92,6 +101,18 @@ func (p *UdpEndpointPool) Remove(lAddr netip.AddrPort, udpEndpoint *UdpEndpoint)
 		ue.(*UdpEndpoint).Close()
 	}
 	return nil
+}
+
+func (p *UdpEndpointPool) Get(lAddr netip.AddrPort) (*UdpEndpoint, bool) {
+	value, ok := p.pool.Load(lAddr)
+	if !ok {
+		return nil, false
+	}
+	ue := value.(*UdpEndpoint)
+	ue.mu.Lock()
+	ue.deadlineTimer.Reset(ue.NatTimeout)
+	ue.mu.Unlock()
+	return ue, true
 }
 
 func (p *UdpEndpointPool) GetOrCreate(lAddr netip.AddrPort, createOption *UdpEndpointOptions) (udpEndpoint *UdpEndpoint, isNew bool, err error) {
@@ -131,8 +152,9 @@ begin:
 			return nil, true, fmt.Errorf("protocol does not support udp")
 		}
 		ue := &UdpEndpoint{
-			conn: udpConn.(netproxy.PacketConn),
-			mu:   sync.Mutex{},
+			conn:   udpConn.(netproxy.PacketConn),
+			logger: createOption.Logger,
+			mu:     sync.Mutex{},
 			deadlineTimer: time.AfterFunc(createOption.NatTimeout, func() {
 				if ue, ok := p.pool.LoadAndDelete(lAddr); ok {
 					ue.(*UdpEndpoint).Close()
