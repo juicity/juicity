@@ -77,9 +77,9 @@ enum bit<8> Network {
 };
 
 enum bit<8> AddrType {
-    IPV4       = 0,
-    IPV6       = 1,
-    DOMAIN     = 2
+    IPV4       = 1,
+    IPV6       = 4,
+    DOMAIN     = 3
 };
 
 header domain_address_t {
@@ -101,6 +101,8 @@ header proxy_t {
     bit<16>   port;
 };
 ```
+
+Type `2` is used internally for command messages (`MetadataTypeMsg`) and must not be used for addresses.
 
 #### TCP
 
