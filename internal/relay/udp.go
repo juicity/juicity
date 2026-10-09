@@ -33,7 +33,7 @@ func (r *relay) RelayUDP(dst net.PacketConn, laddr net.Addr, src net.PacketConn,
 	}
 }
 
-func (r *relay) relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout time.Duration) (err error) {
+func (r *relay) relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout time.Duration, disableOutboundUdp443 bool) (err error) {
 	var n int
 	var addr netip.AddrPort
 	buf := pool.GetFullCap(consts.EthernetMtu)
@@ -44,10 +44,10 @@ func (r *relay) relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn,
 		if err != nil {
 			return
 		}
-		// Remove the log due to flood.
-		// r.logger.Debug().
-		// 	Str("target", addr.String()).
-		// 	Msg("juicity received a udp request")
+		if disableOutboundUdp443 && addr.Port() == 443 {
+			r.logger.Debug().Str("target", addr.String()).Msg("juicity blocked a [udp] frame")
+			continue
+		}
 		_ = dst.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 		_, err = dst.WriteTo(buf[:n], addr.String())
 		// WARNING: if the dst is an pre-connected conn, Write should be invoked here.
@@ -71,13 +71,21 @@ func (r *relay) SelectTimeout(packet []byte) time.Duration {
 	return consts.DnsQueryTimeout
 }
 
-// RelayUoT relays UDP traffict over TCP
-func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, bufLen int) (err error) {
+// RelayUoT relays UDP traffic over TCP.
+func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, bufLen int, disableOutboundUdp443 bool) (err error) {
 	eCh := make(chan error, 1)
 	go func() {
-		e := r.relayConnToUDP(rConn, lConn, consts.DefaultNatTimeout)
-		_ = rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
-		eCh <- e
+		var e error
+		defer func() {
+			if p := recover(); p != nil {
+				e = fmt.Errorf("UDP stream panic: %v", p)
+				r.logger.Error().Err(e).Send()
+				_ = lConn.Close()
+			}
+			_ = rConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+			eCh <- e
+		}()
+		e = r.relayConnToUDP(rConn, lConn, consts.DefaultNatTimeout, disableOutboundUdp443)
 	}()
 	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, bufLen)
 	_ = lConn.CloseWrite()

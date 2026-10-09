@@ -94,6 +94,18 @@ func (p *UdpEndpointPool) Remove(lAddr netip.AddrPort, udpEndpoint *UdpEndpoint)
 	return nil
 }
 
+func (p *UdpEndpointPool) Get(lAddr netip.AddrPort) (*UdpEndpoint, bool) {
+	value, ok := p.pool.Load(lAddr)
+	if !ok {
+		return nil, false
+	}
+	ue := value.(*UdpEndpoint)
+	ue.mu.Lock()
+	ue.deadlineTimer.Reset(ue.NatTimeout)
+	ue.mu.Unlock()
+	return ue, true
+}
+
 func (p *UdpEndpointPool) GetOrCreate(lAddr netip.AddrPort, createOption *UdpEndpointOptions) (udpEndpoint *UdpEndpoint, isNew bool, err error) {
 	_ue, ok := p.pool.Load(lAddr)
 begin:

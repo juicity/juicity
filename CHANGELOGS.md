@@ -12,6 +12,7 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 
 <!-- BEGIN NEW TOC ENTRY -->
 
+- [Unreleased](#unreleased)
 - [v0.5.0 (Latest)](#v050-latest)
 - [v0.4.3](#v043)
 - [v0.4.2](#v042)
@@ -25,6 +26,18 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - [v0.1.1](#v011)
 - [v0.1.0](#v010)
 <!-- BEGIN NEW CHANGELOGS -->
+
+### Unreleased
+
+#### Bug Fixes
+
+- Require successful authentication before proxying streams and bound authentication reads to the timeout.
+- Expire unused underlay credentials, including replacements for the same key.
+- Compare authentication tokens in constant time.
+- Limit underlay credential waits to 256 globally and 8 per source IP, without dropping traffic for live endpoints or authenticated first packets.
+- Skip blocked UDP/443 frames, including the first frame, and close outbound UDP sockets when stream handlers return.
+- Recover stream and underlay handler panics without terminating the server.
+- Authenticate and decrypt the first underlay packet before dialing, consuming its credential only after successful verification.
 
 ### v0.5.0 (Latest)
 

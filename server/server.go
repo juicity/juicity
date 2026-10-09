@@ -3,6 +3,7 @@ package server
 import (
 	"bufio"
 	"context"
+	"crypto/subtle"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -17,14 +18,11 @@ import (
 	"github.com/juicity/juicity/internal/relay"
 	"github.com/juicity/juicity/pkg/log"
 
-	"github.com/daeuniverse/outbound/ciphers"
 	"github.com/daeuniverse/outbound/dialer"
 	"github.com/daeuniverse/outbound/netproxy"
-	"github.com/daeuniverse/outbound/pkg/fastrand"
 	"github.com/daeuniverse/outbound/pool"
 	"github.com/daeuniverse/outbound/protocol/direct"
 	"github.com/daeuniverse/outbound/protocol/juicity"
-	"github.com/daeuniverse/outbound/protocol/shadowsocks"
 	"github.com/daeuniverse/outbound/protocol/tuic"
 	"github.com/daeuniverse/outbound/protocol/tuic/common"
 	"github.com/daeuniverse/quic-go"
@@ -38,6 +36,7 @@ const (
 )
 
 var (
+	authenticateTimeout     = AuthenticateTimeout
 	ErrUnexpectedVersion    = fmt.Errorf("unexpected version")
 	ErrUnexpectedCmdType    = fmt.Errorf("unexpected cmd type")
 	ErrAuthenticationFailed = fmt.Errorf("authentication failed")
@@ -156,6 +155,7 @@ func (s *Server) Serve(addr string) (err error) {
 		return err
 	}
 	go func() {
+		waiting := newUnderlayWaitBudget()
 		buf := pool.GetFullCap(consts.EthernetMtu)
 		defer buf.Put()
 		for {
@@ -166,16 +166,9 @@ func (s *Server) Serve(addr string) (err error) {
 					Send()
 				return
 			}
-			newBuf := pool.Get(n)
-			copy(newBuf, buf)
-			go func(transport *quic.Transport, buf pool.PB, ulAddr *net.UDPAddr) {
-				defer buf.Put()
-				if err := s.handleNonQuicPacket(transport, buf, ulAddr); err != nil {
-					s.logger.Info().
-						Err(err).
-						Send()
-				}
-			}(&transport, newBuf, addr.(*net.UDPAddr))
+			if err := s.dispatchNonQuicPacket(&transport, buf[:n], addr.(*net.UDPAddr), waiting); err != nil {
+				s.logger.Info().Err(err).Send()
+			}
 		}
 	}()
 	for {
@@ -197,88 +190,26 @@ func (s *Server) Serve(addr string) (err error) {
 	}
 }
 
-func (s *Server) handleNonQuicPacket(transport *quic.Transport, buf []byte, ulAddr *net.UDPAddr) (err error) {
-	if len(buf) < juicity.CipherConf.SaltLen {
-		return fmt.Errorf("insuffient [underlay] data: len %v", len(buf))
-	}
-	lAddr := ulAddr.AddrPort()
-	// source ip/port -> dst mapping.
-	endpoint, isNew, err := s.udpEndpointPool.GetOrCreate(lAddr, &UdpEndpointOptions{
-		Handler: func(data []byte, from netip.AddrPort, metadata any) error {
-			masterKey := metadata.([]byte)
-			salt := pool.Get(juicity.CipherConf.SaltLen)
-			defer salt.Put()
-			_, _ = fastrand.Read(salt)
-			salt[0] = 0
-			salt[1] = 0
-			buf, err := shadowsocks.EncryptUDPFromPool(&shadowsocks.Key{
-				CipherConf: juicity.CipherConf,
-				MasterKey:  masterKey,
-			}, data, salt, ciphers.JuicityReusedInfo)
-			if err != nil {
-				return err
-			}
-			defer buf.Put()
-			_, err = transport.WriteTo(buf, ulAddr)
-			return err
-		},
-		NatTimeout: 0,
-		GetDialOption: func() (*DialOption, error) {
-			iv := buf[:juicity.CipherConf.SaltLen]
-			auth := s.inFlightUnderlayKey.Evict(inFlightKey(iv))
-			if auth == nil {
-				return nil, fmt.Errorf("[underlay] auth fail")
-			}
-			if s.disableOutboundUdp443 && auth.Metadata.Port == 443 {
-				s.logger.Debug().
-					Str("target", net.JoinHostPort(auth.Metadata.Hostname, strconv.Itoa(int(auth.Metadata.Port)))).
-					Str("source", lAddr.String()).
-					Msg("juicity blocked an [underlay] request")
-				return nil, ErrDisabledTrafficType
-			}
-			return &DialOption{
-				Target:   net.JoinHostPort(auth.Metadata.Hostname, strconv.Itoa(int(auth.Metadata.Port))),
-				Dialer:   s.dialer,
-				Metadata: auth.Psk,
-			}, nil
-		},
-	})
-	if err != nil {
-		if errors.Is(err, ErrDisabledTrafficType) {
-			return nil
-		}
-		return err
-	}
-	if !isNew {
-		masterKey := endpoint.Metadata.([]byte)
-		decrypted, err := shadowsocks.DecryptUDPFromPool(&shadowsocks.Key{
-			CipherConf: juicity.CipherConf,
-			MasterKey:  masterKey,
-		}, buf, ciphers.JuicityReusedInfo)
-		if err != nil {
-			return err
-		}
-		defer decrypted.Put()
-		buf = decrypted
-	} else {
-		s.logger.Debug().
-			Str("target", endpoint.DialTarget).
-			Str("source", lAddr.String()).
-			Msg("juicity performed an [underlay] request")
-	}
-	if _, err = endpoint.WriteTo(buf, endpoint.DialTarget); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *Server) handleConn(conn quic.Connection) (err error) {
 	common.SetCongestionController(conn, s.congestionControl, s.cwnd)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	authCtx, authDone := context.WithTimeout(ctx, AuthenticateTimeout)
+	authCtx, authDone := context.WithTimeout(ctx, authenticateTimeout)
 	defer authDone()
+	authenticated := make(chan struct{})
+	failAuth := context.AfterFunc(authCtx, func() {
+		cancel()
+		_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
+	})
+	defer failAuth()
 	go func() {
+		defer func() {
+			if p := recover(); p != nil {
+				s.logger.Error().Interface("panic", p).Msg("authentication stream panic")
+				cancel()
+				_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
+			}
+		}()
 		var (
 			uniStream quic.ReceiveStream
 			err       error
@@ -291,6 +222,12 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 			_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
 			return
 		}
+		if !failAuth() || authCtx.Err() != nil {
+			cancel()
+			_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
+			return
+		}
+		close(authenticated)
 		authDone()
 		for {
 			select {
@@ -318,7 +255,14 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 			return err
 		}
 		go func(stream quic.Stream) {
-			if err = s.handleStream(ctx, authCtx, conn, stream); err != nil {
+			defer func() {
+				if p := recover(); p != nil {
+					s.logger.Error().Interface("panic", p).Msg("proxy stream panic")
+					stream.CancelRead(quic.StreamErrorCode(tuic.ProtocolError))
+					stream.CancelWrite(quic.StreamErrorCode(tuic.ProtocolError))
+				}
+			}()
+			if err := s.handleStream(ctx, authenticated, conn, stream); err != nil {
 				s.logger.Warn().
 					Err(err).
 					Send()
@@ -327,7 +271,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 	}
 }
 
-func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn quic.Connection, stream quic.Stream) error {
+func (s *Server) handleStream(ctx context.Context, authenticated <-chan struct{}, conn quic.Connection, stream quic.Stream) error {
 	lConn := juicity.NewConn(stream, nil, nil)
 	defer lConn.Close()
 	// Read the header and initiate the metadata
@@ -335,11 +279,13 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 	if err != nil {
 		return err
 	}
-	<-authCtx.Done()
 	select {
+	case <-authenticated:
 	case <-ctx.Done():
 		return ctx.Err()
-	default:
+	}
+	if err := ctx.Err(); err != nil {
+		return err
 	}
 	mdata := lConn.Metadata
 	source := conn.RemoteAddr().String()
@@ -376,20 +322,22 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			return fmt.Errorf("relay tcp error: %w", err)
 		}
 	case "udp":
-		if s.disableOutboundUdp443 && mdata.Port == 443 {
-			s.logger.Debug().
-				Str("target", net.JoinHostPort(mdata.Hostname, strconv.Itoa(int(mdata.Port)))).
-				Str("source", source).
-				Msg("juicity blocked a [udp] request")
-			return nil
-		}
+		var n int
+		var addr netip.AddrPort
 		lConn := &juicity.PacketConn{Conn: lConn}
 		buf := pool.GetFullCap(consts.EthernetMtu)
 		defer pool.Put(buf)
-		_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
-		n, addr, err := lConn.ReadFrom(buf)
-		if err != nil {
-			return fmt.Errorf("ReadFrom: %w", err)
+		for {
+			_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
+			n, addr, err = lConn.ReadFrom(buf)
+			if err != nil {
+				return fmt.Errorf("ReadFrom: %w", err)
+			}
+			if !s.disableOutboundUdp443 || addr.Port() != 443 {
+				break
+			}
+			s.logger.Debug().Str("target", addr.String()).Str("source", source).
+				Msg("juicity blocked a [udp] frame")
 		}
 
 		magicNetwork := netproxy.MagicNetwork{
@@ -410,6 +358,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			}
 			return fmt.Errorf("Dial: %w", err)
 		}
+		defer c.Close()
 		rConn := c.(netproxy.PacketConn)
 		_ = rConn.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 		_, err = rConn.WriteTo(buf[:n], addr.String())
@@ -425,6 +374,7 @@ func (s *Server) handleStream(ctx context.Context, authCtx context.Context, conn
 			rConn,
 			lConn,
 			len(buf),
+			s.disableOutboundUdp443,
 		); err != nil {
 			var netErr net.Error
 			if errors.Is(err, io.EOF) || (errors.As(err, &netErr) && netErr.Timeout()) || strings.HasSuffix(err.Error(), "with error code 0") {
@@ -442,6 +392,12 @@ func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (
 	uniStream, err = conn.AcceptUniStream(authCtx)
 	if err != nil {
 		return nil, nil, err
+	}
+	if deadline, ok := authCtx.Deadline(); ok {
+		if err := uniStream.SetReadDeadline(deadline); err != nil {
+			return nil, nil, err
+		}
+		defer uniStream.SetReadDeadline(time.Time{})
 	}
 	r := bufio.NewReader(uniStream)
 	v, err := r.Peek(1)
@@ -466,7 +422,7 @@ func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (
 				if err != nil {
 					return nil, nil, fmt.Errorf("GenToken: %w", err)
 				}
-				if token == authenticate.TOKEN {
+				if subtle.ConstantTimeCompare(token[:], authenticate.TOKEN[:]) == 1 {
 					return &authenticate.UUID, uniStream, nil
 				} else {
 					_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
