@@ -49,7 +49,7 @@ func TestRelayGoroutinePanicReturnsErrorAndClosesStream(t *testing.T) {
 	local := &juicity.PacketConn{Conn: juicity.NewConn(stream, &trojanc.Metadata{
 		Metadata: protocol.Metadata{IsClient: true}, Network: "udp",
 	}, nil)}
-	err := r.RelayUoT(&panicPeer{seen: stream.seen}, local, 1500, false)
+	err := r.RelayUoT(&panicPeer{seen: stream.seen}, local, false)
 	if err == nil || !strings.Contains(err.Error(), "UDP stream panic: injected parser panic") {
 		t.Fatalf("relay error = %v, want recovered parser panic", err)
 	}

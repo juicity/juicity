@@ -17,13 +17,17 @@ import (
 
 func (r *relay) RelayUDP(dst net.PacketConn, laddr net.Addr, src net.PacketConn, timeout time.Duration) (err error) {
 	var n int
-	buf := pool.GetFullCap(consts.EthernetMtu)
+	buf := pool.Get(consts.MaxUDPPayload + 1)
 	defer pool.Put(buf)
 	for {
 		_ = src.SetReadDeadline(time.Now().Add(timeout))
 		n, _, err = src.ReadFrom(buf)
 		if err != nil {
 			return
+		}
+		if n > consts.MaxUDPPayload {
+			r.logger.Debug().Int("size", n).Msg("juicity dropped an oversized [udp] packet")
+			continue
 		}
 		_ = dst.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 		_, err = dst.WriteTo(buf[:n], laddr)
@@ -36,7 +40,7 @@ func (r *relay) RelayUDP(dst net.PacketConn, laddr net.Addr, src net.PacketConn,
 func (r *relay) relayConnToUDP(dst netproxy.PacketConn, src *juicity.PacketConn, timeout time.Duration, disableOutboundUdp443 bool) (err error) {
 	var n int
 	var addr netip.AddrPort
-	buf := pool.GetFullCap(consts.EthernetMtu)
+	buf := pool.Get(consts.MaxUDPPayload)
 	defer pool.Put(buf)
 	for {
 		_ = src.SetReadDeadline(time.Now().Add(timeout))
@@ -72,7 +76,7 @@ func (r *relay) SelectTimeout(packet []byte) time.Duration {
 }
 
 // RelayUoT relays UDP traffic over TCP.
-func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, bufLen int, disableOutboundUdp443 bool) (err error) {
+func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, disableOutboundUdp443 bool) (err error) {
 	eCh := make(chan error, 1)
 	go func() {
 		var e error
@@ -87,7 +91,7 @@ func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, b
 		}()
 		e = r.relayConnToUDP(rConn, lConn, consts.DefaultNatTimeout, disableOutboundUdp443)
 	}()
-	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout, bufLen)
+	e := r.RelayUDPToConn(lConn, rConn, consts.DefaultNatTimeout)
 	_ = lConn.CloseWrite()
 	_ = lConn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	var netErr net.Error
@@ -105,16 +109,20 @@ func (r *relay) RelayUoT(rConn netproxy.PacketConn, lConn *juicity.PacketConn, b
 	return nil
 }
 
-func (r *relay) RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration, bufSize int) (err error) {
+func (r *relay) RelayUDPToConn(dst netproxy.FullConn, src netproxy.PacketConn, timeout time.Duration) (err error) {
 	var n int
 	var addr netip.AddrPort
-	buf := pool.GetFullCap(bufSize)
+	buf := pool.Get(consts.MaxUDPPayload + 1)
 	defer pool.Put(buf)
 	for {
 		_ = src.SetReadDeadline(time.Now().Add(timeout))
 		n, addr, err = src.ReadFrom(buf)
 		if err != nil {
 			return
+		}
+		if n > consts.MaxUDPPayload {
+			r.logger.Debug().Int("size", n).Msg("juicity dropped an oversized [udp] packet")
+			continue
 		}
 		_ = dst.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 		_, err = dst.WriteTo(buf[:n], addr.String())

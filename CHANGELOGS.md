@@ -38,6 +38,12 @@ curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.
 - Skip blocked UDP/443 frames, including the first frame, and close outbound UDP sockets when stream handlers return.
 - Recover stream and underlay handler panics without terminating the server.
 - Authenticate and decrypt the first underlay packet before dialing, consuming its credential only after successful verification.
+- Refresh TCP read deadlines on activity after a half-close instead of cutting off responses after ten seconds.
+- Preserve authentication read-ahead when parsing underlay credentials on the same stream.
+- Size UDP relay, underlay, and forwarder buffers for the 16-bit payload limit; drop oversized packets without closing associations.
+- Install congestion control from the QUIC connection's metrics callback to avoid racing ACK processing after Accept.
+- Skip congestion hooks when the connection context is missing and release the first UDP packet buffer before relaying.
+- Correct the address types in both protocol specifications to IPv4 `1`, IPv6 `4`, and domain `3`.
 
 ### v0.5.0 (Latest)
 

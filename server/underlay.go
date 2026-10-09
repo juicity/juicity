@@ -152,6 +152,7 @@ func (s *Server) handleUnderlayPayload(transport *quic.Transport, payload pool.P
 	defer payload.Put()
 	lAddr := ulAddr.AddrPort()
 	endpoint, isNew, err := s.udpEndpointPool.GetOrCreate(lAddr, &UdpEndpointOptions{
+		Logger: s.logger,
 		Handler: func(data []byte, from netip.AddrPort, metadata any) error {
 			salt := pool.Get(juicity.CipherConf.SaltLen)
 			defer salt.Put()

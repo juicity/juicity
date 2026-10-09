@@ -155,12 +155,16 @@ func (s *Forwarder) Serve() (err error) {
 					s.Close()
 				}
 			}()
-			buf := pool.GetFullCap(consts.EthernetMtu)
+			buf := pool.Get(consts.MaxUDPPayload + 1)
 			defer buf.Put()
 			for {
 				n, addr, err := s.udpListener.ReadFromUDPAddrPort(buf)
 				if err != nil {
 					return err
+				}
+				if n > consts.MaxUDPPayload {
+					s.Logger.Debug().Int("size", n).Msg("juicity dropped an oversized [udp] packet")
+					continue
 				}
 				select {
 				case <-ctx.Done():
@@ -172,6 +176,7 @@ func (s *Forwarder) Serve() (err error) {
 				go func(buf pool.PB, lAddr netip.AddrPort) {
 					defer buf.Put()
 					endpoint, isNew, err := s.udpEndpointPool.GetOrCreate(lAddr, &UdpEndpointOptions{
+						Logger: s.Logger,
 						Handler: func(data []byte, from netip.AddrPort, metadata any) error {
 							_, err := s.udpListener.WriteToUDPAddrPort(data, lAddr)
 							return err

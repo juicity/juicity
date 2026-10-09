@@ -137,7 +137,8 @@ func (s *Server) Serve(addr string) (err error) {
 		return err
 	}
 	transport := quic.Transport{
-		Conn: pktConn,
+		Conn:        pktConn,
+		ConnContext: s.connContext,
 	}
 	listener, err := transport.Listen(s.tlsConfig, &quic.Config{
 		InitialStreamReceiveWindow:     common.InitialStreamReceiveWindow,
@@ -150,13 +151,14 @@ func (s *Server) Serve(addr string) (err error) {
 		DisablePathMTUDiscovery:        false,
 		EnableDatagrams:                false,
 		CapabilityCallback:             nil,
+		Tracer:                         s.congestionTracer,
 	})
 	if err != nil {
 		return err
 	}
 	go func() {
 		waiting := newUnderlayWaitBudget()
-		buf := pool.GetFullCap(consts.EthernetMtu)
+		buf := pool.Get(consts.MaxUDPPayload + 1)
 		defer buf.Put()
 		for {
 			n, addr, err := transport.ReadNonQUICPacket(context.Background(), buf)
@@ -165,6 +167,10 @@ func (s *Server) Serve(addr string) (err error) {
 					Err(err).
 					Send()
 				return
+			}
+			if n > consts.MaxUDPPayload {
+				s.logger.Debug().Int("size", n).Msg("juicity dropped an oversized [underlay] packet")
+				continue
 			}
 			if err := s.dispatchNonQuicPacket(&transport, buf[:n], addr.(*net.UDPAddr), waiting); err != nil {
 				s.logger.Info().Err(err).Send()
@@ -191,7 +197,9 @@ func (s *Server) Serve(addr string) (err error) {
 }
 
 func (s *Server) handleConn(conn quic.Connection) (err error) {
-	common.SetCongestionController(conn, s.congestionControl, s.cwnd)
+	if pending, ok := conn.Context().Value(congestionContextKey{}).(*congestionConnection); ok && pending != nil {
+		pending.conn.Store(&conn)
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	authCtx, authDone := context.WithTimeout(ctx, authenticateTimeout)
@@ -211,7 +219,7 @@ func (s *Server) handleConn(conn quic.Connection) (err error) {
 			}
 		}()
 		var (
-			uniStream quic.ReceiveStream
+			uniStream io.Reader
 			err       error
 		)
 		if _, uniStream, err = s.handleConnAuth(authCtx, conn); err != nil {
@@ -325,8 +333,12 @@ func (s *Server) handleStream(ctx context.Context, authenticated <-chan struct{}
 		var n int
 		var addr netip.AddrPort
 		lConn := &juicity.PacketConn{Conn: lConn}
-		buf := pool.GetFullCap(consts.EthernetMtu)
-		defer pool.Put(buf)
+		buf := pool.Get(consts.MaxUDPPayload)
+		defer func() {
+			if buf != nil {
+				pool.Put(buf)
+			}
+		}()
 		for {
 			_ = lConn.SetReadDeadline(time.Now().Add(consts.DefaultNatTimeout))
 			n, addr, err = lConn.ReadFrom(buf)
@@ -362,6 +374,8 @@ func (s *Server) handleStream(ctx context.Context, authenticated <-chan struct{}
 		rConn := c.(netproxy.PacketConn)
 		_ = rConn.SetWriteDeadline(time.Now().Add(consts.DefaultNatTimeout)) // should keep consistent
 		_, err = rConn.WriteTo(buf[:n], addr.String())
+		pool.Put(buf)
+		buf = nil
 		if err != nil {
 			if errors.Is(err, net.ErrWriteToConnected) {
 				s.logger.Warn().
@@ -373,7 +387,6 @@ func (s *Server) handleStream(ctx context.Context, authenticated <-chan struct{}
 		if err = s.relay.RelayUoT(
 			rConn,
 			lConn,
-			len(buf),
 			s.disableOutboundUdp443,
 		); err != nil {
 			var netErr net.Error
@@ -388,8 +401,8 @@ func (s *Server) handleStream(ctx context.Context, authenticated <-chan struct{}
 	return nil
 }
 
-func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (uuid *uuid.UUID, uniStream quic.ReceiveStream, err error) {
-	uniStream, err = conn.AcceptUniStream(authCtx)
+func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (uuid *uuid.UUID, reader io.Reader, err error) {
+	uniStream, err := conn.AcceptUniStream(authCtx)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -423,7 +436,7 @@ func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (
 					return nil, nil, fmt.Errorf("GenToken: %w", err)
 				}
 				if subtle.ConstantTimeCompare(token[:], authenticate.TOKEN[:]) == 1 {
-					return &authenticate.UUID, uniStream, nil
+					return &authenticate.UUID, r, nil
 				} else {
 					_ = conn.CloseWithError(tuic.AuthenticationFailed, "")
 				}
@@ -436,7 +449,7 @@ func (s *Server) handleConnAuth(authCtx context.Context, conn quic.Connection) (
 		return nil, nil, fmt.Errorf("%w: %v", ErrUnexpectedVersion, v)
 	}
 }
-func (s *Server) handleUnderlayAuth(ctx context.Context, uniStream quic.ReceiveStream) (err error) {
+func (s *Server) handleUnderlayAuth(ctx context.Context, uniStream io.Reader) (err error) {
 	// Read an auth from the connection.
 	var auth juicity.UnderlayAuth
 	if _, err = auth.Unpack(uniStream); err != nil {

@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"math/big"
+	"net"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -47,10 +48,16 @@ func testQUICConnection(t *testing.T, s *Server) quic.Connection {
 	if err != nil {
 		t.Fatal(err)
 	}
-	listener, err := quic.ListenAddr("127.0.0.1:0", &tls.Config{
+	socket, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	transport := &quic.Transport{Conn: socket, ConnContext: s.connContext}
+	t.Cleanup(func() { _ = transport.Close(); _ = socket.Close() })
+	listener, err := transport.Listen(&tls.Config{
 		Certificates: []tls.Certificate{{Certificate: [][]byte{der}, PrivateKey: priv}},
 		NextProtos:   []string{"h3"},
-	}, nil)
+	}, &quic.Config{Tracer: s.congestionTracer})
 	if err != nil {
 		t.Fatal(err)
 	}
